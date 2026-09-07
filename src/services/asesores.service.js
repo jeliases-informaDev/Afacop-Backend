@@ -129,7 +129,7 @@ function mapearAsesor(asesor) {
   return {
     id_asesor: asesor.id_asesor,
     id: asesor.id_asesor,
-    dni: asesor.dni,
+    dni: asesor.numero_documento,
     nombres: asesor.nombres,
     apellidos,
     apellido_paterno: asesor.apellido_paterno,
@@ -252,7 +252,7 @@ async function obtenerAsesorPorDni(dni) {
  * Crea un nuevo asesor.
  * 
  * @param {Object} datos
- * @param {string} datos.dni
+ * @param {string} datos.numero_documento
  * @param {string} datos.nombres
  * @param {string} datos.apellido_paterno
  * @param {string} datos.apellido_materno
@@ -263,7 +263,7 @@ async function obtenerAsesorPorDni(dni) {
 async function crearAsesor(datos) {
   const nuevoAsesor = await prisma.asesor.create({
     data: {
-      dni: datos.dni,
+      dni: datos.numero_documento,
       nombres: datos.nombres,
       apellido_paterno: datos.apellido_paterno,
       apellido_materno: datos.apellido_materno,
@@ -290,7 +290,7 @@ async function crearAsesor(datos) {
  */
 async function actualizarAsesor(id, datos) {
   const updateData = {};
-  if (datos.dni !== undefined) updateData.dni = datos.dni;
+  if (datos.numero_documento !== undefined) updateData.numero_documento = datos.numero_documento;
   if (datos.nombres !== undefined) updateData.nombres = datos.nombres;
   if (datos.apellido_paterno !== undefined) updateData.apellido_paterno = datos.apellido_paterno;
   if (datos.apellido_materno !== undefined) updateData.apellido_materno = datos.apellido_materno;
@@ -510,7 +510,7 @@ async function importarAsesores(fileBuffer) {
     }
 
     // Mapeo flexible de atributos de asesores
-    const rawDni = rowObj.dni ?? rowObj.documento ?? rowObj.doc_identidad ?? rowObj.num_doc ?? rowObj.codigo;
+    const rawDni = rowObj.numero_documento ?? rowObj.documento ?? rowObj.doc_identidad ?? rowObj.num_doc ?? rowObj.codigo;
     const rawNombres = rowObj.nombres ?? rowObj.nombre ?? rowObj.colaborador ?? rowObj.asesor ?? rowObj.nombre_completo;
     const rawApPaterno = rowObj.apellido_paterno ?? rowObj.paterno ?? rowObj.ap_paterno;
     const rawApMaterno = rowObj.apellido_materno ?? rowObj.materno ?? rowObj.ap_materno;

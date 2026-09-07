@@ -199,7 +199,7 @@ async function obtenerPuntosMapa({ estado, fecha_pago, zoom = 6, west, east, sou
     ))
     : clientesOperativos;
   const individualPoint = c => ({
-    cluster: false, id: c.id_cliente, dni: c.dni, nombres: c.nombres,
+    cluster: false, id: c.id_cliente, dni: c.numero_documento, nombres: c.nombres,
     apellidos: `${c.apellido_paterno || ''} ${c.apellido_materno || ''}`.trim(),
     direccion: c.direccion, distrito: c.distrito, estado: c.estado,
     deuda_total: Number(c.deuda_castigada || 0) + Number(c.deuda_vigente || 0) + Number(c.otras_deudas || 0),
@@ -495,7 +495,7 @@ async function importarClientes(fileBuffer) {
     }
 
     // Mapeo flexible de atributos (prioriza SBS, cae en formato interno)
-    const rawDni = rowObj.documento ?? rowObj.dni ?? rowObj.doc_identidad ?? rowObj.num_doc;
+    const rawDni = rowObj.documento ?? rowObj.numero_documento ?? rowObj.doc_identidad ?? rowObj.num_doc;
     const rawNombres = rowObj.nombres ?? rowObj.nombre_completo ?? rowObj.cliente;
     const rawApPaterno = rowObj.apellido_paterno ?? rowObj.paterno ?? rowObj.ap_paterno;
     const rawApMaterno = rowObj.apellido_materno ?? rowObj.materno ?? rowObj.ap_materno;

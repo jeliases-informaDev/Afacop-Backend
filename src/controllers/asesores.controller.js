@@ -115,10 +115,10 @@ async function crearAsesor(req, res) {
     }
 
     // 1. Validar presencia y formato de DNI
-    if (!datos.dni || !String(datos.dni).trim()) {
+    if (!datos.numero_documento || !String(datos.numero_documento).trim()) {
       return res.status(400).json({ mensaje: "El DNI es obligatorio" });
     }
-    const dniStr = String(datos.dni).trim();
+    const dniStr = String(datos.numero_documento).trim();
     if (!DNI_REGEX.test(dniStr)) {
       return res.status(400).json({ mensaje: "El DNI debe tener exactamente 8 dígitos numéricos" });
     }
@@ -232,8 +232,8 @@ async function actualizarAsesor(req, res) {
     }
 
     // 3. Validaciones condicionales para campos presentes en el body
-    if (datos.dni !== undefined) {
-      const dniStr = String(datos.dni).trim();
+    if (datos.numero_documento !== undefined) {
+      const dniStr = String(datos.numero_documento).trim();
       if (!dniStr) {
         return res.status(400).json({ mensaje: "El DNI no puede ser vacío" });
       }
@@ -245,7 +245,7 @@ async function actualizarAsesor(req, res) {
       if (dniDuplicado && dniDuplicado.id_asesor !== parsedId) {
         return res.status(400).json({ mensaje: "El DNI ya pertenece a otro asesor" });
       }
-      datos.dni = dniStr;
+      datos.numero_documento = dniStr;
     }
 
     if (datos.nombres !== undefined) {

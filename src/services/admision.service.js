@@ -54,7 +54,7 @@ async function obtenerAdmisiones({ page = 1, limit = 12, search = "", estado } =
 
     return {
       id: admision.id_admision,
-      dni: cliente.dni || "",
+      dni: cliente.numero_documento || "",
       ape_pat: cliente.apellido_paterno || "",
       ape_mat: cliente.apellido_materno || "",
       nombres: cliente.nombres || "",

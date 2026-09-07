@@ -40,7 +40,7 @@ function mapearAsesorResumido(asesor) {
   const apellidos = `${asesor.apellido_paterno ?? ""} ${asesor.apellido_materno ?? ""}`.trim();
   return {
     id: asesor.id_asesor,
-    dni: asesor.dni,
+    dni: asesor.numero_documento,
     nombres: asesor.nombres,
     apellidos,
   };
@@ -294,13 +294,13 @@ async function obtenerAsignaciones({ page = 1, limit = 12 } = {}) {
       estado: a.estado,
       cliente: {
         id: a.cliente.id_cliente,
-        dni: a.cliente.dni,
+        dni: a.cliente.numero_documento,
         nombres: a.cliente.nombres,
         apellidos: apellidosCliente,
       },
       asesor: {
         id: a.asesor.id_asesor,
-        dni: a.asesor.dni,
+        dni: a.asesor.numero_documento,
         nombres: a.asesor.nombres,
         apellidos: apellidosAsesor,
       },

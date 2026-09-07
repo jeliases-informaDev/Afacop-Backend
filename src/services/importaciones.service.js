@@ -140,7 +140,7 @@ function admissionRecord(row) {
   ]), 150) || null;
   const dni = text(pick(row, ['dni', 'documento', 'doc_identidad', 'num_doc']), 20);
   const sampleProducts = ['Pr\u00e9stamo Vehicular', 'Pr\u00e9stamo MYPE', 'Pr\u00e9stamo Personal'];
-  const sampleIndex = [...dni].reduce((total, char) => total + char.charCodeAt(0), 0) % sampleProducts.length;
+  const sampleIndex = [...numero_documento].reduce((total, char) => total + char.charCodeAt(0), 0) % sampleProducts.length;
   const producto = importedProduct || sampleProducts[sampleIndex];
   const rawLine = pick(row, [
     'linea_credito', 'linea_de_credito', 'linea', 'monto_linea', 'monto_aprobado', 'linea_aprobada',
@@ -280,12 +280,12 @@ async function processJob(id) {
       if (!batch.length) return;
       if (job.tipo === 'CLIENTES') {
         const originalSize = batch.length;
-        batch = [...new Map(batch.map(item => [item.dni, item])).values()];
+        batch = [...new Map(batch.map(item => [item.numero_documento, item])).values()];
         omitted += originalSize - batch.length;
-        const existing = await prisma.cliente.count({ where: { dni: { in: batch.map(item => item.dni) } } });
+        const existing = await prisma.cliente.count({ where: { dni: { in: batch.map(item => item.numero_documento) } } });
         const affected = await prisma.$executeRaw`
           INSERT INTO "clientes" ("dni", "nombres", "apellido_paterno", "apellido_materno", "telefono", "direccion", "distrito", "estado", "deuda_castigada", "deuda_vigente", "otras_deudas", "ultima_gestion", "latitud", "longitud")
-          SELECT x.dni, x.nombres, x.apellido_paterno, x.apellido_materno, x.telefono, x.direccion, x.distrito, x.estado,
+          SELECT x.numero_documento, x.nombres, x.apellido_paterno, x.apellido_materno, x.telefono, x.direccion, x.distrito, x.estado,
                  x.deuda_castigada, x.deuda_vigente, x.otras_deudas, x.ultima_gestion, x.latitud, x.longitud
           FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb) AS x(
             dni text, nombres text, apellido_paterno text, apellido_materno text, telefono text, direccion text,
@@ -302,26 +302,26 @@ async function processJob(id) {
         `;
         updated += existing;
         inserted += Number(affected) - existing;
-        const admissions = batch.map(item => ({ dni: item.dni, ...item._admision }));
+        const admissions = batch.map(item => ({ dni: item.numero_documento, ...item._admision }));
         await prisma.$executeRaw`
           INSERT INTO "admisiones" ("id_cliente", "producto", "linea_credito", "estado", "fecha")
           SELECT c."id_cliente", x.producto, x.linea_credito, x.estado, x.fecha
           FROM jsonb_to_recordset(${JSON.stringify(admissions)}::jsonb) AS x(
             dni text, producto text, linea_credito numeric, estado text, fecha timestamp
           )
-          INNER JOIN "clientes" c ON c."dni" = x.dni
+          INNER JOIN "clientes" c ON c."dni" = x.numero_documento
           ON CONFLICT ("id_cliente") DO UPDATE SET
             "producto" = EXCLUDED."producto", "linea_credito" = EXCLUDED."linea_credito",
             "estado" = EXCLUDED."estado", "fecha" = EXCLUDED."fecha"
         `;
       } else {
         const originalSize = batch.length;
-        batch = [...new Map(batch.map(item => [item.dni, item])).values()];
+        batch = [...new Map(batch.map(item => [item.numero_documento, item])).values()];
         omitted += originalSize - batch.length;
-        const existing = await prisma.asesor.count({ where: { dni: { in: batch.map(item => item.dni) } } });
+        const existing = await prisma.asesor.count({ where: { dni: { in: batch.map(item => item.numero_documento) } } });
         const affected = await prisma.$executeRaw`
           INSERT INTO "asesores" ("dni", "nombres", "apellido_paterno", "apellido_materno", "telefono", "correo", "distrito", "estado", "latitud", "longitud", "fecha_actualizar")
-          SELECT x.dni, x.nombres, x.apellido_paterno, x.apellido_materno, x.telefono, x.correo,
+          SELECT x.numero_documento, x.nombres, x.apellido_paterno, x.apellido_materno, x.telefono, x.correo,
                  x.distrito, x.estado, x.latitud, x.longitud, CURRENT_TIMESTAMP
           FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb) AS x(
             dni text, nombres text, apellido_paterno text, apellido_materno text, telefono text,
