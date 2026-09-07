@@ -14,10 +14,8 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  */
 async function obtenerAsesores(req, res) {
   try {
-    // 1. Leer query parameters
     const { page, limit, search, estado } = req.query;
 
-    // 2. Validar y normalizar parámetros de paginación
     let parsedPage = parseInt(page, 10);
     if (isNaN(parsedPage) || parsedPage < 1) {
       parsedPage = 1;
@@ -32,13 +30,11 @@ async function obtenerAsesores(req, res) {
 
     const searchStr = search ? String(search) : "";
 
-    // Normalizar estado si viene en el query
     let estadoNorm = undefined;
     if (estado && String(estado).trim() !== "") {
       estadoNorm = String(estado).trim().toUpperCase();
     }
 
-    // 3. Llamar al servicio
     const resultado = await asesoresService.obtenerAsesores({
       page: parsedPage,
       limit: parsedLimit,
@@ -46,7 +42,6 @@ async function obtenerAsesores(req, res) {
       estado: estadoNorm,
     });
 
-    // 4. Responder directamente con res.json(resultado)
     return res.status(200).json(resultado);
   } catch (error) {
     console.error("Error en obtenerAsesores:", error);
@@ -68,7 +63,6 @@ async function obtenerAsesorPorId(req, res) {
   try {
     const { id } = req.params;
 
-    // 1. Validar que el parámetro id sea un número entero positivo
     const parsedId = Number(id);
     if (isNaN(parsedId) || !Number.isInteger(parsedId) || parsedId <= 0) {
       return res.status(400).json({
@@ -76,17 +70,14 @@ async function obtenerAsesorPorId(req, res) {
       });
     }
 
-    // 2. Llamar al servicio
     const resultado = await asesoresService.obtenerAsesorPorId(parsedId);
 
-    // 3. Si el asesor no existe, responder HTTP 404
     if (!resultado) {
       return res.status(404).json({
         mensaje: "Asesor no encontrado",
       });
     }
 
-    // 4. Responder directamente con res.json(resultado)
     return res.status(200).json(resultado);
   } catch (error) {
     console.error("Error en obtenerAsesorPorId:", error);
@@ -106,15 +97,12 @@ async function obtenerAsesorPorId(req, res) {
  */
 async function crearAsesor(req, res) {
   try {
-    // Trabajar sobre una copia del objeto para no mutar req.body
     const datos = { ...req.body };
 
-    // Normalizar email a correo
     if (datos.email !== undefined && datos.correo === undefined) {
       datos.correo = datos.email;
     }
 
-    // 1. Validar presencia y formato de DNI
     if (!datos.numero_documento || !String(datos.numero_documento).trim()) {
       return res.status(400).json({ mensaje: "El DNI es obligatorio" });
     }
@@ -123,7 +111,6 @@ async function crearAsesor(req, res) {
       return res.status(400).json({ mensaje: "El DNI debe tener exactamente 8 dígitos numéricos" });
     }
 
-    // 2. Validar nombres y apellidos obligatorios
     if (!datos.nombres || !String(datos.nombres).trim()) {
       return res.status(400).json({ mensaje: "Los nombres son obligatorios" });
     }
@@ -134,7 +121,6 @@ async function crearAsesor(req, res) {
       return res.status(400).json({ mensaje: "El apellido materno es obligatorio" });
     }
 
-    // 3. Validar formato del correo si está presente
     if (datos.correo && String(datos.correo).trim() !== "") {
       const correoStr = String(datos.correo).trim();
       if (!EMAIL_REGEX.test(correoStr)) {
@@ -145,13 +131,11 @@ async function crearAsesor(req, res) {
       datos.correo = null;
     }
 
-    // 4. Validar unicidad del DNI
     const dniDuplicado = await asesoresService.obtenerAsesorPorDni(dniStr);
     if (dniDuplicado) {
       return res.status(400).json({ mensaje: "El DNI ya se encuentra registrado" });
     }
 
-    // Validar latitud y longitud opcionales
     if (datos.latitud !== undefined && datos.latitud !== null && datos.latitud !== "") {
       const lat = Number(datos.latitud);
       if (isNaN(lat) || lat < -90 || lat > 90) {
@@ -172,9 +156,8 @@ async function crearAsesor(req, res) {
       datos.longitud = null;
     }
 
-    // 5. Crear el asesor
     const resultado = await asesoresService.crearAsesor({
-      dni: dniStr,
+      numero_documento: dniStr,
       nombres: String(datos.nombres).trim(),
       apellido_paterno: String(datos.apellido_paterno).trim(),
       apellido_materno: String(datos.apellido_materno).trim(),
@@ -185,7 +168,6 @@ async function crearAsesor(req, res) {
       longitud: datos.longitud,
     });
 
-    // 6. Responder con el registro creado (HTTP 201)
     return res.status(201).json(resultado);
   } catch (error) {
     console.error("Error en crearAsesor:", error);
@@ -207,15 +189,12 @@ async function actualizarAsesor(req, res) {
   try {
     const { id } = req.params;
     
-    // Trabajar sobre una copia del objeto para no mutar req.body
     const datos = { ...req.body };
 
-    // Normalizar email a correo
     if (datos.email !== undefined && datos.correo === undefined) {
       datos.correo = datos.email;
     }
 
-    // 1. Validar ID en parámetro
     const parsedId = Number(id);
     if (isNaN(parsedId) || !Number.isInteger(parsedId) || parsedId <= 0) {
       return res.status(400).json({
@@ -223,7 +202,6 @@ async function actualizarAsesor(req, res) {
       });
     }
 
-    // 2. Verificar existencia del asesor
     const asesorExistente = await asesoresService.obtenerAsesorPorId(parsedId);
     if (!asesorExistente) {
       return res.status(404).json({
@@ -231,7 +209,6 @@ async function actualizarAsesor(req, res) {
       });
     }
 
-    // 3. Validaciones condicionales para campos presentes en el body
     if (datos.numero_documento !== undefined) {
       const dniStr = String(datos.numero_documento).trim();
       if (!dniStr) {
@@ -240,7 +217,6 @@ async function actualizarAsesor(req, res) {
       if (!DNI_REGEX.test(dniStr)) {
         return res.status(400).json({ mensaje: "El DNI debe tener exactamente 8 dígitos numéricos" });
       }
-      // Verificar si el DNI pertenece a otro asesor
       const dniDuplicado = await asesoresService.obtenerAsesorPorDni(dniStr);
       if (dniDuplicado && dniDuplicado.id_asesor !== parsedId) {
         return res.status(400).json({ mensaje: "El DNI ya pertenece a otro asesor" });
@@ -316,10 +292,8 @@ async function actualizarAsesor(req, res) {
       }
     }
 
-    // 4. Ejecutar actualización
     const resultado = await asesoresService.actualizarAsesor(parsedId, datos);
 
-    // 5. Responder
     return res.status(200).json(resultado);
   } catch (error) {
     console.error("Error en actualizarAsesor:", error);
@@ -342,7 +316,6 @@ async function actualizarEstado(req, res) {
     const { id } = req.params;
     const { estado } = req.body;
 
-    // 1. Validar ID en parámetro
     const parsedId = Number(id);
     if (isNaN(parsedId) || !Number.isInteger(parsedId) || parsedId <= 0) {
       return res.status(400).json({
@@ -350,14 +323,12 @@ async function actualizarEstado(req, res) {
       });
     }
 
-    // 2. Validar que el nuevo estado sea válido
     if (!estado || String(estado).trim() === "") {
       return res.status(400).json({
         mensaje: "El estado es requerido",
       });
     }
 
-    // Normalizar estado
     const estadoNorm = String(estado).trim().toUpperCase();
     if (!["ACTIVO", "INACTIVO"].includes(estadoNorm)) {
       return res.status(400).json({
@@ -365,7 +336,6 @@ async function actualizarEstado(req, res) {
       });
     }
 
-    // 3. Verificar existencia del asesor
     const asesorExistente = await asesoresService.obtenerAsesorPorId(parsedId);
     if (!asesorExistente) {
       return res.status(404).json({
@@ -373,10 +343,8 @@ async function actualizarEstado(req, res) {
       });
     }
 
-    // 4. Actualizar estado
     const resultado = await asesoresService.actualizarEstado(parsedId, estadoNorm);
 
-    // 5. Responder
     return res.status(200).json(resultado);
   } catch (error) {
     console.error("Error en actualizarEstado:", error);
@@ -398,7 +366,6 @@ async function eliminarAsesor(req, res) {
   try {
     const { id } = req.params;
 
-    // 1. Validar ID en parámetro
     const parsedId = Number(id);
     if (isNaN(parsedId) || !Number.isInteger(parsedId) || parsedId <= 0) {
       return res.status(400).json({
@@ -406,7 +373,6 @@ async function eliminarAsesor(req, res) {
       });
     }
 
-    // 2. Verificar existencia del asesor
     const asesorExistente = await asesoresService.obtenerAsesorPorId(parsedId);
     if (!asesorExistente) {
       return res.status(404).json({
@@ -414,10 +380,8 @@ async function eliminarAsesor(req, res) {
       });
     }
 
-    // 3. Aplicar baja lógica para conservar trazabilidad financiera
     const resultado = await asesoresService.eliminarAsesor(parsedId);
 
-    // 4. Responder
     return res.status(200).json({
       mensaje: "Asesor inactivado correctamente; su historial se mantiene disponible",
       ...resultado,
@@ -440,17 +404,14 @@ async function eliminarAsesor(req, res) {
  */
 async function importarAsesores(req, res) {
   try {
-    // 1. Validar que se haya subido un archivo
     if (!req.file) {
       return res.status(400).json({
         mensaje: "No se ha proporcionado ningún archivo o formato no es válido",
       });
     }
 
-    // 2. Invocar al servicio
     const resultado = await asesoresService.importarAsesores(req.file.buffer);
 
-    // 3. Retornar el resumen de importación
     return res.status(200).json(resultado);
   } catch (error) {
     console.error("Error en importarAsesores:", error);

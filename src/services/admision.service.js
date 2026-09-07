@@ -18,7 +18,7 @@ async function obtenerAdmisiones({ page = 1, limit = 12, search = "", estado } =
     where.cliente = {
       is: {
         OR: [
-          { dni: { contains: trimmedSearch, mode: "insensitive" } },
+          { numero_documento: { contains: trimmedSearch, mode: "insensitive" } },
           { nombres: { contains: trimmedSearch, mode: "insensitive" } },
           { apellido_paterno: { contains: trimmedSearch, mode: "insensitive" } },
           { apellido_materno: { contains: trimmedSearch, mode: "insensitive" } },

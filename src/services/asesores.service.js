@@ -113,12 +113,6 @@ async function geocodificarEnlace(sharedUrl) {
   return geocodificarUbicacion(coords.latitud, coords.longitud);
 }
 
-/**
- * Mapea un registro de asesor de base de datos al formato requerido por la API.
- * 
- * @param {Object} asesor - Registro de asesor de Prisma.
- * @returns {Object|null} Asesor mapeado o null.
- */
 function mapearAsesor(asesor) {
   if (!asesor) return null;
   
@@ -136,7 +130,7 @@ function mapearAsesor(asesor) {
     apellido_materno: asesor.apellido_materno,
     telefono: asesor.telefono,
     correo: asesor.correo,
-    email: asesor.correo, // Duplicado para compatibilidad
+    email: asesor.correo,
     distrito: asesor.distrito,
     estado: asesor.estado,
     ruta_activa: rutaActiva,
@@ -146,23 +140,13 @@ function mapearAsesor(asesor) {
   };
 }
 
-/**
- * Obtiene la lista de asesores con paginación, filtros y formato exacto.
- * 
- * @param {Object} params
- * @param {number} params.page
- * @param {number} params.limit
- * @param {string} [params.search]
- * @param {string} [params.estado]
- * @returns {Promise<Object>} Resultado con data paginada y objeto pagination.
- */
 async function obtenerAsesores({ page = 1, limit = 12, search = "", estado } = {}) {
   const where = {};
 
   if (search && search.trim() !== "") {
     const trimmedSearch = search.trim();
     where.OR = [
-      { dni: { contains: trimmedSearch, mode: "insensitive" } },
+      { numero_documento: { contains: trimmedSearch, mode: "insensitive" } },
       { nombres: { contains: trimmedSearch, mode: "insensitive" } },
       { apellido_paterno: { contains: trimmedSearch, mode: "insensitive" } },
       { apellido_materno: { contains: trimmedSearch, mode: "insensitive" } },
@@ -170,7 +154,6 @@ async function obtenerAsesores({ page = 1, limit = 12, search = "", estado } = {
     ];
   }
 
-  // Normalizar el estado antes de pasarlo a Prisma
   if (estado && estado.trim() !== "") {
     where.estado = estado.trim().toUpperCase();
   }
@@ -211,12 +194,6 @@ async function obtenerAsesores({ page = 1, limit = 12, search = "", estado } = {
   };
 }
 
-/**
- * Obtiene un asesor por su id_asesor.
- * 
- * @param {number} id - El ID del asesor a buscar.
- * @returns {Promise<Object|null>} Objeto con la propiedad data conteniendo el asesor transformado, o null si no se encuentra.
- */
 async function obtenerAsesorPorId(id) {
   const asesor = await prisma.asesor.findUnique({
     where: {
@@ -233,37 +210,18 @@ async function obtenerAsesorPorId(id) {
   };
 }
 
-/**
- * Obtiene un asesor por su DNI.
- * 
- * @param {string} dni - El DNI del asesor a buscar.
- * @returns {Promise<Object|null>} Registro del asesor o null.
- */
 async function obtenerAsesorPorDni(dni) {
-  // Confirmado: el campo "dni" mantiene la restricción @unique en schema.prisma, por lo que findUnique es idóneo.
   return prisma.asesor.findUnique({
     where: {
-      dni,
+      numero_documento: dni,
     },
   });
 }
 
-/**
- * Crea un nuevo asesor.
- * 
- * @param {Object} datos
- * @param {string} datos.numero_documento
- * @param {string} datos.nombres
- * @param {string} datos.apellido_paterno
- * @param {string} datos.apellido_materno
- * @param {string} [datos.telefono]
- * @param {string} [datos.correo]
- * @returns {Promise<Object>} Asesor creado.
- */
 async function crearAsesor(datos) {
   const nuevoAsesor = await prisma.asesor.create({
     data: {
-      dni: datos.numero_documento,
+      numero_documento: datos.numero_documento,
       nombres: datos.nombres,
       apellido_paterno: datos.apellido_paterno,
       apellido_materno: datos.apellido_materno,
@@ -281,13 +239,6 @@ async function crearAsesor(datos) {
   };
 }
 
-/**
- * Actualiza parcialmente los datos de un asesor.
- * 
- * @param {number} id - El ID del asesor.
- * @param {Object} datos - Campos a actualizar.
- * @returns {Promise<Object>} Asesor actualizado.
- */
 async function actualizarAsesor(id, datos) {
   const updateData = {};
   if (datos.numero_documento !== undefined) updateData.numero_documento = datos.numero_documento;
@@ -325,13 +276,6 @@ async function actualizarAsesor(id, datos) {
   };
 }
 
-/**
- * Actualiza el estado de un asesor.
- * 
- * @param {number} id - El ID del asesor.
- * @param {string} estado - Nuevo estado ("ACTIVO" o "INACTIVO").
- * @returns {Promise<Object>} Asesor actualizado.
- */
 async function actualizarEstado(id, estado) {
   const asesorActualizado = await prisma.$transaction(async tx => {
     const advisor = await tx.asesor.update({
@@ -350,12 +294,6 @@ async function actualizarEstado(id, estado) {
   };
 }
 
-/**
- * Compatibilidad con clientes antiguos: nunca elimina, solo inactiva.
- * 
- * @param {number} id - El ID del asesor.
- * @returns {Promise<Object>} Asesor conservado con estado INACTIVO.
- */
 async function eliminarAsesor(id) {
   return actualizarEstado(id, 'INACTIVO');
 }
@@ -366,9 +304,9 @@ function normalizarHeaderKey(header) {
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Eliminar acentos/diacríticos
-    .replace(/[^a-z0-9,\s_]/g, "")   // Mantener alfanuméricos, coma, espacio y guion bajo
-    .replace(/\s+/g, " ");           // Espacios simples
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9,\s_]/g, "")
+    .replace(/\s+/g, " ");
 }
 
 function separarNombreCompleto(nombreCadena) {
@@ -433,15 +371,7 @@ function separarNombreCompleto(nombreCadena) {
   return { apellido_paterno: "", apellido_materno: "", nombres: str };
 }
 
-/**
- * Extrae latitud y longitud desde una columna unificada (ej: "LATITUD, LONGITUD")
- * o columnas individuales.
- * 
- * @param {Object} rowObj - Objeto con llaves ya normalizadas
- * @returns {{ latitud: number|null, longitud: number|null }}
- */
 function extraerCoordenadas(rowObj) {
-  // Buscar primero columna combinada (ej: "latitud, longitud", "latitud,longitud")
   let valCombinado = null;
   for (const key of Object.keys(rowObj)) {
     if (key.includes("latitud") && key.includes("longitud")) {
@@ -463,7 +393,6 @@ function extraerCoordenadas(rowObj) {
     }
   }
 
-  // Buscar columnas individuales
   let latVal = null;
   let lngVal = null;
 
@@ -481,12 +410,6 @@ function extraerCoordenadas(rowObj) {
   };
 }
 
-/**
- * Importa asesores desde un archivo Excel.
- * 
- * @param {Buffer} fileBuffer - El buffer binario del archivo Excel.
- * @returns {Promise<Object>} Resumen del procesamiento con totales y errores.
- */
 async function importarAsesores(fileBuffer) {
   const workbook = xlsx.read(fileBuffer, { type: "buffer", cellDates: true });
   const sheetName = workbook.SheetNames[0];
@@ -500,7 +423,6 @@ async function importarAsesores(fileBuffer) {
   for (let i = 0; i < rows.length; i++) {
     const rawRow = rows[i];
     
-    // Normalizar llaves de la fila
     const rowObj = {};
     for (const key of Object.keys(rawRow)) {
       const normKey = normalizarHeaderKey(key);
@@ -509,7 +431,6 @@ async function importarAsesores(fileBuffer) {
       }
     }
 
-    // Mapeo flexible de atributos de asesores
     const rawDni = rowObj.numero_documento ?? rowObj.documento ?? rowObj.doc_identidad ?? rowObj.num_doc ?? rowObj.codigo;
     const rawNombres = rowObj.nombres ?? rowObj.nombre ?? rowObj.colaborador ?? rowObj.asesor ?? rowObj.nombre_completo;
     const rawApPaterno = rowObj.apellido_paterno ?? rowObj.paterno ?? rowObj.ap_paterno;
@@ -532,7 +453,6 @@ async function importarAsesores(fileBuffer) {
       apellido_materno = parsed.apellido_materno;
     }
 
-    // Validación básica mandatoria
     if (!dni || !nombres) {
       errores++;
       detalleErrores.push({
@@ -556,13 +476,11 @@ async function importarAsesores(fileBuffer) {
       ? String(rawEstado).trim().toUpperCase()
       : "ACTIVO";
 
-    // Extraer coordenadas
     const { latitud, longitud } = extraerCoordenadas(rowObj);
 
     try {
-      // Verificar si el DNI ya existe (si existe, se salta el registro y se cuenta como error según requisitos)
       const existente = await prisma.asesor.findUnique({
-        where: { dni }
+        where: { numero_documento: dni }
       });
 
       if (existente) {
@@ -577,7 +495,7 @@ async function importarAsesores(fileBuffer) {
 
       await prisma.asesor.create({
         data: {
-          dni,
+          numero_documento: dni,
           nombres,
           apellido_paterno: apellido_paterno || "",
           apellido_materno: apellido_materno || "",

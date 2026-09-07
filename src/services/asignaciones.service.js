@@ -18,6 +18,7 @@ function mapearCliente(cliente) {
     id: cliente.id_cliente,
     tipo_documento: cliente.tipo_documento,
     numero_documento: cliente.numero_documento,
+    dni: cliente.numero_documento,
     nombres: cliente.nombres,
     apellidos,
     telefono: cliente.telefono,
@@ -40,7 +41,7 @@ function mapearAsesorResumido(asesor) {
   const apellidos = `${asesor.apellido_paterno ?? ""} ${asesor.apellido_materno ?? ""}`.trim();
   return {
     id: asesor.id_asesor,
-    dni: asesor.numero_documento,
+    dni: asesor.dni,
     nombres: asesor.nombres,
     apellidos,
   };
@@ -294,13 +295,15 @@ async function obtenerAsignaciones({ page = 1, limit = 12 } = {}) {
       estado: a.estado,
       cliente: {
         id: a.cliente.id_cliente,
+        tipo_documento: a.cliente.tipo_documento,
+        numero_documento: a.cliente.numero_documento,
         dni: a.cliente.numero_documento,
         nombres: a.cliente.nombres,
         apellidos: apellidosCliente,
       },
       asesor: {
         id: a.asesor.id_asesor,
-        dni: a.asesor.numero_documento,
+        dni: a.asesor.dni,
         nombres: a.asesor.nombres,
         apellidos: apellidosAsesor,
       },

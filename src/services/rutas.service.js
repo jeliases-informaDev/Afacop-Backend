@@ -126,7 +126,8 @@ async function obtenerRutas() {
           nombres: true,
           apellido_paterno: true,
           apellido_materno: true,
-          dni: true,
+          tipo_documento: true,
+          numero_documento: true,
           distrito: true,
         }
       },
@@ -140,7 +141,8 @@ async function obtenerRutas() {
               nombres: true,
               apellido_paterno: true,
               apellido_materno: true,
-              dni: true,
+              tipo_documento: true,
+              numero_documento: true,
             }
           }
         }
