@@ -16,7 +16,8 @@ function mapearCliente(cliente) {
 
   return {
     id: cliente.id_cliente,
-    dni: cliente.dni,
+    tipo_documento: cliente.tipo_documento,
+    numero_documento: cliente.numero_documento,
     nombres: cliente.nombres,
     apellidos,
     telefono: cliente.telefono,

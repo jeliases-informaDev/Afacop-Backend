@@ -44,14 +44,14 @@ async function obtenerClientes({ page = 1, limit = 12, search = "", distrito, es
   }
 
   if (search && search.trim() !== "") {
-    const trimmedSearch = search.trim();
-    where.OR = [
-      { dni: { contains: trimmedSearch, mode: "insensitive" } },
-      { nombres: { contains: trimmedSearch, mode: "insensitive" } },
-      { apellido_paterno: { contains: trimmedSearch, mode: "insensitive" } },
-      { apellido_materno: { contains: trimmedSearch, mode: "insensitive" } },
-    ];
-  }
+      const trimmedSearch = search.trim();
+      where.OR = [
+        { numero_documento: { contains: trimmedSearch, mode: "insensitive" } },
+        { nombres: { contains: trimmedSearch, mode: "insensitive" } },
+        { apellido_paterno: { contains: trimmedSearch, mode: "insensitive" } },
+        { apellido_materno: { contains: trimmedSearch, mode: "insensitive" } },
+      ];
+    }
 
   // Si se envían coordenadas de proximidad, aplicar filtro de Bounding Box a nivel de DB
   if (lat !== undefined && lat !== null && lng !== undefined && lng !== null) {
@@ -102,7 +102,8 @@ async function obtenerClientes({ page = 1, limit = 12, search = "", distrito, es
     return {
       id: cliente.id_cliente,
       id_cliente: cliente.id_cliente, // Asegura compatibilidad
-      dni: cliente.dni,
+      tipo_documento: cliente.tipo_documento,
+      numero_documento: cliente.numero_documento,
       nombres: cliente.nombres,
       apellidos,
       telefono: cliente.telefono,
@@ -265,7 +266,8 @@ async function obtenerClientePorId(id, asesorId) {
   return {
     data: {
       id: cliente.id_cliente,
-      dni: cliente.dni,
+      tipo_documento: cliente.tipo_documento,
+      numero_documento: cliente.numero_documento,
       nombres: cliente.nombres,
       apellidos,
       apellido_paterno: cliente.apellido_paterno,

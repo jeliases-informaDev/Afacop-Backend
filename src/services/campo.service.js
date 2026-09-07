@@ -9,7 +9,10 @@ function requireAdvisor(id) {
   if (!id) throw Object.assign(new Error('Tu usuario no está vinculado a un asesor activo.'), { statusCode: 403, code: 'ADVISOR_NOT_LINKED' });
   return Number(id);
 }
-const clientSelect = { id_cliente: true, dni: true, nombres: true, apellido_paterno: true, apellido_materno: true, telefono: true, direccion: true, distrito: true, deuda_castigada: true, deuda_vigente: true, otras_deudas: true, ultima_gestion: true, latitud: true, longitud: true };
+
+//Se agregan campos correctos de la tabla clientes 
+const clientSelect = { id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true, telefono: true, direccion: true, distrito: true, deuda_castigada: true, deuda_vigente: true, otras_deudas: true, ultima_gestion: true, latitud: true, longitud: true };
+
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 function validateEvidence(value, type, maxLength) {
   if (typeof value !== 'string' || !new RegExp(`^data:image/${type};base64,[A-Za-z0-9+/=]+$`).test(value) || value.length > maxLength) {
