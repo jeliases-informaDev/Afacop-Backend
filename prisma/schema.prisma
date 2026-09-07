@@ -12,23 +12,35 @@ datasource db {
   provider = "postgresql"
 }
 
+// --- NUEVO: ENUM de Tipos de Documento ---
+enum TipoDocumento {
+  DNI
+  CE
+  PASAPORTE
+  RUC
+}
+
 /// Tabla física: clientes
 model Cliente {
-  id_cliente       Int       @id @default(autoincrement())
-  dni              String    @unique @db.VarChar(20)
-  telefono         String?   @db.VarChar(20)
-  nombres          String    @db.VarChar(150)
-  apellido_paterno String    @db.VarChar(100)
-  apellido_materno String    @db.VarChar(100)
-  direccion        String?   @db.VarChar(255)
-  distrito         String?   @db.VarChar(100)
-  deuda_castigada  Decimal   @default(0) @db.Decimal(12, 2)
-  deuda_vigente    Decimal   @default(0) @db.Decimal(12, 2)
-  otras_deudas     Decimal   @default(0) @db.Decimal(12, 2)
-  estado           String    @default("ACTIVO") @db.VarChar(20)
+  id_cliente       Int           @id @default(autoincrement())
+  
+  // --- MODIFICADO: Se quitó 'dni' y se agregaron los nuevos campos ---
+  tipo_documento   TipoDocumento @default(DNI)
+  numero_documento String        @db.VarChar(20)
+  
+  telefono         String?       @db.VarChar(20)
+  nombres          String        @db.VarChar(150)
+  apellido_paterno String        @db.VarChar(100)
+  apellido_materno String        @db.VarChar(100)
+  direccion        String?       @db.VarChar(255)
+  distrito         String?       @db.VarChar(100)
+  deuda_castigada  Decimal       @default(0) @db.Decimal(12, 2)
+  deuda_vigente    Decimal       @default(0) @db.Decimal(12, 2)
+  otras_deudas     Decimal       @default(0) @db.Decimal(12, 2)
+  estado           String        @default("ACTIVO") @db.VarChar(20)
   ultima_gestion   DateTime?
-  latitud          Decimal?  @db.Decimal(10, 8)
-  longitud         Decimal?  @db.Decimal(11, 8)
+  latitud          Decimal?      @db.Decimal(10, 8)
+  longitud         Decimal?      @db.Decimal(11, 8)
 
   // Relación 1:N → Un cliente puede tener muchas admisiones
   admisiones Admision[]
@@ -39,6 +51,9 @@ model Cliente {
   visitas        Visita[]
 
   @@index([latitud, longitud])
+  
+  // --- NUEVO: Índice único compuesto ---
+  @@unique([tipo_documento, numero_documento], map: "clientes_doc_unico_key")
   @@map("clientes")
 }
 
@@ -61,7 +76,7 @@ model Admision {
 /// Tabla física: asesores
 model Asesor {
   id_asesor        Int      @id @default(autoincrement())
-  dni              String   @unique @db.VarChar(20)
+  dni              String   @unique @db.VarChar(20) // Nota: Si más adelante quieres, puedes aplicarle la misma lógica de documentos a los asesores
   nombres          String   @db.VarChar(150)
   apellido_paterno String   @db.VarChar(100)
   apellido_materno String   @db.VarChar(100)
@@ -135,8 +150,8 @@ model RutaCliente {
   fecha_actualizar DateTime @updatedAt
 
   // Relaciones (Protección de integridad con Restrict)
-  ruta    Ruta     @relation(fields: [id_ruta], references: [id_ruta], onDelete: Restrict, onUpdate: Cascade)
-  cliente Cliente  @relation(fields: [id_cliente], references: [id_cliente], onDelete: Restrict, onUpdate: Cascade)
+  ruta    Ruta    @relation(fields: [id_ruta], references: [id_ruta], onDelete: Restrict, onUpdate: Cascade)
+  cliente Cliente @relation(fields: [id_cliente], references: [id_cliente], onDelete: Restrict, onUpdate: Cascade)
   visitas Visita[]
 
   // Unicidad para evitar duplicados en la misma ruta y optimización de índices
@@ -162,10 +177,10 @@ model Visita {
   monto_recaudado     Decimal?  @db.Decimal(12, 2)
   fecha_promesa       DateTime?
   observaciones       String?   @db.Text
-    foto_url            String?   @db.VarChar(255) // Primera fotografía en almacenamiento externo
-    foto_adicional_url  String?   @db.VarChar(255) // Segunda fotografía en almacenamiento externo
-    video_url           String?   @db.VarChar(255) // Compatibilidad con evidencias antiguas
-    foto_evidencia      String?   @db.Text // Imagen JPEG heredada en data URL
+  foto_url            String?   @db.VarChar(255) // Primera fotografía en almacenamiento externo
+  foto_adicional_url  String?   @db.VarChar(255) // Segunda fotografía en almacenamiento externo
+  video_url           String?   @db.VarChar(255) // Compatibilidad con evidencias antiguas
+  foto_evidencia      String?   @db.Text // Imagen JPEG heredada en data URL
   firma_evidencia     String?   @db.Text // Firma PNG en data URL
   fecha_creacion      DateTime  @default(now())
   fecha_actualizar    DateTime  @updatedAt
