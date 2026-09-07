@@ -113,6 +113,10 @@ async function obtenerRutaOsrm(coordinates) {
 /**
  * Obtiene todas las rutas programadas incluyendo los clientes asociados y el asesor.
  * 
+ * /**
+ * 
+ * Obtiene todas las rutas programadas incluyendo los clientes asociados y el asesor.
+ * 
  * @returns {Promise<Array>}
  */
 async function obtenerRutas() {
@@ -126,8 +130,7 @@ async function obtenerRutas() {
           nombres: true,
           apellido_paterno: true,
           apellido_materno: true,
-          tipo_documento: true,
-          numero_documento: true,
+          dni: true, // <-- REVERTIDO A DNI PARA EL ASESOR
           distrito: true,
         }
       },
@@ -141,8 +144,8 @@ async function obtenerRutas() {
               nombres: true,
               apellido_paterno: true,
               apellido_materno: true,
-              tipo_documento: true,
-              numero_documento: true,
+              tipo_documento: true,   // <-- SE MANTIENE EL NUEVO FORMATO PARA EL CLIENTE
+              numero_documento: true, // <-- SE MANTIENE EL NUEVO FORMATO PARA EL CLIENTE
             }
           }
         }
