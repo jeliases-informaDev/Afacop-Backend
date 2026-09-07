@@ -154,7 +154,7 @@ async function obtenerPuntosMapa({ estado, fecha_pago, zoom = 6, west, east, sou
   const where = { latitud: { not: null }, longitud: { not: null } };
   if (asesorId) where.asignaciones = { some: { id_asesor: Number(asesorId), estado: "ACTIVA" } };
   const clientes = await prisma.cliente.findMany({ where, select: {
-    id_cliente: true, dni: true, nombres: true, apellido_paterno: true, apellido_materno: true,
+    id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true,
     direccion: true, distrito: true, ultima_gestion: true, deuda_castigada: true, deuda_vigente: true,
     otras_deudas: true, latitud: true, longitud: true,
     asignaciones: {
@@ -559,7 +559,8 @@ async function importarClientes(fileBuffer) {
     try {
       await prisma.cliente.create({
         data: {
-          dni,
+          tipo_documento: "DNI",
+          numero_documento: dni,
           nombres,
           apellido_paterno: apellido_paterno || "",
           apellido_materno: apellido_materno || "",
