@@ -66,7 +66,9 @@ export async function createClientTemplate() {
   sheet.getColumn('numero_documento').numFmt = '@';
   sheet.dataValidations.add('A2:A200001', {
     type: 'list', allowBlank: true, formulae: ['"DNI,CE,PASAPORTE,RUC"'],
+    errorStyle: 'stop',
     showErrorMessage: true, errorTitle: 'Tipo de documento no válido', error: 'Seleccione DNI, CE, PASAPORTE o RUC.',
+    showInputMessage: true, promptTitle: 'Tipo de documento', prompt: 'Seleccione un tipo de documento de la lista.',
   });
 
   const instructions = workbook.addWorksheet('Instrucciones', { views: [{ state: 'frozen', ySplit: 1 }] });
