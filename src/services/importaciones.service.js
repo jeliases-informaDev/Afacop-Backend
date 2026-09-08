@@ -11,24 +11,39 @@ const MAX_ROWS = 200_000;
 const BATCH_SIZE = 1_000;
 const MAX_ERRORS = 100;
 
+const VALID_TIPO_DOCUMENTO = ['DNI', 'CE', 'PASAPORTE', 'RUC'];
+const DOCUMENT_VALIDATION_RULES = {
+  DNI: { regex: /^\d{8}$/, description: '8 dígitos numéricos' },
+  CE: { regex: /^\d{9,12}$/, description: '9 a 12 dígitos numéricos' },
+  PASAPORTE: { regex: /^[A-Z0-9]{8,12}$/, description: '8 a 12 caracteres alfanuméricos' },
+  RUC: { regex: /^\d{11}$/, description: '11 dígitos numéricos' },
+};
+
+export function validateDocumentNumber(tipoDocumento, numeroDocumento) {
+  const normalizedTipo = String(tipoDocumento ?? '').trim().toUpperCase();
+  const normalizedNumero = String(numeroDocumento ?? '').trim();
+  const rule = DOCUMENT_VALIDATION_RULES[normalizedTipo];
+
+  if (!normalizedTipo || !rule) {
+    throw Object.assign(new Error(`Tipo de documento no válido: ${tipoDocumento}. Valores permitidos: ${VALID_TIPO_DOCUMENTO.join(', ')}`), {
+      statusCode: 400,
+      code: 'INVALID_DOCUMENT_TYPE',
+    });
+  }
+
+  if (!normalizedNumero || !rule.regex.test(normalizedNumero)) {
+    throw Object.assign(new Error(`El número para ${normalizedTipo} debe tener ${rule.description}.`), {
+      statusCode: 400,
+      code: 'INVALID_DOCUMENT_NUMBER',
+    });
+  }
+
+  return normalizedNumero;
+}
+
 const CLIENT_TEMPLATE_COLUMNS = [
-  { header: 'dni', key: 'dni', width: 16, required: true, description: 'Documento de identidad único del cliente (obligatorio).' },
-  { header: 'nombres', key: 'nombres', width: 24, required: true, description: 'Nombres del cliente (obligatorio).' },
-  { header: 'apellido_paterno', key: 'apellido_paterno', width: 22, description: 'Apellido paterno.' },
-  { header: 'apellido_materno', key: 'apellido_materno', width: 22, description: 'Apellido materno.' },
-  { header: 'telefono', key: 'telefono', width: 16, description: 'Teléfono o celular.' },
-  { header: 'direccion', key: 'direccion', width: 38, description: 'Dirección completa del domicilio.' },
-  { header: 'distrito', key: 'distrito', width: 24, description: 'Distrito del domicilio.' },
-  { header: 'estado', key: 'estado', width: 14, description: 'Estado del cliente: ACTIVO o INACTIVO.' },
-  { header: 'deuda_castigada', key: 'deuda_castigada', width: 19, description: 'Monto de deuda castigada, sin símbolo monetario.' },
-  { header: 'deuda_vigente', key: 'deuda_vigente', width: 18, description: 'Monto de deuda vigente, sin símbolo monetario.' },
-  { header: 'otras_deudas', key: 'otras_deudas', width: 17, description: 'Monto de otras deudas, sin símbolo monetario.' },
-  { header: 'ultima_gestion', key: 'ultima_gestion', width: 18, description: 'Fecha de última gestión (AAAA-MM-DD).' },
-  { header: 'ubicacion', key: 'ubicacion', width: 48, description: 'Coordenadas "latitud,longitud" o enlace de Google Maps, Waze, Apple Maps u OpenStreetMap.' },
-  { header: 'producto', key: 'producto', width: 24, description: 'Producto o tipo de crédito.' },
-  { header: 'linea_credito', key: 'linea_credito', width: 18, description: 'Línea de crédito aprobada, sin símbolo monetario.' },
-  { header: 'estado_admision', key: 'estado_admision', width: 20, description: 'Resultado o estado de admisión.' },
-  { header: 'fecha_admision', key: 'fecha_admision', width: 18, description: 'Fecha de admisión (AAAA-MM-DD).' },
+  { header: 'tipo_documento', key: 'tipo_documento', width: 20, required: true, description: 'Tipo de documento: DNI, CE, PASAPORTE o RUC.' },
+  { header: 'numero_documento', key: 'numero_documento', width: 22, required: true, description: 'Número del documento del cliente (obligatorio).' },
 ];
 
 export async function createClientTemplate() {
@@ -47,14 +62,11 @@ export async function createClientTemplate() {
     cell.alignment = { vertical: 'middle', horizontal: 'center' };
     cell.border = { bottom: { style: 'thin', color: { argb: 'FFDCE3EF' } } };
   });
-  sheet.getColumn('dni').numFmt = '@';
-  sheet.getColumn('telefono').numFmt = '@';
-  ['deuda_castigada', 'deuda_vigente', 'otras_deudas', 'linea_credito'].forEach(key => {
-    sheet.getColumn(key).numFmt = '#,##0.00';
-  });
-  sheet.dataValidations.add('H2:H200001', {
-    type: 'list', allowBlank: true, formulae: ['"ACTIVO,INACTIVO"'],
-    showErrorMessage: true, errorTitle: 'Estado no válido', error: 'Seleccione ACTIVO o INACTIVO.',
+  sheet.getColumn('tipo_documento').numFmt = '@';
+  sheet.getColumn('numero_documento').numFmt = '@';
+  sheet.dataValidations.add('A2:A200001', {
+    type: 'list', allowBlank: true, formulae: ['"DNI,CE,PASAPORTE,RUC"'],
+    showErrorMessage: true, errorTitle: 'Tipo de documento no válido', error: 'Seleccione DNI, CE, PASAPORTE o RUC.',
   });
 
   const instructions = workbook.addWorksheet('Instrucciones', { views: [{ state: 'frozen', ySplit: 1 }] });
@@ -173,32 +185,37 @@ function pickMatching(row, aliases, patterns = []) {
 }
 
 async function clientRecord(row) {
-  const dni = text(pick(row, ['dni', 'documento', 'doc_identidad', 'num_doc']), 20);
-  let nombres = text(pick(row, ['nombres', 'nombre', 'nombre_completo', 'cliente']), 150);
-  let apellidoPaterno = text(pick(row, ['apellido_paterno', 'ape_paterno', 'paterno']), 100);
-  let apellidoMaterno = text(pick(row, ['apellido_materno', 'ape_materno', 'materno']), 100);
-  if (!apellidoPaterno && nombres.includes(',')) {
-    const [apellidos, ...rest] = nombres.split(',');
-    const parts = apellidos.trim().split(/\s+/);
-    apellidoPaterno = parts.shift() || '';
-    apellidoMaterno = parts.join(' ');
-    nombres = rest.join(',').trim();
+  const tipoDocumento = text(pick(row, ['tipo_documento', 'tipo_doc', 'tipo_docuemento', 'tipo_document']), 20).toUpperCase();
+  const numeroDocumento = text(pick(row, ['numero_documento', 'numero', 'documento', 'doc_identidad', 'num_doc']), 20);
+  if (!tipoDocumento || !numeroDocumento) return null;
+
+  const normalizedTipo = VALID_TIPO_DOCUMENTO.includes(tipoDocumento) ? tipoDocumento : null;
+  if (!normalizedTipo) {
+    throw Object.assign(new Error(`Tipo de documento no válido: ${tipoDocumento}. Valores permitidos: ${VALID_TIPO_DOCUMENTO.join(', ')}`), {
+      statusCode: 400,
+      code: 'INVALID_DOCUMENT_TYPE',
+    });
   }
-  if (!dni || !nombres) return null;
-  const coords = await coordinates(row);
+
+  const validNumeroDocumento = validateDocumentNumber(normalizedTipo, numeroDocumento);
+
   return {
-    dni, nombres, apellido_paterno: apellidoPaterno, apellido_materno: apellidoMaterno,
-    telefono: text(pick(row, ['telefono', 'celular']), 20) || null,
-    direccion: text(pick(row, ['direccion', 'domicilio']), 255) || null,
-    distrito: text(pick(row, ['distrito', 'dist_domi']), 100) || null,
-    estado: text(pick(row, ['estado']), 20) || 'ACTIVO',
-    deuda_castigada: money(pick(row, ['deuda_castigada', 'castigada'])),
-    deuda_vigente: money(pick(row, ['deuda_vigente', 'deuda_vigentes', 'vigente'])),
-    otras_deudas: money(pick(row, ['otras_deudas', 'otra_deuda'])),
-    ultima_gestion: dateOrNull(pick(row, ['ultima_gestion', 'fecha_gestion', 'fec_gestion', 'fecha_pago'])),
-    latitud: coords.latitud,
-    longitud: coords.longitud,
-    _admision: admissionRecord(row),
+    tipo_documento: normalizedTipo,
+    numero_documento: validNumeroDocumento,
+    nombres: '',
+    apellido_paterno: '',
+    apellido_materno: '',
+    telefono: null,
+    direccion: null,
+    distrito: null,
+    estado: 'ACTIVO',
+    deuda_castigada: 0,
+    deuda_vigente: 0,
+    otras_deudas: 0,
+    ultima_gestion: null,
+    latitud: null,
+    longitud: null,
+    _admision: { producto: 'IMPORTACION', linea_credito: 0, estado: 'PENDIENTE', fecha: null },
   };
 }
 
@@ -280,19 +297,26 @@ async function processJob(id) {
       if (!batch.length) return;
       if (job.tipo === 'CLIENTES') {
         const originalSize = batch.length;
-        batch = [...new Map(batch.map(item => [item.numero_documento, item])).values()];
+        batch = [...new Map(batch.map(item => [item.tipo_documento + item.numero_documento, item])).values()];
         omitted += originalSize - batch.length;
-        const existing = await prisma.cliente.count({ where: { dni: { in: batch.map(item => item.numero_documento) } } });
+        const existing = await prisma.cliente.count({
+          where: {
+            OR: batch.map(item => ({
+              tipo_documento: item.tipo_documento,
+              numero_documento: item.numero_documento,
+            })),
+          },
+        });
         const affected = await prisma.$executeRaw`
-          INSERT INTO "clientes" ("dni", "nombres", "apellido_paterno", "apellido_materno", "telefono", "direccion", "distrito", "estado", "deuda_castigada", "deuda_vigente", "otras_deudas", "ultima_gestion", "latitud", "longitud")
-          SELECT x.numero_documento, x.nombres, x.apellido_paterno, x.apellido_materno, x.telefono, x.direccion, x.distrito, x.estado,
+          INSERT INTO "clientes" ("tipo_documento", "numero_documento", "nombres", "apellido_paterno", "apellido_materno", "telefono", "direccion", "distrito", "estado", "deuda_castigada", "deuda_vigente", "otras_deudas", "ultima_gestion", "latitud", "longitud")
+          SELECT x.tipo_documento::"TipoDocumento", x.numero_documento, x.nombres, x.apellido_paterno, x.apellido_materno, x.telefono, x.direccion, x.distrito, x.estado,
                  x.deuda_castigada, x.deuda_vigente, x.otras_deudas, x.ultima_gestion, x.latitud, x.longitud
           FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb) AS x(
-            dni text, nombres text, apellido_paterno text, apellido_materno text, telefono text, direccion text,
+            tipo_documento text, numero_documento text, nombres text, apellido_paterno text, apellido_materno text, telefono text, direccion text,
             distrito text, estado text, deuda_castigada numeric, deuda_vigente numeric, otras_deudas numeric,
             ultima_gestion timestamp, latitud numeric, longitud numeric
           )
-          ON CONFLICT ("dni") DO UPDATE SET
+          ON CONFLICT ("tipo_documento", "numero_documento") DO UPDATE SET
             "nombres" = EXCLUDED."nombres", "apellido_paterno" = EXCLUDED."apellido_paterno",
             "apellido_materno" = EXCLUDED."apellido_materno", "telefono" = EXCLUDED."telefono",
             "direccion" = EXCLUDED."direccion", "distrito" = EXCLUDED."distrito", "estado" = EXCLUDED."estado",
@@ -302,14 +326,14 @@ async function processJob(id) {
         `;
         updated += existing;
         inserted += Number(affected) - existing;
-        const admissions = batch.map(item => ({ dni: item.numero_documento, ...item._admision }));
+        const admissions = batch.map(item => ({ tipo_documento: item.tipo_documento, numero_documento: item.numero_documento, ...item._admision }));
         await prisma.$executeRaw`
           INSERT INTO "admisiones" ("id_cliente", "producto", "linea_credito", "estado", "fecha")
           SELECT c."id_cliente", x.producto, x.linea_credito, x.estado, x.fecha
           FROM jsonb_to_recordset(${JSON.stringify(admissions)}::jsonb) AS x(
-            dni text, producto text, linea_credito numeric, estado text, fecha timestamp
+            tipo_documento text, numero_documento text, producto text, linea_credito numeric, estado text, fecha timestamp
           )
-          INNER JOIN "clientes" c ON c."dni" = x.numero_documento
+          INNER JOIN "clientes" c ON c."tipo_documento" = x.tipo_documento::"TipoDocumento" AND c."numero_documento" = x.numero_documento
           ON CONFLICT ("id_cliente") DO UPDATE SET
             "producto" = EXCLUDED."producto", "linea_credito" = EXCLUDED."linea_credito",
             "estado" = EXCLUDED."estado", "fecha" = EXCLUDED."fecha"
@@ -346,9 +370,9 @@ async function processJob(id) {
         if (!headers) {
           if (values.length > 100) throw Object.assign(new Error('El archivo supera el máximo de 100 columnas'), { code: 'COLUMN_LIMIT_EXCEEDED' });
           headers = values.map(normalizeHeader);
-          const hasDni = headers.some(header => ['dni', 'documento', 'doc_identidad', 'num_doc'].includes(header));
-          const hasName = headers.some(header => ['nombres', 'nombre', 'nombre_completo', 'cliente'].includes(header));
-          if (!hasDni || !hasName) throw Object.assign(new Error('La cabecera debe incluir DNI/documento y nombres'), { code: 'INVALID_HEADERS' });
+          const hasDocumentType = headers.some(header => ['tipo_documento', 'tipo_doc', 'tipo_docuemento', 'tipo_document'].includes(header));
+          const hasDocumentNumber = headers.some(header => ['numero_documento', 'numero', 'documento', 'doc_identidad', 'num_doc'].includes(header));
+          if (!hasDocumentType || !hasDocumentNumber) throw Object.assign(new Error('La cabecera debe incluir tipo_documento y numero_documento'), { code: 'INVALID_HEADERS' });
           continue;
         }
         if (values.every(value => text(value) === '')) continue;
@@ -363,7 +387,7 @@ async function processJob(id) {
           if (details.length < MAX_ERRORS) details.push({ fila: excelRow.number, error: `Ubicación no válida: ${rowError.message}` });
           continue;
         }
-        if (!record) { errors++; if (details.length < MAX_ERRORS) details.push({ fila: excelRow.number, error: 'DNI y nombres son obligatorios' }); }
+        if (!record) { errors++; if (details.length < MAX_ERRORS) details.push({ fila: excelRow.number, error: 'tipo_documento y numero_documento son obligatorios' }); }
         else batch.push(record);
         if (batch.length >= BATCH_SIZE) await flush();
       }
