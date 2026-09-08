@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { loginBody, routeBody, routeStatusBody, routeClientStatusBody, userCreateBody } from '../src/validation/schemas.js';
 import { normalizeRole, ROLES } from '../src/security/roles.js';
+import { validateDocumentNumber } from '../src/services/importaciones.service.js';
 
 test('normaliza roles heredados sin confiar en el frontend', () => {
   assert.equal(normalizeRole('ADMIN'), ROLES.ADMINISTRADOR);
@@ -13,6 +14,18 @@ test('normaliza roles heredados sin confiar en el frontend', () => {
 test('rechaza campos inesperados y credenciales vacías', () => {
   assert.equal(loginBody.safeParse({ username: '', password: '' }).success, false);
   assert.equal(loginBody.safeParse({ username: 'admin', password: 'secret', injected: true }).success, false);
+});
+
+test('valida la longitud del documento según el tipo', () => {
+  assert.equal(validateDocumentNumber('DNI', '12345678'), '12345678');
+  assert.equal(validateDocumentNumber('RUC', '20123456789'), '20123456789');
+  assert.equal(validateDocumentNumber('CE', '123456789'), '123456789');
+  assert.equal(validateDocumentNumber('PASAPORTE', 'AB1234567'), 'AB1234567');
+
+  assert.throws(() => validateDocumentNumber('DNI', '1234567'), /DNI/);
+  assert.throws(() => validateDocumentNumber('RUC', '1234567890'), /RUC/);
+  assert.throws(() => validateDocumentNumber('CE', '12345678'), /CE/);
+  assert.throws(() => validateDocumentNumber('PASAPORTE', 'ABC123'), /PASAPORTE/);
 });
 
 test('exige contraseñas robustas al crear usuarios', () => {
