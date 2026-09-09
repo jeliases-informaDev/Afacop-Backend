@@ -32,7 +32,8 @@ const schema = z.object({
   REQUIRE_MFA: z.enum(['true', 'false']).default('false'),
   // Exenciones por cuenta, nunca por rol, para no desactivar MFA a todos los administradores.
   MFA_EXEMPT_USERNAMES: z.string().default(''),
-  JWT_EXPIRES_IN: z.string().default('15m'),
+  JWT_EXPIRES_IN: z.string().default('8h'),
+  JWT_ADVISOR_EXPIRES_IN: z.string().default('15m'),
   JWT_ISSUER: z.string().default('radar-360-api'),
   JWT_AUDIENCE: z.string().default('radar-360-clients'),
   FRONTEND_URL: corsOrigins.default('http://localhost:5173'),

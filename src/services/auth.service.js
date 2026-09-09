@@ -19,12 +19,17 @@ function mapearUsuario(usuario) {
 
 function normalizeClientPlatform(value) { return value === 'mobile' ? 'mobile' : 'web'; }
 
+function accessTokenExpiresIn(role) {
+  return normalizeRole(role) === ROLES.ASESOR ? env.JWT_ADVISOR_EXPIRES_IN : env.JWT_EXPIRES_IN;
+}
+
 function issueAccessToken(usuario, clientPlatform = 'web') {
+  const role = normalizeRole(usuario.rol);
   return jwt.sign(
-    { username: usuario.username, rol: normalizeRole(usuario.rol), id_asesor: usuario.id_asesor, channel: normalizeClientPlatform(clientPlatform), type: 'access', ver: usuario.token_version },
+    { username: usuario.username, rol: role, id_asesor: usuario.id_asesor, channel: normalizeClientPlatform(clientPlatform), type: 'access', ver: usuario.token_version },
     env.JWT_SECRET,
     {
-      expiresIn: env.JWT_EXPIRES_IN, algorithm: 'HS256', issuer: env.JWT_ISSUER,
+      expiresIn: accessTokenExpiresIn(role), algorithm: 'HS256', issuer: env.JWT_ISSUER,
       audience: env.JWT_AUDIENCE, subject: usuario.id_usuario, jwtid: crypto.randomUUID(),
     }
   );
