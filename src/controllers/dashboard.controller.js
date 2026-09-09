@@ -27,14 +27,12 @@ async function obtenerStats(req, res) {
  */
 async function obtenerActividad(req, res) {
   try {
-    const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 200);
-    const offset = Math.max(parseInt(req.query.offset) || 0, 0);
     const id_asesor = req.query.id_asesor ? Number(req.query.id_asesor) : undefined;
     if (req.query.id_asesor && !Number.isInteger(id_asesor)) {
       return res.status(400).json({ mensaje: 'El asesor seleccionado no es válido' });
     }
     const actividad = await dashboardService.obtenerActividad({
-      limit, offset, id_asesor, fecha: req.query.fecha,
+      id_asesor, fecha: req.query.fecha,
     });
     return res.status(200).json({ data: actividad });
   } catch (error) {

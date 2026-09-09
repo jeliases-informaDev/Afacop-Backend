@@ -110,6 +110,14 @@ test('los tokens de acceso incluyen control de tipo y versión revocable', () =>
   assert.match(service, /mfaRequired/);
 });
 
+test('la vigencia del token distingue asesores del resto de roles', () => {
+  const envSource = fs.readFileSync(path.resolve('src/config/env.js'), 'utf8');
+  const service = fs.readFileSync(path.resolve('src/services/auth.service.js'), 'utf8');
+  assert.match(envSource, /JWT_EXPIRES_IN: z\.string\(\)\.default\('8h'\)/);
+  assert.match(envSource, /JWT_ADVISOR_EXPIRES_IN: z\.string\(\)\.default\('15m'\)/);
+  assert.match(service, /normalizeRole\(role\) === ROLES\.ASESOR \? env\.JWT_ADVISOR_EXPIRES_IN : env\.JWT_EXPIRES_IN/);
+});
+
 test('la cartera del asesor se filtra por asignación activa', () => {
   const source = fs.readFileSync(path.resolve('src/services/clientes.service.js'), 'utf8');
   assert.match(source, /asesorId/);

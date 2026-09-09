@@ -238,11 +238,10 @@ async function obtenerStats() {
  * Obtiene la actividad de visitas más reciente.
  * 
  * @param {Object} params
- * @param {number} params.limit
- * @param {number} params.offset
  * @returns {Promise<Array>} Listado de gestiones formateado.
  */
-async function obtenerActividad({ limit, offset, id_asesor, fecha }) {
+async function obtenerActividad({ id_asesor, fecha }) {
+  const activityLimit = 5;
   const where = {};
   const routeWhere = {};
   let start;
@@ -264,13 +263,13 @@ async function obtenerActividad({ limit, offset, id_asesor, fecha }) {
   const [visitas, rutas] = await Promise.all([
     prisma.visita.findMany({
       where,
-      take: limit + offset,
+      take: activityLimit,
       orderBy: { fecha_creacion: 'desc' },
       include: { asesor: true, cliente: true },
     }),
     prisma.ruta.findMany({
       where: routeWhere,
-      take: limit + offset,
+      take: activityLimit,
       orderBy: { fecha_actualizar: 'desc' },
       include: {
         asesor: { select: { nombres: true } },
@@ -342,7 +341,7 @@ async function obtenerActividad({ limit, offset, id_asesor, fecha }) {
   return [...visitEvents, ...routeEvents]
     .filter(event => !start || (new Date(event.created_at) >= start && new Date(event.created_at) < end))
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    .slice(offset, offset + limit);
+    .slice(0, activityLimit);
 }
 
 /**
