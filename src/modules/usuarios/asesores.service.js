@@ -125,6 +125,7 @@ function mapearAsesor(asesor) {
     id_asesor: asesor.id_asesor,
     id: asesor.id_asesor,
     dni: asesor.dni,
+    numero_documento: asesor.dni, // Compatibilidad extra por si algún módulo lo espera
     nombres: asesor.nombres,
     apellidos,
     apellido_paterno: asesor.apellido_paterno,
@@ -147,7 +148,7 @@ async function obtenerAsesores({ page = 1, limit = 12, search = "", estado } = {
   if (search && search.trim() !== "") {
     const trimmedSearch = search.trim();
     where.OR = [
-      { numero_documento: { contains: trimmedSearch, mode: "insensitive" } },
+      { dni: { contains: trimmedSearch, mode: "insensitive" } }, // <-- Corregido a 'dni'
       { nombres: { contains: trimmedSearch, mode: "insensitive" } },
       { apellido_paterno: { contains: trimmedSearch, mode: "insensitive" } },
       { apellido_materno: { contains: trimmedSearch, mode: "insensitive" } },
@@ -214,7 +215,7 @@ async function obtenerAsesorPorId(id) {
 async function obtenerAsesorPorDni(dni) {
   return prisma.asesor.findUnique({
     where: {
-      numero_documento: dni,
+      dni: dni, // <-- Corregido a 'dni'
     },
   });
 }
@@ -222,7 +223,7 @@ async function obtenerAsesorPorDni(dni) {
 async function crearAsesor(datos) {
   const nuevoAsesor = await prisma.asesor.create({
     data: {
-      numero_documento: datos.numero_documento,
+      dni: datos.dni, // <-- Corregido a 'dni' directo
       nombres: datos.nombres,
       apellido_paterno: datos.apellido_paterno,
       apellido_materno: datos.apellido_materno,
@@ -242,7 +243,7 @@ async function crearAsesor(datos) {
 
 async function actualizarAsesor(id, datos) {
   const updateData = {};
-  if (datos.numero_documento !== undefined) updateData.numero_documento = datos.numero_documento;
+  if (datos.dni !== undefined) updateData.dni = datos.dni; // <-- Corregido a 'dni'
   if (datos.nombres !== undefined) updateData.nombres = datos.nombres;
   if (datos.apellido_paterno !== undefined) updateData.apellido_paterno = datos.apellido_paterno;
   if (datos.apellido_materno !== undefined) updateData.apellido_materno = datos.apellido_materno;
@@ -432,7 +433,7 @@ async function importarAsesores(fileBuffer) {
       }
     }
 
-    const rawDni = rowObj.numero_documento ?? rowObj.documento ?? rowObj.doc_identidad ?? rowObj.num_doc ?? rowObj.codigo;
+    const rawDni = rowObj.dni ?? rowObj.numero_documento ?? rowObj.documento ?? rowObj.doc_identidad ?? rowObj.num_doc ?? rowObj.codigo;
     const rawNombres = rowObj.nombres ?? rowObj.nombre ?? rowObj.colaborador ?? rowObj.asesor ?? rowObj.nombre_completo;
     const rawApPaterno = rowObj.apellido_paterno ?? rowObj.paterno ?? rowObj.ap_paterno;
     const rawApMaterno = rowObj.apellido_materno ?? rowObj.materno ?? rowObj.ap_materno;
@@ -481,7 +482,7 @@ async function importarAsesores(fileBuffer) {
 
     try {
       const existente = await prisma.asesor.findUnique({
-        where: { numero_documento: dni }
+        where: { dni: dni } // <-- Corregido a 'dni'
       });
 
       if (existente) {
@@ -496,7 +497,7 @@ async function importarAsesores(fileBuffer) {
 
       await prisma.asesor.create({
         data: {
-          numero_documento: dni,
+          dni: dni, // <-- Corregido a 'dni'
           nombres,
           apellido_paterno: apellido_paterno || "",
           apellido_materno: apellido_materno || "",
