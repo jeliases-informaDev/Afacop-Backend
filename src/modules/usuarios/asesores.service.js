@@ -221,9 +221,11 @@ async function obtenerAsesorPorDni(dni) {
 }
 
 async function crearAsesor(datos) {
+  const dniValor = datos.dni || datos.numero_documento;
+  
   const nuevoAsesor = await prisma.asesor.create({
     data: {
-      dni: datos.dni, // <-- Corregido a 'dni' directo
+      dni: dniValor ? String(dniValor).trim() : null,
       nombres: datos.nombres,
       apellido_paterno: datos.apellido_paterno,
       apellido_materno: datos.apellido_materno,
@@ -240,6 +242,7 @@ async function crearAsesor(datos) {
     data: mapearAsesor(nuevoAsesor),
   };
 }
+
 
 async function actualizarAsesor(id, datos) {
   const updateData = {};
