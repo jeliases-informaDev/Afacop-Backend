@@ -22,25 +22,25 @@ enum TipoDocumento {
 
 /// Tabla física: clientes
 model Cliente {
-  id_cliente       Int           @id @default(autoincrement())
-  
+  id_cliente Int @id @default(autoincrement())
+
   // --- MODIFICADO: Se quitó 'dni' y se agregaron los nuevos campos ---
   tipo_documento   TipoDocumento @default(DNI)
   numero_documento String        @db.VarChar(20)
-  
-  telefono         String?       @db.VarChar(20)
-  nombres          String        @db.VarChar(150)
-  apellido_paterno String        @db.VarChar(100)
-  apellido_materno String        @db.VarChar(100)
-  direccion        String?       @db.VarChar(255)
-  distrito         String?       @db.VarChar(100)
-  deuda_castigada  Decimal       @default(0) @db.Decimal(12, 2)
-  deuda_vigente    Decimal       @default(0) @db.Decimal(12, 2)
-  otras_deudas     Decimal       @default(0) @db.Decimal(12, 2)
-  estado           String        @default("ACTIVO") @db.VarChar(20)
+
+  telefono         String?   @db.VarChar(20)
+  nombres          String    @db.VarChar(150)
+  apellido_paterno String    @db.VarChar(100)
+  apellido_materno String    @db.VarChar(100)
+  direccion        String?   @db.VarChar(255)
+  distrito         String?   @db.VarChar(100)
+  deuda_castigada  Decimal   @default(0) @db.Decimal(12, 2)
+  deuda_vigente    Decimal   @default(0) @db.Decimal(12, 2)
+  otras_deudas     Decimal   @default(0) @db.Decimal(12, 2)
+  estado           String    @default("ACTIVO") @db.VarChar(20)
   ultima_gestion   DateTime?
-  latitud          Decimal?      @db.Decimal(10, 8)
-  longitud         Decimal?      @db.Decimal(11, 8)
+  latitud          Decimal?  @db.Decimal(10, 8)
+  longitud         Decimal?  @db.Decimal(11, 8)
 
   // Relación 1:N → Un cliente puede tener muchas admisiones
   admisiones Admision[]
@@ -50,10 +50,9 @@ model Cliente {
   rutas_clientes RutaCliente[]
   visitas        Visita[]
 
-  @@index([latitud, longitud])
-  
   // --- NUEVO: Índice único compuesto ---
   @@unique([tipo_documento, numero_documento], map: "clientes_doc_unico_key")
+  @@index([latitud, longitud])
   @@map("clientes")
 }
 
@@ -150,8 +149,8 @@ model RutaCliente {
   fecha_actualizar DateTime @updatedAt
 
   // Relaciones (Protección de integridad con Restrict)
-  ruta    Ruta    @relation(fields: [id_ruta], references: [id_ruta], onDelete: Restrict, onUpdate: Cascade)
-  cliente Cliente @relation(fields: [id_cliente], references: [id_cliente], onDelete: Restrict, onUpdate: Cascade)
+  ruta    Ruta     @relation(fields: [id_ruta], references: [id_ruta], onDelete: Restrict, onUpdate: Cascade)
+  cliente Cliente  @relation(fields: [id_cliente], references: [id_cliente], onDelete: Restrict, onUpdate: Cascade)
   visitas Visita[]
 
   // Unicidad para evitar duplicados en la misma ruta y optimización de índices

@@ -1,0 +1,15 @@
+import { Router } from 'express';
+import campoController from './campo.controller.js';
+import { authMiddleware } from '#modules/auth/auth.middleware.js';
+import { roleMiddleware } from '#core/middlewares/role.middleware.js';
+import { ROLES } from '#core/security/roles.js';
+const router = Router();
+router.use(authMiddleware, roleMiddleware([ROLES.ASESOR]));
+router.get('/resumen', campoController.resumen);
+router.get('/ruta-hoy', campoController.rutaHoy);
+router.get('/clientes', campoController.clientes);
+router.patch('/ubicacion', campoController.ubicacion);
+router.patch('/rutas/:id/estado', campoController.estadoRuta);
+router.post('/evidencias/presign', campoController.presignEvidence);
+router.post('/visitas', campoController.visita);
+export default router;

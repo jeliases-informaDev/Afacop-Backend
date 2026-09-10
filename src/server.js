@@ -6,30 +6,48 @@ import { rateLimit } from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import jwt from 'jsonwebtoken';
 import { Server as SocketServer } from 'socket.io';
-import { env, allowedOrigins } from './config/env.js';
-import { logger } from './config/logger.js';
-import prisma from './config/prisma.js';
-import { auditMiddleware } from './middlewares/audit.middleware.js';
-import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
-import { authMiddleware } from './middlewares/auth.middleware.js';
-import { roleMiddleware } from './middlewares/role.middleware.js';
-import { OPERATIONAL_MANAGERS, normalizeRole } from './security/roles.js';
+import { auditMiddleware } from '#core/middlewares/audit.middleware.js';
+// ============================================================================
+// 1. CORE (Configuraciones, Middlewares y Seguridad Transversal)
+// ============================================================================
+import { env, allowedOrigins } from '#core/config/env.js';
+import { logger } from '#core/config/logger.js';
+import prisma from '#core/config/prisma.js';
+import { authMiddleware } from '#modules/auth/auth.middleware.js';
+import { errorHandler, notFoundHandler } from '#core/middlewares/error.middleware.js';
+import { roleMiddleware } from '#core/middlewares/role.middleware.js';
+import { OPERATIONAL_MANAGERS, normalizeRole } from '#core/security/roles.js';
 
-import clientesRoutes from './routes/clientes.routes.js';
-import admisionRoutes from './routes/admision.routes.js';
-import asesoresRoutes from './routes/asesores.routes.js';
-import asignacionesRoutes from './routes/asignaciones.routes.js';
-import asignacionesController from './controllers/asignaciones.controller.js';
-import rutasRoutes from './routes/rutas.routes.js';
-import authRoutes from './routes/auth.routes.js';
-import dashboardRoutes from './routes/dashboard.routes.js';
-import visitasRoutes from './routes/visitas.routes.js';
-import usuariosRoutes from './routes/usuarios.routes.js';
-import importacionesRoutes from './routes/importaciones.routes.js';
-import seguridadRoutes from './routes/seguridad.routes.js';
-import campoRoutes from './routes/campo.routes.js';
-import { resumePendingJobs } from './services/importaciones.service.js';
+// ============================================================================
+// 2. MODULES (Dominios de Negocio)
+// ============================================================================
+// Auth
+import authRoutes from '#modules/auth/auth.routes.js';
 
+// Clientes & Admisión
+import clientesRoutes from '#modules/clientes/clientes.routes.js';
+import admisionRoutes from '#modules/clientes/admision.routes.js';
+
+// Usuarios & Asesores
+import usuariosRoutes from '#modules/usuarios/usuarios.routes.js';
+import asesoresRoutes from '#modules/usuarios/asesores.routes.js';
+
+// Operaciones en Campo
+import asignacionesRoutes from '#modules/operaciones/asignaciones.routes.js';
+import asignacionesController from '#modules/operaciones/asignaciones.controller.js';
+import rutasRoutes from '#modules/operaciones/rutas.routes.js';
+import visitasRoutes from '#modules/operaciones/visitas.routes.js';
+import campoRoutes from '#modules/operaciones/campo.routes.js';
+
+// Sistema, Reportes y Procesos Background
+import dashboardRoutes from '#modules/sistema/dashboard.routes.js';
+import importacionesRoutes from '#modules/sistema/importaciones.routes.js';
+import seguridadRoutes from '#modules/sistema/seguridad.routes.js';
+import { resumePendingJobs } from '#modules/sistema/importaciones.service.js';
+
+// ============================================================================
+// 3. CONFIGURACIÓN DE EXPRESS Y MIDDLEWARES GLOBALES
+// ============================================================================
 const app = express();
 app.disable('x-powered-by');
 if (env.TRUST_PROXY === 'true') app.set('trust proxy', 1);
@@ -39,7 +57,9 @@ app.use((req, res, next) => {
   res.setHeader('X-Request-Id', req.id);
   next();
 });
+
 app.use(pinoHttp({ logger, genReqId: req => req.id, autoLogging: { ignore: req => req.url === '/health/live' } }));
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -49,9 +69,10 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'same-site' },
   strictTransportSecurity: env.NODE_ENV === 'production' ? { maxAge: 31_536_000, includeSubDomains: true, preload: true } : false,
 }));
+
 app.use('/api', (_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); res.setHeader('Pragma', 'no-cache'); next(); });
-// Chrome/Edge aplican Private Network Access cuando un frontend HTTPS de
-// Dev Tunnels accede al backend local. Se habilita exclusivamente en desarrollo.
+
+// Chrome/Edge aplican Private Network Access
 app.use((req, res, next) => {
   if (
     env.NODE_ENV === 'development'
@@ -62,6 +83,7 @@ app.use((req, res, next) => {
   }
   next();
 });
+
 app.use(cors({
   origin(origin, callback) {
     if (!origin) return callback(null, true);
@@ -80,11 +102,10 @@ const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: env.NODE_ENV === 'development' ? 5000 : 1200,
   standardHeaders: 'draft-8', legacyHeaders: false,
-  // Autenticación tiene su propio limitador. No debe quedar bloqueada por la
-  // navegación, sincronización o consultas normales realizadas antes del logout.
   skip: req => req.path.startsWith('/api/auth/') || req.path.startsWith('/health/'),
   message: { error: 'Demasiadas solicitudes. Intente nuevamente más tarde.', code: 'RATE_LIMITED' },
 });
+
 const createAuthLimiter = () => rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: env.NODE_ENV === 'development' ? 50 : 10,
@@ -100,11 +121,13 @@ const createAuthLimiter = () => rateLimit({
     });
   },
 });
+
 app.use(globalLimiter);
 app.use('/api/auth/login', createAuthLimiter());
 app.use('/api/auth/mfa/verify', createAuthLimiter());
 app.use('/api/auth/mfa/enroll', createAuthLimiter());
 app.use(express.json({ limit: '5mb', strict: true }));
+
 app.use((req, res, next) => {
   const sendJson = res.json.bind(res);
   res.json = payload => {
@@ -119,8 +142,12 @@ app.use((req, res, next) => {
   };
   next();
 });
+
 app.use(auditMiddleware);
 
+// ============================================================================
+// 4. RUTAS (Endpoints)
+// ============================================================================
 app.get('/', (_req, res) => res.json({ service: 'radar-360-backend', status: 'ok' }));
 app.get('/health/live', (_req, res) => res.json({ status: 'ok' }));
 app.get('/health/ready', async (req, res, next) => {
@@ -129,7 +156,10 @@ app.get('/health/ready', async (req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/clientes', clientesRoutes);
+
+// Nota Arquitectónica: A futuro, esta ruta específica podría moverse dentro de clientes.routes.js para mantener server.js 100% limpio.
 app.get('/api/clientes/:id/historial-asignaciones', authMiddleware, roleMiddleware(OPERATIONAL_MANAGERS), asignacionesController.obtenerHistorialAsignacionesDeCliente);
+
 app.use('/api/admision', admisionRoutes);
 app.use('/api/asesores', asesoresRoutes);
 app.use('/api/asignaciones', asignacionesRoutes);
@@ -141,13 +171,19 @@ app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/importaciones', importacionesRoutes);
 app.use('/api/seguridad', seguridadRoutes);
 app.use('/api/campo', campoRoutes);
+
+// Manejo de errores
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+// ============================================================================
+// 5. INICIALIZACIÓN DE SERVIDOR Y WEBSOCKETS
+// ============================================================================
 const server = app.listen(env.PORT, () => {
   if (env.NODE_ENV === 'development') process.stdout.write(`http://localhost:${env.PORT}\n`);
   else logger.info({ port: env.PORT }, 'server_started');
 });
+
 server.once('error', error => {
   if (error?.code === 'EADDRINUSE') {
     process.stderr.write(`No se pudo iniciar el backend: el puerto ${env.PORT} ya está siendo utilizado por otra instancia.\n`);
@@ -156,6 +192,7 @@ server.once('error', error => {
   }
   setImmediate(() => process.exit(1));
 });
+
 const io = new SocketServer(server, {
   cors: { origin: env.CORS_ALLOW_ALL === 'true' ? true : allowedOrigins, credentials: true, methods: ['GET', 'POST'] },
   transports: ['websocket', 'polling'],
@@ -188,7 +225,9 @@ io.on('connection', socket => {
   logger.info({ event: 'socket_connected', userId: socket.user.id, role: socket.user.rol, socketId: socket.id }, 'realtime_session_started');
   socket.on('disconnect', reason => logger.info({ event: 'socket_disconnected', userId: socket.user.id, socketId: socket.id, reason }, 'realtime_session_finished'));
 });
+
 resumePendingJobs().catch(error => logger.error({ err: error }, 'bulk_import_resume_failed'));
+
 server.requestTimeout = 30_000;
 server.headersTimeout = 35_000;
 server.keepAliveTimeout = 5_000;
