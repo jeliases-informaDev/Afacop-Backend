@@ -11,7 +11,8 @@ const MAX_ROWS = 200_000;
 const BATCH_SIZE = 1_000;
 const MAX_ERRORS = 100;
 
-const VALID_TIPO_DOCUMENTO = ['DNI', 'CE', 'PASAPORTE', 'RUC'];
+const DOCUMENT_TYPE_BY_INDEX = Object.freeze({ 1: 'DNI', 2: 'CE', 3: 'PASAPORTE', 4: 'RUC' });
+const VALID_TIPO_DOCUMENTO = Object.values(DOCUMENT_TYPE_BY_INDEX);
 const DOCUMENT_VALIDATION_RULES = {
   DNI: { regex: /^\d{8}$/, description: '8 dígitos numéricos' },
   CE: { regex: /^\d{9,12}$/, description: '9 a 12 dígitos numéricos' },
@@ -20,7 +21,8 @@ const DOCUMENT_VALIDATION_RULES = {
 };
 
 export function validateDocumentNumber(tipoDocumento, numeroDocumento) {
-  const normalizedTipo = String(tipoDocumento ?? '').trim().toUpperCase();
+  const rawTipo = String(tipoDocumento ?? '').trim().toUpperCase();
+  const normalizedTipo = DOCUMENT_TYPE_BY_INDEX[rawTipo] || rawTipo;
   const normalizedNumero = String(numeroDocumento ?? '').trim();
   const rule = DOCUMENT_VALIDATION_RULES[normalizedTipo];
 
@@ -42,8 +44,13 @@ export function validateDocumentNumber(tipoDocumento, numeroDocumento) {
 }
 
 const CLIENT_TEMPLATE_COLUMNS = [
-  { header: 'tipo_documento', key: 'tipo_documento', width: 20, required: true, description: 'Tipo de documento: DNI, CE, PASAPORTE o RUC.' },
+  { header: 'tipo_documento', key: 'tipo_documento', width: 20, required: true, description: 'Índice del tipo: 1 DNI, 2 CE, 3 PASAPORTE, 4 RUC.' },
   { header: 'numero_documento', key: 'numero_documento', width: 22, required: true, description: 'Número del documento del cliente (obligatorio).' },
+  { header: 'deuda_cliente', key: 'deuda_cliente', width: 18, required: true, description: 'Deuda del cliente. Obligatoria y numérica.' },
+  { header: 'direccion', key: 'direccion', width: 35, required: false, description: 'Dirección del cliente.' },
+  { header: 'telefono', key: 'telefono', width: 18, required: false, description: 'Teléfono del cliente.' },
+  { header: 'opcional_1', key: 'opcional_1', width: 20, required: false, description: 'Campo libre opcional.' },
+  { header: 'opcional_2', key: 'opcional_2', width: 20, required: false, description: 'Campo libre opcional.' },
 ];
 
 export async function createClientTemplate() {
@@ -51,6 +58,7 @@ export async function createClientTemplate() {
   workbook.creator = 'Mi Radar 360° - Informa Perú';
   workbook.created = new Date();
 
+  const dataStartRow = 2;
   const sheet = workbook.addWorksheet('Clientes', { views: [{ state: 'frozen', ySplit: 1 }] });
   sheet.columns = CLIENT_TEMPLATE_COLUMNS.map(({ header, key, width }) => ({ header, key, width }));
   sheet.autoFilter = { from: 'A1', to: `${sheet.getColumn(CLIENT_TEMPLATE_COLUMNS.length).letter}1` };
@@ -64,33 +72,56 @@ export async function createClientTemplate() {
   });
   sheet.getColumn('tipo_documento').numFmt = '@';
   sheet.getColumn('numero_documento').numFmt = '@';
-  sheet.dataValidations.add('A2:A200001', {
-    type: 'list', allowBlank: true, formulae: ['"DNI,CE,PASAPORTE,RUC"'],
-    errorStyle: 'stop',
-    showErrorMessage: true, errorTitle: 'Tipo de documento no válido', error: 'Seleccione DNI, CE, PASAPORTE o RUC.',
-    showInputMessage: true, promptTitle: 'Tipo de documento', prompt: 'Seleccione un tipo de documento de la lista.',
+  sheet.dataValidations.add(`A${dataStartRow}:A200001`, {
+    type: 'custom', allowBlank: false, formulae: [`AND(LEN(A${dataStartRow})>0,OR(A${dataStartRow}="1",A${dataStartRow}="2",A${dataStartRow}="3",A${dataStartRow}="4"))`],
+    errorStyle: 'stop', showErrorMessage: true,
+    errorTitle: 'Tipo de documento no válido', error: 'Ingrese 1, 2, 3 o 4 según la leyenda.',
+  });
+  sheet.dataValidations.add(`B${dataStartRow}:B200001`, {
+    type: 'custom', allowBlank: false, formulae: [`LEN(B${dataStartRow})>0`],
+    errorStyle: 'stop', showErrorMessage: true,
+    errorTitle: 'Número de documento obligatorio', error: 'Ingrese el número de documento.',
+  });
+  sheet.dataValidations.add(`C${dataStartRow}:C200001`, {
+    type: 'custom', allowBlank: false, formulae: [`AND(LEN(C${dataStartRow})>0,ISNUMBER(C${dataStartRow}),C${dataStartRow}>=0)`],
+    errorStyle: 'stop', showErrorMessage: true,
+    errorTitle: 'Deuda inválida', error: 'Ingrese una deuda numérica mayor o igual a cero.',
+  });
+  sheet.dataValidations.add(`E${dataStartRow}:E200001`, {
+    type: 'custom', allowBlank: true, formulae: [`OR(E${dataStartRow}="",AND(ISNUMBER(E${dataStartRow}),LEN(E${dataStartRow})=9))`],
+    errorStyle: 'stop', showErrorMessage: true,
+    errorTitle: 'Teléfono inválido', error: 'El teléfono debe tener exactamente 9 dígitos.',
   });
 
   const instructions = workbook.addWorksheet('Instrucciones', { views: [{ state: 'frozen', ySplit: 1 }] });
   instructions.columns = [
-    { header: 'Columna', key: 'column', width: 24 },
-    { header: 'Obligatoria', key: 'required', width: 15 },
-    { header: 'Descripción y formato', key: 'description', width: 72 },
+    { header: 'Campo', key: 'field', width: 24 },
+    { header: 'Obligatorio', key: 'required', width: 16 },
+    { header: 'Descripción y validación', key: 'description', width: 72 },
   ];
-  CLIENT_TEMPLATE_COLUMNS.forEach(column => instructions.addRow({
-    column: column.header,
-    required: column.required ? 'SÍ' : 'No',
-    description: column.description,
-  }));
-  instructions.getRow(1).height = 26;
+  instructions.addRows([
+    ['tipo_documento', 'Sí', 'Use 1 para DNI, 2 para CE, 3 para PASAPORTE o 4 para RUC.'],
+    ['numero_documento', 'Sí', 'DNI: 8 dígitos; CE: 9 a 12 dígitos; PASAPORTE: 8 a 12 caracteres; RUC: 11 dígitos.'],
+    ['deuda_cliente', 'Sí', 'Importe numérico mayor o igual a cero. Se guarda como deuda vigente.'],
+    ['direccion', 'No', 'Dirección del cliente.'],
+    ['telefono', 'No', 'Si se informa, debe contener exactamente 9 dígitos.'],
+    ['opcional_1', 'No', 'Campo libre opcional.'],
+    ['opcional_2', 'No', 'Campo libre opcional.'],
+  ]);
+  instructions.getRow(1).height = 28;
   instructions.getRow(1).eachCell(cell => {
     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF102DB6' } };
     cell.alignment = { vertical: 'middle', horizontal: 'center' };
   });
   instructions.eachRow((row, rowNumber) => {
-    if (rowNumber > 1) row.alignment = { vertical: 'top', wrapText: true };
+    if (rowNumber > 1) {
+      row.alignment = { vertical: 'top', wrapText: true };
+      row.height = 32;
+      if (rowNumber <= 4) row.getCell(2).font = { bold: true, color: { argb: 'FFF5333F' } };
+    }
   });
+  instructions.autoFilter = { from: 'A1', to: 'C8' };
 
   return workbook.xlsx.writeBuffer();
 }
@@ -189,17 +220,32 @@ function pickMatching(row, aliases, patterns = []) {
 async function clientRecord(row) {
   const tipoDocumento = text(pick(row, ['tipo_documento', 'tipo_doc', 'tipo_docuemento', 'tipo_document']), 20).toUpperCase();
   const numeroDocumento = text(pick(row, ['numero_documento', 'numero', 'documento', 'doc_identidad', 'num_doc']), 20);
-  if (!tipoDocumento || !numeroDocumento) return null;
+  const deudaCliente = text(pick(row, ['deuda_cliente']), 30);
+  if (!tipoDocumento || !numeroDocumento || !deudaCliente) return null;
 
-  const normalizedTipo = VALID_TIPO_DOCUMENTO.includes(tipoDocumento) ? tipoDocumento : null;
+  const normalizedTipo = DOCUMENT_TYPE_BY_INDEX[tipoDocumento] || null;
   if (!normalizedTipo) {
-    throw Object.assign(new Error(`Tipo de documento no válido: ${tipoDocumento}. Valores permitidos: ${VALID_TIPO_DOCUMENTO.join(', ')}`), {
+    throw Object.assign(new Error(`Tipo de documento no válido: ${tipoDocumento}. Valores permitidos: 1, 2, 3 o 4.`), {
       statusCode: 400,
       code: 'INVALID_DOCUMENT_TYPE',
     });
   }
 
   const validNumeroDocumento = validateDocumentNumber(normalizedTipo, numeroDocumento);
+  const parsedDebt = Number(deudaCliente.replace(',', '.'));
+  if (!Number.isFinite(parsedDebt) || parsedDebt < 0) {
+    throw Object.assign(new Error('deuda_cliente debe ser un número mayor o igual a cero.'), {
+      statusCode: 400,
+      code: 'INVALID_CLIENT_DEBT',
+    });
+  }
+  const telefono = text(pick(row, ['telefono']), 20);
+  if (telefono && !/^\d{9}$/.test(telefono)) {
+    throw Object.assign(new Error('El teléfono debe tener exactamente 9 dígitos.'), {
+      statusCode: 400,
+      code: 'INVALID_PHONE_NUMBER',
+    });
+  }
 
   return {
     tipo_documento: normalizedTipo,
@@ -207,12 +253,12 @@ async function clientRecord(row) {
     nombres: '',
     apellido_paterno: '',
     apellido_materno: '',
-    telefono: null,
-    direccion: null,
+    telefono: telefono || null,
+    direccion: text(pick(row, ['direccion']), 255) || null,
     distrito: null,
     estado: 'ACTIVO',
     deuda_castigada: 0,
-    deuda_vigente: 0,
+    deuda_vigente: parsedDebt,
     otras_deudas: 0,
     ultima_gestion: null,
     latitud: null,
@@ -374,7 +420,13 @@ async function processJob(id) {
           headers = values.map(normalizeHeader);
           const hasDocumentType = headers.some(header => ['tipo_documento', 'tipo_doc', 'tipo_docuemento', 'tipo_document'].includes(header));
           const hasDocumentNumber = headers.some(header => ['numero_documento', 'numero', 'documento', 'doc_identidad', 'num_doc'].includes(header));
-          if (!hasDocumentType || !hasDocumentNumber) throw Object.assign(new Error('La cabecera debe incluir tipo_documento y numero_documento'), { code: 'INVALID_HEADERS' });
+          const hasClientDebt = headers.includes('deuda_cliente');
+          if (job.tipo === 'CLIENTES' && (!hasDocumentType || !hasDocumentNumber || !hasClientDebt)) {
+            throw Object.assign(new Error('La cabecera debe incluir tipo_documento, numero_documento y deuda_cliente'), { code: 'INVALID_HEADERS' });
+          }
+          if (job.tipo !== 'CLIENTES' && (!hasDocumentType || !hasDocumentNumber)) {
+            throw Object.assign(new Error('La cabecera debe incluir numero_documento'), { code: 'INVALID_HEADERS' });
+          }
           continue;
         }
         if (values.every(value => text(value) === '')) continue;
@@ -389,7 +441,10 @@ async function processJob(id) {
           if (details.length < MAX_ERRORS) details.push({ fila: excelRow.number, error: `Ubicación no válida: ${rowError.message}` });
           continue;
         }
-        if (!record) { errors++; if (details.length < MAX_ERRORS) details.push({ fila: excelRow.number, error: 'tipo_documento y numero_documento son obligatorios' }); }
+        if (!record) {
+          errors++;
+          if (details.length < MAX_ERRORS) details.push({ fila: excelRow.number, error: 'tipo_documento, numero_documento y deuda_cliente son obligatorios' });
+        }
         else batch.push(record);
         if (batch.length >= BATCH_SIZE) await flush();
       }
