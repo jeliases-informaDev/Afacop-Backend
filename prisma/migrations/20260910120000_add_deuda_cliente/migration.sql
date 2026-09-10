@@ -1,0 +1,2 @@
+ALTER TABLE "clientes"
+ADD COLUMN "deuda_cliente" DECIMAL(12, 2) NOT NULL DEFAULT 0;

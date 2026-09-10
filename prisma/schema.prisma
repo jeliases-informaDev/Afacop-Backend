@@ -35,6 +35,7 @@ model Cliente {
   direccion        String?       @db.VarChar(255)
   distrito         String?       @db.VarChar(100)
   deuda_castigada  Decimal       @default(0) @db.Decimal(12, 2)
+  deuda_cliente    Decimal       @default(0) @db.Decimal(12, 2)
   deuda_vigente    Decimal       @default(0) @db.Decimal(12, 2)
   otras_deudas     Decimal       @default(0) @db.Decimal(12, 2)
   estado           String        @default("ACTIVO") @db.VarChar(20)
