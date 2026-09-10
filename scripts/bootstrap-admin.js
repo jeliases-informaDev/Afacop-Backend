@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import prisma from '../src/config/prisma.js';
+import prisma from '#core/config/prisma.js';
 
 // El nombre de acceso y el rol son conceptos distintos. El usuario inicial es
 // "Afacop" (persistido en minúsculas para que el inicio de sesión no distinga
