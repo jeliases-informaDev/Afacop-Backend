@@ -77,9 +77,9 @@ export async function createClientTemplate() {
     errorTitle: 'Tipo de documento no válido', error: 'Ingrese 1, 2, 3 o 4 según la leyenda.',
   });
   sheet.dataValidations.add(`B${dataStartRow}:B200001`, {
-    type: 'custom', allowBlank: false, formulae: [`LEN(B${dataStartRow})>0`],
+    type: 'custom', allowBlank: false, formulae: [`OR(AND(A${dataStartRow}="1",LEN(B${dataStartRow})=8,ISNUMBER(--B${dataStartRow})),AND(A${dataStartRow}="2",LEN(B${dataStartRow})>=9,LEN(B${dataStartRow})<=12,ISNUMBER(--B${dataStartRow})),AND(A${dataStartRow}="3",LEN(B${dataStartRow})>=8,LEN(B${dataStartRow})<=12),AND(A${dataStartRow}="4",LEN(B${dataStartRow})=11,ISNUMBER(--B${dataStartRow})))`],
     errorStyle: 'stop', showErrorMessage: true,
-    errorTitle: 'Número de documento obligatorio', error: 'Ingrese el número de documento.',
+    errorTitle: 'Número de documento inválido', error: 'La cantidad de dígitos o caracteres no coincide con el tipo de documento.',
   });
   sheet.dataValidations.add(`C${dataStartRow}:C200001`, {
     type: 'custom', allowBlank: false, formulae: [`AND(LEN(C${dataStartRow})>0,ISNUMBER(C${dataStartRow}),C${dataStartRow}>=0)`],
