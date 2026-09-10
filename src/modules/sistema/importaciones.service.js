@@ -101,7 +101,7 @@ export async function createClientTemplate() {
   instructions.addRows([
     ['tipo_documento', 'Sí', 'Use 1 para DNI, 2 para CE, 3 para PASAPORTE o 4 para RUC.'],
     ['numero_documento', 'Sí', 'DNI: 8 dígitos; CE: 9 a 12 dígitos; PASAPORTE: 8 a 12 caracteres; RUC: 11 dígitos.'],
-    ['deuda_cliente', 'Sí', 'Importe numérico mayor o igual a cero. Se guarda como deuda vigente.'],
+    ['deuda_cliente', 'Sí', 'Importe numérico mayor o igual a cero. Se guarda en la columna deuda_cliente.'],
     ['direccion', 'No', 'Dirección del cliente.'],
     ['telefono', 'No', 'Si se informa, debe contener exactamente 9 dígitos.'],
     ['opcional_1', 'No', 'Campo libre opcional.'],
@@ -257,7 +257,8 @@ async function clientRecord(row) {
     distrito: null,
     estado: 'ACTIVO',
     deuda_castigada: 0,
-    deuda_vigente: parsedDebt,
+    deuda_cliente: parsedDebt,
+    deuda_vigente: 0,
     otras_deudas: 0,
     ultima_gestion: null,
     latitud: null,
@@ -299,6 +300,26 @@ async function validateSignature(filePath) {
 
 export async function createJob({ type, file, actorId }) {
   await validateSignature(file.path);
+  if (type === 'CLIENTES') {
+    const now = new Date();
+    const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    const nextMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+    const monthlyImport = await prisma.importacionMasiva.findFirst({
+      where: {
+        tipo: 'CLIENTES',
+        fecha_creacion: { gte: monthStart, lt: nextMonthStart },
+        estado: { in: ['PENDIENTE', 'PROCESANDO', 'COMPLETADA'] },
+      },
+      select: { id_importacion: true, estado: true, fecha_creacion: true },
+      orderBy: { fecha_creacion: 'desc' },
+    });
+    if (monthlyImport) {
+      const error = new Error('La importación de clientes solo puede realizarse una vez por mes.');
+      error.statusCode = 409;
+      error.code = 'CLIENT_IMPORT_MONTHLY_LIMIT';
+      throw error;
+    }
+  }
   const job = await prisma.importacionMasiva.create({ data: {
     tipo: type, archivo: file.originalname.slice(0, 255), ruta_temporal: file.path, actor_id: actorId,
   } });
@@ -355,19 +376,19 @@ async function processJob(id) {
           },
         });
         const affected = await prisma.$executeRaw`
-          INSERT INTO "clientes" ("tipo_documento", "numero_documento", "nombres", "apellido_paterno", "apellido_materno", "telefono", "direccion", "distrito", "estado", "deuda_castigada", "deuda_vigente", "otras_deudas", "ultima_gestion", "latitud", "longitud")
+             INSERT INTO "clientes" ("tipo_documento", "numero_documento", "nombres", "apellido_paterno", "apellido_materno", "telefono", "direccion", "distrito", "estado", "deuda_castigada", "deuda_cliente", "deuda_vigente", "otras_deudas", "ultima_gestion", "latitud", "longitud")
           SELECT x.tipo_documento::"TipoDocumento", x.numero_documento, x.nombres, x.apellido_paterno, x.apellido_materno, x.telefono, x.direccion, x.distrito, x.estado,
-                 x.deuda_castigada, x.deuda_vigente, x.otras_deudas, x.ultima_gestion, x.latitud, x.longitud
+               x.deuda_castigada, x.deuda_cliente, x.deuda_vigente, x.otras_deudas, x.ultima_gestion, x.latitud, x.longitud
           FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb) AS x(
             tipo_documento text, numero_documento text, nombres text, apellido_paterno text, apellido_materno text, telefono text, direccion text,
-            distrito text, estado text, deuda_castigada numeric, deuda_vigente numeric, otras_deudas numeric,
+               distrito text, estado text, deuda_castigada numeric, deuda_cliente numeric, deuda_vigente numeric, otras_deudas numeric,
             ultima_gestion timestamp, latitud numeric, longitud numeric
           )
           ON CONFLICT ("tipo_documento", "numero_documento") DO UPDATE SET
             "nombres" = EXCLUDED."nombres", "apellido_paterno" = EXCLUDED."apellido_paterno",
             "apellido_materno" = EXCLUDED."apellido_materno", "telefono" = EXCLUDED."telefono",
             "direccion" = EXCLUDED."direccion", "distrito" = EXCLUDED."distrito", "estado" = EXCLUDED."estado",
-            "deuda_castigada" = EXCLUDED."deuda_castigada", "deuda_vigente" = EXCLUDED."deuda_vigente",
+            "deuda_castigada" = EXCLUDED."deuda_castigada", "deuda_cliente" = EXCLUDED."deuda_cliente",
             "otras_deudas" = EXCLUDED."otras_deudas", "ultima_gestion" = EXCLUDED."ultima_gestion",
             "latitud" = EXCLUDED."latitud", "longitud" = EXCLUDED."longitud"
         `;
