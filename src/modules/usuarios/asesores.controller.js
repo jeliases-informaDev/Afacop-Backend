@@ -104,10 +104,13 @@ async function crearAsesor(req, res) {
       datos.correo = datos.email;
     }
 
-    if (!datos.numero_documento || !String(datos.numero_documento).trim()) {
+    // Acepta indistintamente 'dni' o 'numero_documento' enviado desde el cliente
+    const documentoEntrante = datos.dni || datos.numero_documento || datos.DNI || datos.documento;
+
+    if (!documentoEntrante || !String(documentoEntrante).trim()) {
       return res.status(400).json({ mensaje: "El DNI es obligatorio" });
     }
-    const dniStr = String(datos.numero_documento).trim();
+    const dniStr = String(documentoEntrante).trim();
     if (!DNI_REGEX.test(dniStr)) {
       return res.status(400).json({ mensaje: "El DNI debe tener exactamente 8 dígitos numéricos" });
     }
@@ -158,6 +161,7 @@ async function crearAsesor(req, res) {
     }
 
     const resultado = await asesoresService.crearAsesor({
+      dni: dniStr,
       numero_documento: dniStr,
       nombres: String(datos.nombres).trim(),
       apellido_paterno: String(datos.apellido_paterno).trim(),
@@ -179,7 +183,6 @@ async function crearAsesor(req, res) {
     });
   }
 }
-
 /**
  * Controlador para actualizar parcialmente un asesor por su ID.
  * 
