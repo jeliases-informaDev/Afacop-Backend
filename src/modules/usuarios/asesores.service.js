@@ -124,7 +124,7 @@ function mapearAsesor(asesor) {
   return {
     id_asesor: asesor.id_asesor,
     id: asesor.id_asesor,
-    dni: asesor.numero_documento,
+    dni: asesor.dni,
     nombres: asesor.nombres,
     apellidos,
     apellido_paterno: asesor.apellido_paterno,
