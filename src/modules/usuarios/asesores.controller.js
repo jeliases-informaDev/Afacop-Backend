@@ -99,6 +99,13 @@ async function crearAsesor(req, res) {
   try {
     const datos = { ...req.body };
 
+    // --- CORRECCIÓN CLAVE: Mapear 'dni' o 'numero_documento' indistintamente ---
+    if (!datos.numero_documento && datos.dni) {
+      datos.numero_documento = datos.dni;
+    } else if (!datos.dni && datos.numero_documento) {
+      datos.dni = datos.numero_documento;
+    }
+
     if (datos.email !== undefined && datos.correo === undefined) {
       datos.correo = datos.email;
     }
@@ -190,6 +197,13 @@ async function actualizarAsesor(req, res) {
     const { id } = req.params;
     
     const datos = { ...req.body };
+
+    // --- CORRECCIÓN CLAVE: Mapear 'dni' o 'numero_documento' en actualización ---
+    if (!datos.numero_documento && datos.dni) {
+      datos.numero_documento = datos.dni;
+    } else if (!datos.dni && datos.numero_documento) {
+      datos.dni = datos.numero_documento;
+    }
 
     if (datos.email !== undefined && datos.correo === undefined) {
       datos.correo = datos.email;
