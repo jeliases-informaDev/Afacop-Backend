@@ -345,7 +345,7 @@ async function obtenerActividad({ id_asesor, fecha }) {
 }
 
 /**
- * Exporta el historial de visitas a formato CSV.
+ * Exporta toda la actividad del dashboard a formato CSV.
  * 
  * @param {Object} params
  * @param {string} [params.fecha_inicio]
@@ -354,38 +354,68 @@ async function obtenerActividad({ id_asesor, fecha }) {
  */
 async function exportarActividad({ fecha_inicio, fecha_fin }) {
   const where = {};
+  const routeWhere = {};
+  let start;
+  let end;
   if (fecha_inicio || fecha_fin) {
     where.fecha_creacion = {};
     if (fecha_inicio) {
-      where.fecha_creacion.gte = new Date(fecha_inicio);
+      start = new Date(fecha_inicio);
+      where.fecha_creacion.gte = start;
+      routeWhere.fecha_actualizar = { gte: start };
     }
     if (fecha_fin) {
-      const end = new Date(fecha_fin);
+      end = new Date(fecha_fin);
       if (fecha_fin.length <= 10) {
         end.setHours(23, 59, 59, 999);
       }
       where.fecha_creacion.lte = end;
+      routeWhere.fecha_actualizar = { ...(routeWhere.fecha_actualizar || {}), lte: end };
     }
   }
 
-  const visitas = await prisma.visita.findMany({
-    where,
-    orderBy: {
-      fecha_creacion: "desc",
-    },
-    include: {
-      asesor: true,
-      cliente: true,
-    },
-  });
+  const [visitas, rutas] = await Promise.all([
+    prisma.visita.findMany({ where, orderBy: { fecha_creacion: 'desc' }, include: { asesor: true, cliente: true } }),
+    prisma.ruta.findMany({
+      where: routeWhere,
+      orderBy: { fecha_actualizar: 'desc' },
+      include: {
+        asesor: { select: { nombres: true } },
+        rutas_clientes: { where: { estado_visita: { not: 'PENDIENTE' } }, include: { cliente: true } },
+      },
+    }),
+  ]);
 
-  let csv = "ID,Worker,Cliente,Tipificacion,Estado Nuevo,Observacion,Fecha Hora\n";
-  visitas.forEach((v) => {
-    const fecha = new Date(v.fecha_creacion).toLocaleString("es-PE", { timeZone: "America/Lima" });
-    const cleanObs = v.observaciones ? v.observaciones.replace(/"/g, '""').replace(/\n/g, " ") : "";
-    const workerName = `${v.asesor.nombres} ${v.asesor.apellido_paterno ?? ""}`.trim();
-    const clientName = `${v.cliente.nombres} ${v.cliente.apellido_paterno ?? ""} ${v.cliente.apellido_materno ?? ""}`.trim();
-    csv += `${v.id_visita},"${workerName}","${clientName}",${v.resultado || "GESTIONADO"},${v.resultado || "GESTIONADO"},"${cleanObs}","${fecha}"\n`;
+  const events = visitas.map(v => ({
+    id: String(v.id_visita),
+    worker: `${v.asesor.nombres} ${v.asesor.apellido_paterno ?? ''}`.trim(),
+    client: `${v.cliente.nombres} ${v.cliente.apellido_paterno ?? ''} ${v.cliente.apellido_materno ?? ''}`.trim(),
+    tipificacion: v.resultado || 'GESTIONADO',
+    estado: v.resultado || 'GESTIONADO',
+    observacion: v.observaciones || '',
+    created_at: v.fecha_creacion,
+  }));
+  const routeEvents = rutas.flatMap(route => {
+    const base = { worker: route.asesor.nombres, observacion: `Ruta #${route.id_ruta}` };
+    const result = [];
+    if (route.fecha_inicio_real) result.push({ ...base, id: `ruta-${route.id_ruta}-inicio`, tipificacion: 'RUTA_INICIADA', estado: 'RUTA_INICIADA', created_at: route.fecha_inicio_real });
+    if (route.estado === 'FINALIZADA' && route.fecha_fin_real) result.push({ ...base, id: `ruta-${route.id_ruta}-fin`, tipificacion: 'RUTA_FINALIZADA', estado: 'RUTA_FINALIZADA', created_at: route.fecha_fin_real });
+    if (route.estado === 'CANCELADA') result.push({ ...base, id: `ruta-${route.id_ruta}-cancelada`, tipificacion: 'RUTA_CANCELADA', estado: 'RUTA_CANCELADA', created_at: route.fecha_actualizar });
+    for (const item of route.rutas_clientes) result.push({
+      ...base, id: `ruta-cliente-${item.id_ruta_cliente}-${item.estado_visita}`,
+      client: `${item.cliente.nombres} ${item.cliente.apellido_paterno || ''} ${item.cliente.apellido_materno || ''}`.trim(),
+      tipificacion: item.estado_visita, estado: item.estado_visita, created_at: item.fecha_actualizar,
+    });
+    return result;
+  });
+  const csvField = value => `"${String(value ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
+  const allEvents = [...events, ...routeEvents]
+    .filter(event => !start || (new Date(event.created_at) >= start && (!end || new Date(event.created_at) < end)))
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  let csv = ['ID', 'Worker', 'Cliente', 'Tipificacion', 'Estado Nuevo', 'Observacion', 'Fecha Hora'].map(csvField).join(';') + '\r\n';
+  allEvents.forEach((event) => {
+    const fecha = new Date(event.created_at).toLocaleString("es-PE", { timeZone: "America/Lima" });
+    csv += [event.id, event.worker, event.client, event.tipificacion, event.estado, event.observacion, fecha].map(csvField).join(';') + '\r\n';
   });
 
   return csv;
