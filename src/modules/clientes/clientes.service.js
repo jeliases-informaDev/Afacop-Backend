@@ -29,53 +29,118 @@ function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
  * @param {string} [params.search]
  * @param {string} [params.distrito]
  * @param {string} [params.estado]
+ * @param {string} [params.estado_gestion]
  * @param {string} [params.fecha_pago]
  * @param {number} [params.lat]
  * @param {number} [params.lng]
  * @param {number} [params.radio]
  * @returns {Promise<Object>} Resultado con data paginada y objeto pagination.
  */
-async function obtenerClientes({ page = 1, limit = 12, search = "", distrito, estado, fecha_pago, lat, lng, radio, asesorId } = {}) {
+async function obtenerClientes({
+  page = 1,
+  limit = 12,
+  search = "",
+  distrito,
+  estado,
+  estado_gestion,
+  fecha_pago,
+  lat,
+  lng,
+  radio,
+  asesorId,
+} = {}) {
+
   const where = {};
 
-  if (asesorId) where.asignaciones = { some: { id_asesor: Number(asesorId), estado: "ACTIVA" } };
-  if (distrito) where.distrito = { equals: distrito.trim(), mode: "insensitive" };
-  if (estado) where.estado = estado;
-  if (fecha_pago) {
-    const start = new Date(`${fecha_pago}T00:00:00.000Z`);
-    const end = new Date(start); end.setUTCDate(end.getUTCDate() + 1);
-    where.ultima_gestion = { gte: start, lt: end };
+  if (asesorId) {
+    where.asignaciones = {
+      some: {
+        id_asesor: Number(asesorId),
+        estado: "ACTIVA",
+      },
+    };
+  }
+
+  if (distrito) {
+    where.distrito = {
+      equals: distrito.trim(),
+      mode: "insensitive",
+    };
+  }
+
+  // Estado propio del cliente
+  if (estado) {
+    where.estado = estado;
   }
 
   if (search && search.trim() !== "") {
-      const trimmedSearch = search.trim();
-      where.OR = [
-        { numero_documento: { contains: trimmedSearch, mode: "insensitive" } },
-        { nombres: { contains: trimmedSearch, mode: "insensitive" } },
-        { apellido_paterno: { contains: trimmedSearch, mode: "insensitive" } },
-        { apellido_materno: { contains: trimmedSearch, mode: "insensitive" } },
-      ];
-    }
+    const trimmedSearch = search.trim();
 
-  // Si se envían coordenadas de proximidad, aplicar filtro de Bounding Box a nivel de DB
-  if (lat !== undefined && lat !== null && lng !== undefined && lng !== null) {
-    const latNum = Number(lat);
-    const lngNum = Number(lng);
-    const radioKm = Number(radio || 5);
+    where.OR = [
+      {
+        numero_documento: {
+          contains: trimmedSearch,
+          mode: "insensitive",
+        },
+      },
+      {
+        nombres: {
+          contains: trimmedSearch,
+          mode: "insensitive",
+        },
+      },
+      {
+        apellido_paterno: {
+          contains: trimmedSearch,
+          mode: "insensitive",
+        },
+      },
+      {
+        apellido_materno: {
+          contains: trimmedSearch,
+          mode: "insensitive",
+        },
+      },
+    ];
+  }
 
-    if (!isNaN(latNum) && !isNaN(lngNum) && !isNaN(radioKm)) {
-      // 1 grado de latitud es aproximadamente 111.1 km
+  let latNum = null;
+  let lngNum = null;
+  let radioKm = null;
+  let filtrarPorDistancia = false;
+
+  // Bounding Box
+  if (
+    lat !== undefined &&
+    lat !== null &&
+    lng !== undefined &&
+    lng !== null
+  ) {
+    latNum = Number(lat);
+    lngNum = Number(lng);
+    radioKm = Number(radio || 5);
+
+    if (
+      !isNaN(latNum) &&
+      !isNaN(lngNum) &&
+      !isNaN(radioKm)
+    ) {
+      filtrarPorDistancia = true;
+
       const deltaLat = radioKm / 111.1;
-      // 1 grado de longitud es aproximadamente 111.1 km * cos(latitud)
-      const deltaLng = radioKm / (111.1 * Math.cos(latNum * Math.PI / 180));
+
+      const deltaLng =
+        radioKm /
+        (111.1 * Math.cos((latNum * Math.PI) / 180));
 
       where.latitud = {
         gte: latNum - deltaLat,
-        lte: latNum + deltaLat
+        lte: latNum + deltaLat,
       };
+
       where.longitud = {
         gte: lngNum - deltaLng,
-        lte: lngNum + deltaLng
+        lte: lngNum + deltaLng,
       };
     }
   }
@@ -83,72 +148,250 @@ async function obtenerClientes({ page = 1, limit = 12, search = "", distrito, es
   const skip = (page - 1) * limit;
   const take = limit;
 
-  const [total, clientes] = await Promise.all([
-    prisma.cliente.count({ where }),
-    prisma.cliente.findMany({
+  /*
+   * estado_gestion se calcula después de consultar Prisma.
+   * Por eso, cuando existe ese filtro, primero debemos obtener
+   * los clientes, calcular el estado y recién después paginar.
+   */
+  const requiereFiltroPosterior =
+    Boolean(estado_gestion || fecha_pago || filtrarPorDistancia);
+
+  const includeGestion = {
+    rutas_clientes: {
+      orderBy: {
+        fecha_actualizar: "desc",
+      },
+      take: 1,
+      select: {
+        estado_visita: true,
+        fecha_actualizar: true,
+        ruta: {
+          select: {
+            estado: true,
+          },
+        },
+      },
+    },
+  };
+
+  let clientes;
+  let total;
+
+  if (requiereFiltroPosterior) {
+    clientes = await prisma.cliente.findMany({
       where,
-      skip,
-      take,
       orderBy: {
         id_cliente: "asc",
       },
-    }),
-  ]);
+      include: includeGestion,
+    });
+  } else {
+    [total, clientes] = await Promise.all([
+      prisma.cliente.count({
+        where,
+      }),
+
+      prisma.cliente.findMany({
+        where,
+        skip,
+        take,
+        orderBy: {
+          id_cliente: "asc",
+        },
+        include: includeGestion,
+      }),
+    ]);
+  }
+
+  const getEstadoGestion = (cliente) => {
+    const enlace = cliente.rutas_clientes?.[0];
+
+    if (enlace) {
+      if (enlace.estado_visita === "REPROGRAMADO") {
+        return {
+          estado_gestion: "REPROGRAMADO",
+          fecha_gestion: enlace.fecha_actualizar,
+        };
+      }
+
+      if (enlace.estado_visita === "NO_ENCONTRADO") {
+        return {
+          estado_gestion: "NO_ENCONTRADO",
+          fecha_gestion: enlace.fecha_actualizar,
+        };
+      }
+
+      if (enlace.estado_visita === "VISITADO") {
+        return {
+          estado_gestion: "GESTIONADO",
+          fecha_gestion: enlace.fecha_actualizar,
+        };
+      }
+
+      if (enlace.ruta?.estado === "EN_PROCESO") {
+        return {
+          estado_gestion: "EN_VISITA",
+          fecha_gestion: enlace.fecha_actualizar,
+        };
+      }
+    }
+
+    return {
+      estado_gestion: "LIBRE",
+      fecha_gestion: cliente.ultima_gestion,
+    };
+  };
 
   let data = clientes.map((cliente) => {
-    const deuda_total =
-      Number(cliente.deuda_castigada ?? 0) +
-      Number(cliente.deuda_vigente ?? 0) +
+    const deuda_castigada =
+      Number(cliente.deuda_castigada ?? 0);
+
+    const deuda_cliente =
+      Number(cliente.deuda_cliente ?? 0);
+
+    const deuda_vigente =
+      Number(cliente.deuda_vigente ?? 0);
+
+    const otras_deudas =
       Number(cliente.otras_deudas ?? 0);
 
-    const apellidos = `${cliente.apellido_paterno ?? ""} ${cliente.apellido_materno ?? ""}`.trim();
+    const deuda_total =
+      deuda_castigada +
+      deuda_cliente +
+      deuda_vigente +
+      otras_deudas;
+
+    const apellidos =
+      `${cliente.apellido_paterno ?? ""} ${cliente.apellido_materno ?? ""}`.trim();
+
+    const gestion = getEstadoGestion(cliente);
 
     return {
       id: cliente.id_cliente,
-      id_cliente: cliente.id_cliente, // Asegura compatibilidad
+      id_cliente: cliente.id_cliente,
+
       tipo_documento: cliente.tipo_documento,
       numero_documento: cliente.numero_documento,
+
       nombres: cliente.nombres,
       apellidos,
+
       telefono: cliente.telefono,
       direccion: cliente.direccion,
       distrito: cliente.distrito,
+
+      deuda_cliente,
       deuda_total,
+
       dias_retraso: 0,
+
+      // Estado propio del cliente
       estado: cliente.estado,
-      fecha_gestion: cliente.ultima_gestion,
-      latitud: cliente.latitud !== null && cliente.latitud !== undefined ? Number(cliente.latitud) : null,
-      longitud: cliente.longitud !== null && cliente.longitud !== undefined ? Number(cliente.longitud) : null,
+
+      // Estado operativo
+      estado_gestion: gestion.estado_gestion,
+
+      fecha_gestion: gestion.fecha_gestion,
+
+      latitud:
+        cliente.latitud !== null &&
+        cliente.latitud !== undefined
+          ? Number(cliente.latitud)
+          : null,
+
+      longitud:
+        cliente.longitud !== null &&
+        cliente.longitud !== undefined
+          ? Number(cliente.longitud)
+          : null,
     };
   });
 
-  // Si se pasaron coordenadas, aplicar filtro estricto de distancia circular (Haversine) y ordenar
-  if (lat !== undefined && lat !== null && lng !== undefined && lng !== null) {
-    const latNum = Number(lat);
-    const lngNum = Number(lng);
-    const radioKm = Number(radio || 5);
-
-    if (!isNaN(latNum) && !isNaN(lngNum) && !isNaN(radioKm)) {
-      data = data
-        .map(c => {
-          if (c.latitud === null || c.longitud === null) return { ...c, distancia_km: null };
-          const dist = calcularDistanciaHaversine(latNum, lngNum, c.latitud, c.longitud);
-          return { ...c, distancia_km: parseFloat(dist.toFixed(2)) };
-        })
-        .filter(c => c.distancia_km !== null && c.distancia_km <= radioKm)
-        .sort((a, b) => a.distancia_km - b.distancia_km);
-    }
+  // FILTRO ESTADO GESTIÓN
+  if (estado_gestion) {
+    data = data.filter(
+      cliente =>
+        cliente.estado_gestion === estado_gestion
+    );
   }
 
-  const finalTotal = (lat !== undefined && lat !== null && lng !== undefined && lng !== null) ? data.length : total;
-  const totalPages = Math.ceil(finalTotal / limit);
+  // FILTRO FECHA DE GESTIÓN
+  if (fecha_pago) {
+    const dateFormatter =
+      new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Lima",
+      });
+
+    data = data.filter(cliente => {
+      if (!cliente.fecha_gestion) {
+        return false;
+      }
+
+      return (
+        dateFormatter.format(
+          new Date(cliente.fecha_gestion)
+        ) === fecha_pago
+      );
+    });
+  }
+
+  // FILTRO CIRCULAR HAVERSINE
+  if (filtrarPorDistancia) {
+    data = data
+      .map((cliente) => {
+        if (
+          cliente.latitud === null ||
+          cliente.longitud === null
+        ) {
+          return {
+            ...cliente,
+            distancia_km: null,
+          };
+        }
+
+        const distancia =
+          calcularDistanciaHaversine(
+            latNum,
+            lngNum,
+            cliente.latitud,
+            cliente.longitud
+          );
+
+        return {
+          ...cliente,
+          distancia_km: parseFloat(
+            distancia.toFixed(2)
+          ),
+        };
+      })
+      .filter(
+        cliente =>
+          cliente.distancia_km !== null &&
+          cliente.distancia_km <= radioKm
+      )
+      .sort(
+        (a, b) =>
+          a.distancia_km -
+          b.distancia_km
+      );
+  }
+
+  if (requiereFiltroPosterior) {
+    total = data.length;
+
+    // La paginación ocurre después del filtro
+    data = data.slice(skip, skip + take);
+  }
+
+  const totalPages =
+    Math.ceil(total / limit);
 
   return {
     data,
     pagination: {
       page,
       limit,
-      total: finalTotal,
+      total,
       totalPages,
     },
   };
@@ -261,9 +504,10 @@ async function obtenerClientePorId(id, asesorId) {
   }
 
   const deuda_castigada = Number(cliente.deuda_castigada ?? 0);
+  const deuda_cliente = Number(cliente.deuda_cliente ?? 0);
   const deuda_vigente = Number(cliente.deuda_vigente ?? 0);
   const otras_deudas = Number(cliente.otras_deudas ?? 0);
-  const deuda_total = deuda_castigada + deuda_vigente + otras_deudas;
+  const deuda_total = deuda_castigada + deuda_cliente + deuda_vigente + otras_deudas;
 
   const apellidos = `${cliente.apellido_paterno ?? ""} ${cliente.apellido_materno ?? ""}`.trim();
 
@@ -280,6 +524,7 @@ async function obtenerClientePorId(id, asesorId) {
       direccion: cliente.direccion,
       distrito: cliente.distrito,
       deuda_castigada,
+      deuda_cliente,
       deuda_vigente,
       otras_deudas,
       deuda_total,
