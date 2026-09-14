@@ -45,6 +45,9 @@ import importacionesRoutes from '#modules/sistema/importaciones.routes.js';
 import seguridadRoutes from '#modules/sistema/seguridad.routes.js';
 import { resumePendingJobs } from '#modules/sistema/importaciones.service.js';
 
+//worker de geocodificacion
+import { startClientGeocodingWorker,} from '#modules/sistema/geocodificacion-clientes.worker.js';
+
 // ============================================================================
 // 3. CONFIGURACIÓN DE EXPRESS Y MIDDLEWARES GLOBALES
 // ============================================================================
@@ -182,16 +185,25 @@ app.use(errorHandler);
 const server = app.listen(env.PORT, () => {
   if (env.NODE_ENV === 'development') process.stdout.write(`http://localhost:${env.PORT}\n`);
   else logger.info({ port: env.PORT }, 'server_started');
+
+  startClientGeocodingWorker();
 });
 
 server.once('error', error => {
   if (error?.code === 'EADDRINUSE') {
-    process.stderr.write(`No se pudo iniciar el backend: el puerto ${env.PORT} ya está siendo utilizado por otra instancia.\n`);
+    process.stderr.write(
+      `No se pudo iniciar el backend: el puerto ${env.PORT} ya está siendo utilizado por otra instancia.\n`
+    );
   } else {
-    logger.error({ err: error, port: env.PORT }, 'server_start_failed');
+    logger.error(
+      { err: error, port: env.PORT },
+      'server_start_failed'
+    );
   }
+
   setImmediate(() => process.exit(1));
 });
+ 
 
 const io = new SocketServer(server, {
   cors: { origin: env.CORS_ALLOW_ALL === 'true' ? true : allowedOrigins, credentials: true, methods: ['GET', 'POST'] },

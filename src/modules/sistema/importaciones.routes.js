@@ -5,7 +5,7 @@ import { roleMiddleware } from '#core/middlewares/role.middleware.js';
 import { OPERATIONAL_MANAGERS } from '#core/security/roles.js';
 import { validate } from '#core/middlewares/validate.middleware.js';
 import { uuidParams } from '../../validation/schemas.js';
-import { downloadClientTemplate, getJob, uploadType } from './importaciones.controller.js';
+import { downloadClientTemplate, getJob, uploadType, geocodePendingClients } from './importaciones.controller.js';
 
 const router = Router();
 router.use(authMiddleware, roleMiddleware(OPERATIONAL_MANAGERS));
@@ -13,5 +13,10 @@ router.get('/plantillas/clientes', downloadClientTemplate);
 router.post('/clientes', upload.single('file'), uploadType('CLIENTES'));
 router.post('/asesores', upload.single('file'), uploadType('ASESORES'));
 router.get('/:id', validate({ params: uuidParams }), getJob);
+
+router.post(
+  '/clientes/geocodificar-pendientes',
+  geocodePendingClients
+);
 
 export default router;

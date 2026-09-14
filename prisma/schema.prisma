@@ -22,26 +22,38 @@ enum TipoDocumento {
 
 /// Tabla física: clientes
 model Cliente {
-  id_cliente       Int           @id @default(autoincrement())
-  
+  id_cliente Int @id @default(autoincrement())
+
   // --- MODIFICADO: Se quitó 'dni' y se agregaron los nuevos campos ---
   tipo_documento   TipoDocumento @default(DNI)
   numero_documento String        @db.VarChar(20)
-  
-  telefono         String?       @db.VarChar(20)
-  nombres          String        @db.VarChar(150)
-  apellido_paterno String        @db.VarChar(100)
-  apellido_materno String        @db.VarChar(100)
-  direccion        String?       @db.VarChar(255)
-  distrito         String?       @db.VarChar(100)
-  deuda_castigada  Decimal       @default(0) @db.Decimal(12, 2)
-  deuda_cliente    Decimal       @default(0) @db.Decimal(12, 2)
-  deuda_vigente    Decimal       @default(0) @db.Decimal(12, 2)
-  otras_deudas     Decimal       @default(0) @db.Decimal(12, 2)
-  estado           String        @default("ACTIVO") @db.VarChar(20)
-  ultima_gestion   DateTime?
-  latitud          Decimal?      @db.Decimal(10, 8)
-  longitud         Decimal?      @db.Decimal(11, 8)
+
+  telefono              String?   @db.VarChar(20)
+  nombres               String    @db.VarChar(150)
+  apellido_paterno      String    @db.VarChar(100)
+  apellido_materno      String    @db.VarChar(100)
+  direccion             String?   @db.VarChar(255)
+  direccion_normalizada String?   @db.VarChar(300)
+  provincia             String?   @db.VarChar(100)
+  departamento          String?   @db.VarChar(100)
+  ubigeo                String?   @db.VarChar(6)
+  distrito              String?   @db.VarChar(100)
+  deuda_castigada       Decimal   @default(0) @db.Decimal(12, 2)
+  deuda_cliente         Decimal   @default(0) @db.Decimal(12, 2)
+  deuda_vigente         Decimal   @default(0) @db.Decimal(12, 2)
+  otras_deudas          Decimal   @default(0) @db.Decimal(12, 2)
+  estado                String    @default("ACTIVO") @db.VarChar(20)
+  ultima_gestion        DateTime?
+  latitud               Decimal?  @db.Decimal(10, 8)
+  longitud              Decimal?  @db.Decimal(11, 8)
+
+  // Control interno de localización
+  estado_geocodificacion    String?   @db.VarChar(30)
+  precision_geocodificacion String?   @db.VarChar(30)
+  fecha_geocodificacion     DateTime? @db.Timestamptz
+
+  // Cualquier campo extra proveniente del Excel
+  datos_adicionales Json?
 
   // Relación 1:N → Un cliente puede tener muchas admisiones
   admisiones Admision[]
@@ -51,10 +63,11 @@ model Cliente {
   rutas_clientes RutaCliente[]
   visitas        Visita[]
 
-  @@index([latitud, longitud])
-  
   // --- NUEVO: Índice único compuesto ---
   @@unique([tipo_documento, numero_documento], map: "clientes_doc_unico_key")
+  @@index([latitud, longitud])
+  @@index([estado_geocodificacion])
+  @@index([ubigeo])
   @@map("clientes")
 }
 
@@ -151,8 +164,8 @@ model RutaCliente {
   fecha_actualizar DateTime @updatedAt
 
   // Relaciones (Protección de integridad con Restrict)
-  ruta    Ruta    @relation(fields: [id_ruta], references: [id_ruta], onDelete: Restrict, onUpdate: Cascade)
-  cliente Cliente @relation(fields: [id_cliente], references: [id_cliente], onDelete: Restrict, onUpdate: Cascade)
+  ruta    Ruta     @relation(fields: [id_ruta], references: [id_ruta], onDelete: Restrict, onUpdate: Cascade)
+  cliente Cliente  @relation(fields: [id_cliente], references: [id_cliente], onDelete: Restrict, onUpdate: Cascade)
   visitas Visita[]
 
   // Unicidad para evitar duplicados en la misma ruta y optimización de índices
@@ -225,11 +238,12 @@ model Usuario {
   // Relación opcional al registro de Asesor
   asesor Asesor? @relation(fields: [id_asesor], references: [id_asesor], onDelete: SetNull, onUpdate: Cascade)
 
+  @@index([bloqueado_hasta], map: "usuarios_bloqueado_hasta_idx")
   @@map("usuarios")
 }
 
 model AuditoriaSeguridad {
-  id_auditoria String   @id @default(uuid()) @db.Uuid
+  id_auditoria String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   fecha        DateTime @default(now()) @db.Timestamptz
   request_id   String?  @db.VarChar(100)
   actor_id     String?  @db.Uuid
@@ -248,8 +262,10 @@ model AuditoriaSeguridad {
 }
 
 model ImportacionMasiva {
-  id_importacion String    @id @default(uuid()) @db.Uuid
+  id_importacion String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tipo           String    @db.VarChar(30)
+  modo           String?   @db.VarChar(30)
+  periodo        String?   @db.VarChar(6)
   estado         String    @default("PENDIENTE") @db.VarChar(20)
   archivo        String    @db.VarChar(255)
   ruta_temporal  String    @db.Text
@@ -267,12 +283,13 @@ model ImportacionMasiva {
 
   @@index([estado, fecha_creacion])
   @@index([actor_id, fecha_creacion])
+  @@index([tipo, modo, periodo])
   @@map("importaciones_masivas")
 }
 
 /// Registro controlado del Sistema de Gestión de Calidad (ISO 9001).
 model RegistroCalidad {
-  id_registro      String             @id @default(uuid()) @db.Uuid
+  id_registro      String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   tipo             String             @db.VarChar(40)
   codigo           String             @unique @db.VarChar(40)
   titulo           String             @db.VarChar(200)
@@ -293,7 +310,7 @@ model RegistroCalidad {
   creado_por       String?            @db.Uuid
   actualizado_por  String?            @db.Uuid
   fecha_creacion   DateTime           @default(now()) @db.Timestamptz
-  fecha_actualizar DateTime           @updatedAt @db.Timestamptz
+  fecha_actualizar DateTime           @default(now()) @updatedAt @db.Timestamptz
   historial        HistorialCalidad[]
 
   @@index([tipo, estado])
@@ -304,7 +321,7 @@ model RegistroCalidad {
 
 /// Evidencia inmutable de cada modificación del registro de calidad.
 model HistorialCalidad {
-  id_historial String          @id @default(uuid()) @db.Uuid
+  id_historial String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   id_registro  String          @db.Uuid
   accion       String          @db.VarChar(30)
   version      Int
@@ -312,7 +329,7 @@ model HistorialCalidad {
   actor        String?         @db.VarChar(100)
   detalle      Json?
   fecha        DateTime        @default(now()) @db.Timestamptz
-  registro     RegistroCalidad @relation(fields: [id_registro], references: [id_registro], onDelete: Restrict, onUpdate: Cascade)
+  registro     RegistroCalidad @relation(fields: [id_registro], references: [id_registro], onDelete: Restrict, onUpdate: Cascade, map: "historial_calidad_registro_fkey")
 
   @@index([id_registro, fecha])
   @@index([fecha])

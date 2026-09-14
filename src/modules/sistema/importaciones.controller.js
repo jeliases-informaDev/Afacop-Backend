@@ -1,14 +1,18 @@
 import fs from 'node:fs/promises';
 import * as importacionesService from './importaciones.service.js';
 
+import * as geocodificacionClientesService
+  from './geocodificacion-clientes.service.js';
+  
+
 export function uploadType(type) {
   return async (req, res, next) => {
     try {
       if (!req.file) throw Object.assign(new Error('Debe adjuntar un archivo XLSX'), { statusCode: 400, code: 'FILE_REQUIRED' });
-      const job = await importacionesService.createJob({ type, file: req.file, actorId: req.user.id });
+      const job = await importacionesService.createJob({type, file: req.file, actorId: req.user.id, modo: req.body?.modo, periodo: req.body?.periodo});
       res.status(202).json({
         message: 'Archivo recibido; la importación se procesa en segundo plano',
-        data: { id: job.id_importacion, estado: job.estado, archivo: job.archivo },
+        data: { id: job.id_importacion, tipo: job.tipo, modo: job.modo, periodo: job.periodo, estado: job.estado, archivo: job.archivo,},
       });
     } catch (error) {
       if (req.file?.path) await fs.rm(req.file.path, { force: true }).catch(() => {});
@@ -33,4 +37,26 @@ export async function downloadClientTemplate(_req, res, next) {
     res.setHeader('Cache-Control', 'no-store');
     return res.send(Buffer.from(file));
   } catch (error) { next(error); }
+}
+
+export async function geocodePendingClients(
+  req,
+  res,
+  next
+) {
+  try {
+    const result =
+      await geocodificacionClientesService
+        .geocodePendingClients({
+          limit: req.body?.limit ?? 5,
+        });
+
+    res.json({
+      message:
+        'Lote de geocodificación procesado',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
 }

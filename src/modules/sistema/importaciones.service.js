@@ -43,13 +43,50 @@ export function validateDocumentNumber(tipoDocumento, numeroDocumento) {
 }
 
 const CLIENT_TEMPLATE_COLUMNS = [
-  { header: 'tipo_documento', key: 'tipo_documento', width: 20, required: true, description: 'Índice del tipo: 1 DNI, 2 CE, 3 PASAPORTE, 4 RUC.' },
-  { header: 'numero_documento', key: 'numero_documento', width: 22, required: true, description: 'Número del documento del cliente (obligatorio).' },
-  { header: 'deuda_cliente', key: 'deuda_cliente', width: 18, required: true, description: 'Deuda del cliente. Obligatoria y numérica.' },
-  { header: 'direccion', key: 'direccion', width: 35, required: false, description: 'Dirección del cliente.' },
-  { header: 'telefono', key: 'telefono', width: 18, required: false, description: 'Teléfono del cliente.' },
-  { header: 'opcional_1', key: 'opcional_1', width: 20, required: false, description: 'Campo libre opcional.' },
-  { header: 'opcional_2', key: 'opcional_2', width: 20, required: false, description: 'Campo libre opcional.' },
+  {
+    header: 'tipo_documento', key: 'tipo_documento', width: 20, required: true,
+    description: 'Índice del tipo: 1 DNI, 2 CE, 3 PASAPORTE, 4 RUC.',
+  },
+  {
+    header: 'numero_documento', key: 'numero_documento', width: 22, required: true,
+    description: 'Número del documento del cliente.',
+  },
+  {
+    header: 'deuda_cliente', key: 'deuda_cliente', width: 18, required: true,
+    description: 'Deuda del cliente. Obligatoria y numérica.',
+  },
+  {
+    header: 'direccion', key: 'direccion', width: 40, required: false,
+    description: 'Dirección del cliente. Ejemplo: Av. Arequipa 1450.',
+  },
+  {
+    header: 'departamento', key: 'departamento', width: 25, required: false,
+    description: 'Departamento de la dirección. Ejemplo: Lima.',
+  },
+  {
+    header: 'provincia', key: 'provincia', width: 25, required: false, 
+    description: 'Provincia de la dirección. Ejemplo: Lima.',
+  },
+  {
+    header: 'distrito', key: 'distrito', width: 25, required: false,
+    description: 'Distrito de la dirección. Ejemplo: Lince.',
+  },
+  {
+    header: 'ubigeo', key: 'ubigeo', width: 15, required: false, 
+    description: 'Código UBIGEO de 6 dígitos. No es código postal.',
+  },
+  {
+    header: 'telefono', key: 'telefono', width: 18, required: false,
+    description: 'Teléfono del cliente. Si se informa, debe tener 9 dígitos.',
+  },
+  {
+    header: 'opcional_1', key: 'opcional_1', width: 22, required: false,
+    description: 'Campo adicional libre. Se almacenará en datos_adicionales.',
+  },
+  {
+    header: 'opcional_2', key: 'opcional_2', width: 22, required: false,
+    description: 'Campo adicional libre. Se almacenará en datos_adicionales.',
+  },
 ];
 
 export async function createClientTemplate() {
@@ -71,6 +108,8 @@ export async function createClientTemplate() {
   });
   sheet.getColumn('tipo_documento').numFmt = '@';
   sheet.getColumn('numero_documento').numFmt = '@';
+  sheet.getColumn('ubigeo').numFmt = '@';
+  sheet.getColumn('telefono').numFmt = '@';
   sheet.dataValidations.add(`A${dataStartRow}:A200001`, {
     type: 'custom', allowBlank: false, formulae: [`AND(LEN(A${dataStartRow})>0,OR(A${dataStartRow}="1",A${dataStartRow}="2",A${dataStartRow}="3",A${dataStartRow}="4"))`],
     errorStyle: 'stop', showErrorMessage: true,
@@ -86,8 +125,13 @@ export async function createClientTemplate() {
     errorStyle: 'stop', showErrorMessage: true,
     errorTitle: 'Deuda inválida', error: 'Ingrese una deuda numérica mayor o igual a cero.',
   });
-  sheet.dataValidations.add(`E${dataStartRow}:E200001`, {
-    type: 'custom', allowBlank: true, formulae: [`OR(E${dataStartRow}="",AND(ISNUMBER(E${dataStartRow}),LEN(E${dataStartRow})=9))`],
+  sheet.dataValidations.add(`H${dataStartRow}:H200001`, {
+    type: 'custom', allowBlank: true, formulae: [`OR(H${dataStartRow}="",AND(LEN(H${dataStartRow})=6,ISNUMBER(--H${dataStartRow})))`],
+    errorStyle: 'stop',showErrorMessage: true, errorTitle: 'UBIGEO inválido',
+    error: 'El UBIGEO debe contener exactamente 6 dígitos.',
+  });
+  sheet.dataValidations.add(`I${dataStartRow}:I200001`, {
+    type: 'custom', allowBlank: true, formulae: [`OR(I${dataStartRow}="",AND(LEN(I${dataStartRow})=9,ISNUMBER(--I${dataStartRow})))`],
     errorStyle: 'stop', showErrorMessage: true,
     errorTitle: 'Teléfono inválido', error: 'El teléfono debe tener exactamente 9 dígitos.',
   });
@@ -101,11 +145,15 @@ export async function createClientTemplate() {
   instructions.addRows([
     ['tipo_documento', 'Sí', 'Use 1 para DNI, 2 para CE, 3 para PASAPORTE o 4 para RUC.'],
     ['numero_documento', 'Sí', 'DNI: 8 dígitos; CE: 9 a 12 dígitos; PASAPORTE: 8 a 12 caracteres; RUC: 11 dígitos.'],
-    ['deuda_cliente', 'Sí', 'Importe numérico mayor o igual a cero. Se guarda en la columna deuda_cliente.'],
-    ['direccion', 'No', 'Dirección del cliente.'],
+    ['deuda_cliente', 'Sí', 'Importe numérico mayor o igual a cero.'],
+    ['direccion', 'No', 'Dirección del cliente. Ejemplo: Av. Arequipa 1450.'],
+    ['departamento', 'No', 'Departamento correspondiente a la dirección.'],
+    ['provincia', 'No', 'Provincia correspondiente a la dirección.'],
+    ['distrito', 'No', 'Distrito correspondiente a la dirección.'],
+    ['ubigeo', 'No', 'Código UBIGEO de 6 dígitos. No corresponde al código postal.'],
     ['telefono', 'No', 'Si se informa, debe contener exactamente 9 dígitos.'],
-    ['opcional_1', 'No', 'Campo libre opcional.'],
-    ['opcional_2', 'No', 'Campo libre opcional.'],
+    ['opcional_1', 'No', 'Campo adicional libre. Se almacenará internamente como dato adicional.'],
+    ['opcional_2', 'No', 'Campo adicional libre. Se almacenará internamente como dato adicional.'],
   ]);
   instructions.getRow(1).height = 28;
   instructions.getRow(1).eachCell(cell => {
@@ -120,7 +168,10 @@ export async function createClientTemplate() {
       if (rowNumber <= 4) row.getCell(2).font = { bold: true, color: { argb: 'FFF5333F' } };
     }
   });
-  instructions.autoFilter = { from: 'A1', to: 'C8' };
+  instructions.autoFilter = {
+    from: 'A1',
+    to: `C${CLIENT_TEMPLATE_COLUMNS.length + 1}`,
+  };
 
   return workbook.xlsx.writeBuffer();
 }
@@ -216,54 +267,398 @@ function pickMatching(row, aliases, patterns = []) {
   return matchedKey ? row[matchedKey] : '';
 }
 
+const CLIENT_IMPORT_FIELDS = new Set([
+  'tipo_documento',
+  'tipo_doc',
+  'tipo_docuemento',
+  'tipo_document',
+
+  'numero_documento',
+  'numero',
+  'documento',
+  'doc_identidad',
+  'num_doc',
+
+  'deuda_cliente',
+
+  'direccion',
+  'distrito',
+  'provincia',
+  'departamento',
+  'ubigeo',
+  'telefono',
+
+  'latitud',
+  'lat',
+  'latitude',
+
+  'longitud',
+  'lng',
+  'long',
+  'lon',
+  'longitude',
+]);
+
+function buildNormalizedAddress({
+  direccion, distrito, provincia, departamento,
+}) {
+  if (!direccion && !distrito && !provincia && !departamento) {
+      return null;
+    }
+
+  const parts = [direccion, distrito, provincia, departamento, 'Perú',
+  ]
+    .map(value => String(value ?? '').trim())
+    .filter(Boolean);
+
+  const seen = new Set();
+
+  const uniqueParts = parts.filter(part => {
+    const normalized = part.toUpperCase();
+
+    if (seen.has(normalized)) return false;
+
+    seen.add(normalized);
+    return true;
+  });
+
+  return uniqueParts.join(', ').slice(0, 300) || null;
+}
+
+function buildAdditionalData(row) {
+  const additional = {};
+
+  for (const [key, value] of Object.entries(row)) {
+    // Los campos oficiales tienen sus propias columnas en clientes
+    if (CLIENT_IMPORT_FIELDS.has(key)) continue;
+
+    const raw = plainValue(value);
+
+    if (raw === null || raw === undefined || raw === '') continue;
+
+    if (raw instanceof Date) {
+      additional[key] = raw.toISOString();
+      continue;
+    }
+
+    if (typeof raw === 'string') {
+      const trimmed = raw.trim();
+
+      if (!trimmed) continue;
+
+      additional[key] = trimmed;
+      continue;
+    }
+
+    additional[key] = raw;
+  }
+
+  return Object.keys(additional).length
+    ? additional
+    : null;
+}
+
 async function clientRecord(row) {
-  const tipoDocumento = text(pick(row, ['tipo_documento', 'tipo_doc', 'tipo_docuemento', 'tipo_document']), 20).toUpperCase();
-  const numeroDocumento = text(pick(row, ['numero_documento', 'numero', 'documento', 'doc_identidad', 'num_doc']), 20);
-  const deudaCliente = text(pick(row, ['deuda_cliente']), 30);
-  if (!tipoDocumento || !numeroDocumento || !deudaCliente) return null;
+  // --------------------------------------------------
+  // TIPO Y NÚMERO DE DOCUMENTO
+  // --------------------------------------------------
 
-  const normalizedTipo = DOCUMENT_TYPE_BY_INDEX[tipoDocumento] || null;
+  const tipoDocumento = text(
+    pick(row, [
+      'tipo_documento',
+      'tipo_doc',
+      'tipo_docuemento',
+      'tipo_document',
+    ]),
+    20
+  ).toUpperCase();
+
+  const numeroDocumento = text(
+    pick(row, [
+      'numero_documento',
+      'numero',
+      'documento',
+      'doc_identidad',
+      'num_doc',
+    ]),
+    20
+  );
+
+  const deudaCliente = text(
+    pick(row, ['deuda_cliente']),
+    30
+  );
+
+  // Campos mínimos obligatorios
+  if (
+    !tipoDocumento ||
+    !numeroDocumento ||
+    !deudaCliente
+  ) {
+    return null;
+  }
+
+  // 1 = DNI
+  // 2 = CE
+  // 3 = PASAPORTE
+  // 4 = RUC
+  const normalizedTipo =
+    DOCUMENT_TYPE_BY_INDEX[tipoDocumento] || null;
+
   if (!normalizedTipo) {
-    throw Object.assign(new Error(`Tipo de documento no válido: ${tipoDocumento}. Valores permitidos: 1, 2, 3 o 4.`), {
-      statusCode: 400,
-      code: 'INVALID_DOCUMENT_TYPE',
-    });
+    throw Object.assign(
+      new Error(
+        `Tipo de documento no válido: ${tipoDocumento}. Valores permitidos: 1, 2, 3 o 4.`
+      ),
+      {
+        statusCode: 400,
+        code: 'INVALID_DOCUMENT_TYPE',
+      }
+    );
   }
 
-  const validNumeroDocumento = validateDocumentNumber(normalizedTipo, numeroDocumento);
-  const parsedDebt = Number(deudaCliente.replace(',', '.'));
-  if (!Number.isFinite(parsedDebt) || parsedDebt < 0) {
-    throw Object.assign(new Error('deuda_cliente debe ser un número mayor o igual a cero.'), {
-      statusCode: 400,
-      code: 'INVALID_CLIENT_DEBT',
-    });
+  const validNumeroDocumento =
+    validateDocumentNumber(
+      normalizedTipo,
+      numeroDocumento
+    );
+
+  // --------------------------------------------------
+  // DEUDA
+  // --------------------------------------------------
+
+  const parsedDebt = Number(
+    deudaCliente.replace(',', '.')
+  );
+
+  if (
+    !Number.isFinite(parsedDebt) ||
+    parsedDebt < 0
+  ) {
+    throw Object.assign(
+      new Error(
+        'deuda_cliente debe ser un número mayor o igual a cero.'
+      ),
+      {
+        statusCode: 400,
+        code: 'INVALID_CLIENT_DEBT',
+      }
+    );
   }
-  const telefono = text(pick(row, ['telefono']), 20);
-  if (telefono && !/^\d{9}$/.test(telefono)) {
-    throw Object.assign(new Error('El teléfono debe tener exactamente 9 dígitos.'), {
-      statusCode: 400,
-      code: 'INVALID_PHONE_NUMBER',
-    });
+
+  // --------------------------------------------------
+  // TELÉFONO
+  // --------------------------------------------------
+
+  const telefono = text(
+    pick(row, ['telefono']),
+    20
+  );
+
+  if (
+    telefono &&
+    !/^\d{9}$/.test(telefono)
+  ) {
+    throw Object.assign(
+      new Error(
+        'El teléfono debe tener exactamente 9 dígitos.'
+      ),
+      {
+        statusCode: 400,
+        code: 'INVALID_PHONE_NUMBER',
+      }
+    );
   }
+
+  // --------------------------------------------------
+  // DIRECCIÓN
+  // --------------------------------------------------
+
+  const direccion =
+    text(
+      pick(row, ['direccion']),
+      255
+    ) || null;
+
+  // Orden administrativo solicitado:
+  // Departamento -> Provincia -> Distrito
+
+  const departamento =
+    text(
+      pick(row, ['departamento']),
+      100
+    ) || null;
+
+  const provincia =
+    text(
+      pick(row, ['provincia']),
+      100
+    ) || null;
+
+  const distrito =
+    text(
+      pick(row, ['distrito']),
+      100
+    ) || null;
+
+  // --------------------------------------------------
+  // UBIGEO
+  // --------------------------------------------------
+
+  const ubigeoRaw = text(
+    pick(row, ['ubigeo']),
+    20
+  );
+
+  if (
+    ubigeoRaw &&
+    !/^\d{6}$/.test(ubigeoRaw)
+  ) {
+    throw Object.assign(
+      new Error(
+        'El UBIGEO debe contener exactamente 6 dígitos.'
+      ),
+      {
+        statusCode: 400,
+        code: 'INVALID_UBIGEO',
+      }
+    );
+  }
+
+  const ubigeo =
+    ubigeoRaw || null;
+
+  // --------------------------------------------------
+  // DIRECCIÓN NORMALIZADA
+  // --------------------------------------------------
+
+  const direccionNormalizada =
+    buildNormalizedAddress({
+      direccion,
+      distrito,
+      provincia,
+      departamento,
+    });
+
+  // --------------------------------------------------
+  // COORDENADAS
+  // --------------------------------------------------
+  //
+  // IMPORTANTE:
+  // La latitud y longitud YA NO vienen desde el Excel.
+  //
+  // Se inicializan en NULL y posteriormente el worker
+  // de geocodificación las obtiene utilizando:
+  //
+  // direccion_normalizada
+  //
+  // Ejemplo:
+  // Av. Brasil 1200, Breña, Lima, Lima, Perú
+  // --------------------------------------------------
+
+  const latitud = null;
+  const longitud = null;
+
+  // --------------------------------------------------
+  // ESTADO DE GEOLOCALIZACIÓN
+  // --------------------------------------------------
+
+  let estadoGeocodificacion;
+
+  /*
+   * Si tenemos información suficiente para intentar
+   * ubicar al cliente, lo dejamos pendiente para que
+   * el worker lo procese.
+   */
+  if (
+    direccionNormalizada ||
+    ubigeo
+  ) {
+    estadoGeocodificacion =
+      'PENDIENTE';
+  } else {
+    /*
+     * No existe dirección, departamento,
+     * provincia, distrito ni UBIGEO.
+     */
+    estadoGeocodificacion =
+      'SIN_DIRECCION';
+  }
+
+  /*
+   * Estos valores los completará posteriormente
+   * el worker de geocodificación.
+   */
+  const precisionGeocodificacion = null;
+  const fechaGeocodificacion = null;
+
+  // --------------------------------------------------
+  // CAMPOS ADICIONALES
+  // --------------------------------------------------
+
+  const datosAdicionales =
+    buildAdditionalData(row);
+
+  // --------------------------------------------------
+  // REGISTRO FINAL
+  // --------------------------------------------------
 
   return {
-    tipo_documento: normalizedTipo,
-    numero_documento: validNumeroDocumento,
+    tipo_documento:
+      normalizedTipo,
+
+    numero_documento:
+      validNumeroDocumento,
+
     nombres: '',
     apellido_paterno: '',
     apellido_materno: '',
-    telefono: telefono || null,
-    direccion: text(pick(row, ['direccion']), 255) || null,
-    distrito: null,
+
+    telefono,
+
+    direccion,
+
+    direccion_normalizada:
+      direccionNormalizada,
+
+    // Orden administrativo
+    departamento,
+    provincia,
+    distrito,
+
+    ubigeo,
+
     estado: 'ACTIVO',
+
     deuda_castigada: 0,
     deuda_cliente: parsedDebt,
     deuda_vigente: 0,
     otras_deudas: 0,
+
     ultima_gestion: null,
-    latitud: null,
-    longitud: null,
-    _admision: { producto: 'IMPORTACION', linea_credito: 0, estado: 'PENDIENTE', fecha: null },
+
+    // Se calculan posteriormente
+    latitud,
+    longitud,
+
+    estado_geocodificacion:
+      estadoGeocodificacion,
+
+    precision_geocodificacion:
+      precisionGeocodificacion,
+
+    fecha_geocodificacion:
+      fechaGeocodificacion,
+
+    datos_adicionales:
+      datosAdicionales,
+
+    _admision: {
+      producto: 'IMPORTACION',
+      linea_credito: 0,
+      estado: 'PENDIENTE',
+      fecha: null,
+    },
   };
 }
 
@@ -298,41 +693,183 @@ async function validateSignature(filePath) {
   } finally { await handle.close(); }
 }
 
-export async function createJob({ type, file, actorId }) {
+export async function createJob({
+  type,
+  file,
+  actorId,
+  modo,
+  periodo,
+}) {
   await validateSignature(file.path);
+
+  let normalizedModo = null;
+  let normalizedPeriodo = null;
+
   if (type === 'CLIENTES') {
-    const now = new Date();
-    const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-    const nextMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-    const monthlyImport = await prisma.importacionMasiva.findFirst({
-      where: {
-        tipo: 'CLIENTES',
-        fecha_creacion: { gte: monthStart, lt: nextMonthStart },
-        estado: { in: ['PENDIENTE', 'PROCESANDO', 'COMPLETADA'] },
-      },
-      select: { id_importacion: true, estado: true, fecha_creacion: true },
-      orderBy: { fecha_creacion: 'desc' },
-    });
-    if (monthlyImport) {
-      const error = new Error('La importación de clientes solo puede realizarse una vez por mes.');
-      error.statusCode = 409;
-      error.code = 'CLIENT_IMPORT_MONTHLY_LIMIT';
-      throw error;
+    // --------------------------------
+    // NORMALIZAR MODO Y PERIODO
+    // --------------------------------
+    normalizedModo = String(modo ?? '')
+      .trim()
+      .toUpperCase();
+
+    normalizedPeriodo = String(periodo ?? '')
+      .trim();
+
+    // --------------------------------
+    // VALIDAR MODO
+    // --------------------------------
+    const validModes = [
+      'CARGA_MENSUAL',
+      'ACTUALIZACION',
+    ];
+
+    if (!validModes.includes(normalizedModo)) {
+      throw Object.assign(
+        new Error(
+          'modo debe ser CARGA_MENSUAL o ACTUALIZACION.'
+        ),
+        {
+          statusCode: 400,
+          code: 'INVALID_IMPORT_MODE',
+        }
+      );
+    }
+
+    // --------------------------------
+    // VALIDAR PERIODO YYYYMM
+    // --------------------------------
+    if (!/^\d{6}$/.test(normalizedPeriodo)) {
+      throw Object.assign(
+        new Error(
+          'periodo debe tener formato YYYYMM. Ejemplo: 202609.'
+        ),
+        {
+          statusCode: 400,
+          code: 'INVALID_IMPORT_PERIOD',
+        }
+      );
+    }
+
+    const year = Number(
+      normalizedPeriodo.slice(0, 4)
+    );
+
+    const month = Number(
+      normalizedPeriodo.slice(4, 6)
+    );
+
+    if (
+      year < 2000 ||
+      year > 2100 ||
+      month < 1 ||
+      month > 12
+    ) {
+      throw Object.assign(
+        new Error(
+          'periodo no contiene un año/mes válido.'
+        ),
+        {
+          statusCode: 400,
+          code: 'INVALID_IMPORT_PERIOD',
+        }
+      );
+    }
+
+    // --------------------------------
+    // REGLA PARA CARGA MENSUAL
+    // --------------------------------
+    if (normalizedModo === 'CARGA_MENSUAL') {
+      const existingMonthlyImport =
+        await prisma.importacionMasiva.findFirst({
+          where: {
+            tipo: 'CLIENTES',
+            modo: 'CARGA_MENSUAL',
+            periodo: normalizedPeriodo,
+            estado: {
+              in: [
+                'PENDIENTE',
+                'PROCESANDO',
+                'COMPLETADA',
+              ],
+            },
+          },
+          select: {
+            id_importacion: true,
+            estado: true,
+            periodo: true,
+          },
+          orderBy: {
+            fecha_creacion: 'desc',
+          },
+        });
+
+      if (existingMonthlyImport) {
+        throw Object.assign(
+          new Error(
+            `Ya existe una carga mensual de clientes para el periodo ${normalizedPeriodo}.`
+          ),
+          {
+            statusCode: 409,
+            code: 'CLIENT_MONTHLY_IMPORT_ALREADY_EXISTS',
+          }
+        );
+      }
     }
   }
-  const job = await prisma.importacionMasiva.create({ data: {
-    tipo: type, archivo: file.originalname.slice(0, 255), ruta_temporal: file.path, actor_id: actorId,
-  } });
+
+  // --------------------------------
+  // CREAR JOB
+  // --------------------------------
+  const job = await prisma.importacionMasiva.create({
+    data: {
+      tipo: type,
+
+      modo:
+        type === 'CLIENTES'
+          ? normalizedModo
+          : null,
+
+      periodo:
+        type === 'CLIENTES'
+          ? normalizedPeriodo
+          : null,
+
+      archivo: file.originalname.slice(0, 255),
+      ruta_temporal: file.path,
+      actor_id: actorId,
+    },
+  });
+
   enqueue(job.id_importacion);
+
   return job;
 }
 
 export async function getJob(id) {
-  return prisma.importacionMasiva.findUnique({ where: { id_importacion: id }, select: {
-    id_importacion: true, tipo: true, estado: true, archivo: true, total_filas: true,
-    procesadas: true, insertadas: true, actualizadas: true, omitidas: true, errores: true, detalle_error: true,
-    fecha_creacion: true, fecha_inicio: true, fecha_fin: true,
-  } });
+  return prisma.importacionMasiva.findUnique({
+    where: {
+      id_importacion: id,
+    },
+    select: {
+      id_importacion: true,
+      tipo: true,
+      modo: true,
+      periodo: true,
+      estado: true,
+      archivo: true,
+      total_filas: true,
+      procesadas: true,
+      insertadas: true,
+      actualizadas: true,
+      omitidas: true,
+      errores: true,
+      detalle_error: true,
+      fecha_creacion: true,
+      fecha_inicio: true,
+      fecha_fin: true,
+    },
+  });
 }
 
 export function enqueue(id) {
@@ -363,81 +900,747 @@ async function processJob(id) {
     let headers = null; let processed = 0; let inserted = 0; let updated = 0; let omitted = 0; let errors = 0; const details = []; let batch = [];
     const flush = async () => {
       if (!batch.length) return;
+
       if (job.tipo === 'CLIENTES') {
         const originalSize = batch.length;
-        batch = [...new Map(batch.map(item => [item.tipo_documento + item.numero_documento, item])).values()];
+
+        // Eliminar duplicados dentro del mismo lote
+        // usando tipo_documento + numero_documento
+        batch = [
+          ...new Map(
+            batch.map(item => [
+              `${item.tipo_documento}-${item.numero_documento}`,
+              item
+            ])
+          ).values()
+        ];
+
         omitted += originalSize - batch.length;
-        const existing = await prisma.cliente.count({
-          where: {
-            OR: batch.map(item => ({
-              tipo_documento: item.tipo_documento,
-              numero_documento: item.numero_documento,
-            })),
-          },
+
+        // --------------------------------------------------
+// IDENTIFICAR CLIENTES QUE YA EXISTEN
+// --------------------------------------------------
+
+const existingClients = await prisma.cliente.findMany({
+  where: {
+    OR: batch.map(item => ({
+      tipo_documento: item.tipo_documento,
+      numero_documento: item.numero_documento,
+    })),
+  },
+  select: {
+    tipo_documento: true,
+    numero_documento: true,
+  },
+});
+
+const existingKeys = new Set(
+  existingClients.map(
+    item => `${item.tipo_documento}-${item.numero_documento}`
+  )
+);
+
+    // --------------------------------------------------
+    // MODO ACTUALIZACION
+    // Solo permite modificar clientes existentes.
+    // Los documentos inexistentes se omiten.
+    // --------------------------------------------------
+
+    if (job.modo === 'ACTUALIZACION') {
+      const validBatch = [];
+      const missingClients = [];
+
+      for (const item of batch) {
+        const key =
+          `${item.tipo_documento}-${item.numero_documento}`;
+
+        if (existingKeys.has(key)) {
+          validBatch.push(item);
+        } else {
+          missingClients.push(item);
+        }
+      }
+
+      omitted += missingClients.length;
+
+      for (const item of missingClients) {
+        if (details.length >= MAX_ERRORS) break;
+
+        details.push({
+          tipo: 'OMITIDO',
+          documento: item.numero_documento,
+          mensaje:
+            'El cliente no existe y no puede ser creado mediante una ACTUALIZACION.',
         });
+      }
+
+      batch = validBatch;
+    }
+
+    const existing = batch.filter(item =>
+      existingKeys.has(
+        `${item.tipo_documento}-${item.numero_documento}`
+      )
+    ).length;
+
+    // Si ACTUALIZACION no tiene ningún cliente existente,
+    // no hay nada que insertar ni actualizar.
+    if (!batch.length) {
+      await prisma.importacionMasiva.update({
+        where: {
+          id_importacion: id,
+        },
+        data: {
+          procesadas: processed,
+          insertadas: inserted,
+          actualizadas: updated,
+          omitidas: omitted,
+          errores: errors,
+        },
+      });
+
+      return;
+    }
         const affected = await prisma.$executeRaw`
-             INSERT INTO "clientes" ("tipo_documento", "numero_documento", "nombres", "apellido_paterno", "apellido_materno", "telefono", "direccion", "distrito", "estado", "deuda_castigada", "deuda_cliente", "deuda_vigente", "otras_deudas", "ultima_gestion", "latitud", "longitud")
-          SELECT x.tipo_documento::"TipoDocumento", x.numero_documento, x.nombres, x.apellido_paterno, x.apellido_materno, x.telefono, x.direccion, x.distrito, x.estado,
-               x.deuda_castigada, x.deuda_cliente, x.deuda_vigente, x.otras_deudas, x.ultima_gestion, x.latitud, x.longitud
-          FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb) AS x(
-            tipo_documento text, numero_documento text, nombres text, apellido_paterno text, apellido_materno text, telefono text, direccion text,
-               distrito text, estado text, deuda_castigada numeric, deuda_cliente numeric, deuda_vigente numeric, otras_deudas numeric,
-            ultima_gestion timestamp, latitud numeric, longitud numeric
-          )
-          ON CONFLICT ("tipo_documento", "numero_documento") DO UPDATE SET
-            "nombres" = EXCLUDED."nombres", "apellido_paterno" = EXCLUDED."apellido_paterno",
-            "apellido_materno" = EXCLUDED."apellido_materno", "telefono" = EXCLUDED."telefono",
-            "direccion" = EXCLUDED."direccion", "distrito" = EXCLUDED."distrito", "estado" = EXCLUDED."estado",
-            "deuda_castigada" = EXCLUDED."deuda_castigada", "deuda_cliente" = EXCLUDED."deuda_cliente",
-            "otras_deudas" = EXCLUDED."otras_deudas", "ultima_gestion" = EXCLUDED."ultima_gestion",
-            "latitud" = EXCLUDED."latitud", "longitud" = EXCLUDED."longitud"
-        `;
+        INSERT INTO "clientes" (
+          "tipo_documento",
+          "numero_documento",
+          "nombres",
+          "apellido_paterno",
+          "apellido_materno",
+          "telefono",
+
+          "direccion",
+          "direccion_normalizada",
+          "distrito",
+          "provincia",
+          "departamento",
+          "ubigeo",
+
+          "estado",
+
+          "deuda_castigada",
+          "deuda_cliente",
+          "deuda_vigente",
+          "otras_deudas",
+
+          "ultima_gestion",
+
+          "latitud",
+          "longitud",
+
+          "estado_geocodificacion",
+          "precision_geocodificacion",
+          "fecha_geocodificacion",
+
+          "datos_adicionales"
+        )
+
+        SELECT
+          x.tipo_documento::"TipoDocumento",
+          x.numero_documento,
+          x.nombres,
+          x.apellido_paterno,
+          x.apellido_materno,
+          x.telefono,
+
+          x.direccion,
+          x.direccion_normalizada,
+          x.distrito,
+          x.provincia,
+          x.departamento,
+          x.ubigeo,
+
+          x.estado,
+
+          x.deuda_castigada,
+          x.deuda_cliente,
+          x.deuda_vigente,
+          x.otras_deudas,
+
+          x.ultima_gestion,
+
+          x.latitud,
+          x.longitud,
+
+          x.estado_geocodificacion,
+          x.precision_geocodificacion,
+          x.fecha_geocodificacion,
+
+          x.datos_adicionales
+
+        FROM jsonb_to_recordset(
+          ${JSON.stringify(batch)}::jsonb
+        ) AS x(
+          tipo_documento text,
+          numero_documento text,
+          nombres text,
+          apellido_paterno text,
+          apellido_materno text,
+          telefono text,
+
+          direccion text,
+          direccion_normalizada text,
+          distrito text,
+          provincia text,
+          departamento text,
+          ubigeo text,
+
+          estado text,
+
+          deuda_castigada numeric,
+          deuda_cliente numeric,
+          deuda_vigente numeric,
+          otras_deudas numeric,
+
+          ultima_gestion timestamp,
+
+          latitud numeric,
+          longitud numeric,
+
+          estado_geocodificacion text,
+          precision_geocodificacion text,
+          fecha_geocodificacion timestamptz,
+
+          datos_adicionales jsonb
+        )
+
+        ON CONFLICT ("tipo_documento", "numero_documento")
+        DO UPDATE SET
+
+          -- La deuda de la nueva asignación siempre se actualiza
+          "deuda_cliente" = EXCLUDED."deuda_cliente",
+
+          -- Solo reemplazar teléfono cuando el Excel trae uno
+          "telefono" = COALESCE(
+            NULLIF(BTRIM(EXCLUDED."telefono"), ''),
+            "clientes"."telefono"
+          ),
+
+          -- Datos territoriales:
+          -- si vienen vacíos, conservamos los existentes.
+          "direccion" = COALESCE(
+            NULLIF(BTRIM(EXCLUDED."direccion"), ''),
+            "clientes"."direccion"
+          ),
+
+          "distrito" = COALESCE(
+            NULLIF(BTRIM(EXCLUDED."distrito"), ''),
+            "clientes"."distrito"
+          ),
+
+          "provincia" = COALESCE(
+            NULLIF(BTRIM(EXCLUDED."provincia"), ''),
+            "clientes"."provincia"
+          ),
+
+          "departamento" = COALESCE(
+            NULLIF(BTRIM(EXCLUDED."departamento"), ''),
+            "clientes"."departamento"
+          ),
+
+          "ubigeo" = COALESCE(
+            NULLIF(BTRIM(EXCLUDED."ubigeo"), ''),
+            "clientes"."ubigeo"
+          ),
+
+          /*
+          * DIRECCIÓN NORMALIZADA
+          *
+          * Si el Excel está cambiando algún dato territorial,
+          * reconstruimos la dirección utilizando también la
+          * información que ya tenía el cliente.
+          *
+          * Si no cambió la ubicación, conservamos la existente.
+          */
+          "direccion_normalizada" =
+            CASE
+              WHEN
+                (
+                  NULLIF(BTRIM(EXCLUDED."direccion"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."direccion"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."direccion"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."distrito"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."distrito"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."distrito"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."provincia"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."provincia"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."provincia"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."departamento"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."departamento"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."departamento"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."ubigeo"), '') IS NOT NULL
+                  AND NULLIF(BTRIM(EXCLUDED."ubigeo"), '')
+                      IS DISTINCT FROM
+                      NULLIF(BTRIM("clientes"."ubigeo"), '')
+                )
+              THEN
+                LEFT(
+                  CONCAT_WS(
+                    ', ',
+                    COALESCE(
+                      NULLIF(BTRIM(EXCLUDED."direccion"), ''),
+                      NULLIF(BTRIM("clientes"."direccion"), '')
+                    ),
+                    COALESCE(
+                      NULLIF(BTRIM(EXCLUDED."distrito"), ''),
+                      NULLIF(BTRIM("clientes"."distrito"), '')
+                    ),
+                    COALESCE(
+                      NULLIF(BTRIM(EXCLUDED."provincia"), ''),
+                      NULLIF(BTRIM("clientes"."provincia"), '')
+                    ),
+                    COALESCE(
+                      NULLIF(BTRIM(EXCLUDED."departamento"), ''),
+                      NULLIF(BTRIM("clientes"."departamento"), '')
+                    ),
+                    'Perú'
+                  ),
+                  300
+                )
+              ELSE
+                "clientes"."direccion_normalizada"
+            END,
+
+          /*
+          * COORDENADAS
+          *
+          * 1. Si el Excel trae coordenadas -> utilizarlas.
+          * 2. Si cambió la ubicación pero no trae coordenadas ->
+          *    eliminar coordenadas antiguas para no mostrar al
+          *    cliente en una dirección que ya no corresponde.
+          * 3. Si no cambió nada -> conservarlas.
+          */
+          "latitud" =
+            CASE
+              WHEN EXCLUDED."latitud" IS NOT NULL
+              AND EXCLUDED."longitud" IS NOT NULL
+                THEN EXCLUDED."latitud"
+
+              WHEN
+                (
+                  NULLIF(BTRIM(EXCLUDED."direccion"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."direccion"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."direccion"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."distrito"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."distrito"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."distrito"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."provincia"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."provincia"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."provincia"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."departamento"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."departamento"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."departamento"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."ubigeo"), '') IS NOT NULL
+                  AND NULLIF(BTRIM(EXCLUDED."ubigeo"), '')
+                      IS DISTINCT FROM
+                      NULLIF(BTRIM("clientes"."ubigeo"), '')
+                )
+                THEN NULL
+
+              ELSE "clientes"."latitud"
+            END,
+
+          "longitud" =
+            CASE
+              WHEN EXCLUDED."latitud" IS NOT NULL
+              AND EXCLUDED."longitud" IS NOT NULL
+                THEN EXCLUDED."longitud"
+
+              WHEN
+                (
+                  NULLIF(BTRIM(EXCLUDED."direccion"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."direccion"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."direccion"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."distrito"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."distrito"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."distrito"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."provincia"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."provincia"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."provincia"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."departamento"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."departamento"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."departamento"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."ubigeo"), '') IS NOT NULL
+                  AND NULLIF(BTRIM(EXCLUDED."ubigeo"), '')
+                      IS DISTINCT FROM
+                      NULLIF(BTRIM("clientes"."ubigeo"), '')
+                )
+                THEN NULL
+
+              ELSE "clientes"."longitud"
+            END,
+
+          "estado_geocodificacion" =
+            CASE
+              -- El Excel trae coordenadas válidas
+              WHEN EXCLUDED."latitud" IS NOT NULL
+              AND EXCLUDED."longitud" IS NOT NULL
+                THEN 'LOCALIZADO'
+
+              -- La dirección/localización cambió
+              WHEN
+                (
+                  NULLIF(BTRIM(EXCLUDED."direccion"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."direccion"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."direccion"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."distrito"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."distrito"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."distrito"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."provincia"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."provincia"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."provincia"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."departamento"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."departamento"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."departamento"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."ubigeo"), '') IS NOT NULL
+                  AND NULLIF(BTRIM(EXCLUDED."ubigeo"), '')
+                      IS DISTINCT FROM
+                      NULLIF(BTRIM("clientes"."ubigeo"), '')
+                )
+                THEN 'PENDIENTE'
+
+              ELSE "clientes"."estado_geocodificacion"
+            END,
+
+          "precision_geocodificacion" =
+            CASE
+              WHEN EXCLUDED."latitud" IS NOT NULL
+              AND EXCLUDED."longitud" IS NOT NULL
+                THEN 'IMPORTADA'
+
+              WHEN
+                (
+                  NULLIF(BTRIM(EXCLUDED."direccion"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."direccion"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."direccion"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."distrito"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."distrito"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."distrito"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."provincia"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."provincia"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."provincia"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."departamento"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."departamento"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."departamento"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."ubigeo"), '') IS NOT NULL
+                  AND NULLIF(BTRIM(EXCLUDED."ubigeo"), '')
+                      IS DISTINCT FROM
+                      NULLIF(BTRIM("clientes"."ubigeo"), '')
+                )
+                THEN NULL
+
+              ELSE "clientes"."precision_geocodificacion"
+            END,
+
+          "fecha_geocodificacion" =
+            CASE
+              WHEN EXCLUDED."latitud" IS NOT NULL
+              AND EXCLUDED."longitud" IS NOT NULL
+                THEN CURRENT_TIMESTAMP
+
+              WHEN
+                (
+                  NULLIF(BTRIM(EXCLUDED."direccion"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."direccion"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."direccion"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."distrito"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."distrito"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."distrito"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."provincia"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."provincia"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."provincia"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."departamento"), '') IS NOT NULL
+                  AND LOWER(NULLIF(BTRIM(EXCLUDED."departamento"), ''))
+                      IS DISTINCT FROM
+                      LOWER(NULLIF(BTRIM("clientes"."departamento"), ''))
+                )
+                OR
+                (
+                  NULLIF(BTRIM(EXCLUDED."ubigeo"), '') IS NOT NULL
+                  AND NULLIF(BTRIM(EXCLUDED."ubigeo"), '')
+                      IS DISTINCT FROM
+                      NULLIF(BTRIM("clientes"."ubigeo"), '')
+                )
+                THEN NULL
+
+              ELSE "clientes"."fecha_geocodificacion"
+            END,
+
+          /*
+          * Los campos adicionales del nuevo Excel se fusionan
+          * con los anteriores.
+          *
+          * Si una clave vuelve a llegar, gana el nuevo valor.
+          */
+          "datos_adicionales" =
+            CASE
+              WHEN EXCLUDED."datos_adicionales" IS NULL
+                THEN "clientes"."datos_adicionales"
+
+              WHEN "clientes"."datos_adicionales" IS NULL
+                THEN EXCLUDED."datos_adicionales"
+
+              ELSE
+                "clientes"."datos_adicionales"
+                || EXCLUDED."datos_adicionales"
+            END
+      `;
+
         updated += existing;
         inserted += Number(affected) - existing;
-        const admissions = batch.map(item => ({ tipo_documento: item.tipo_documento, numero_documento: item.numero_documento, ...item._admision }));
+
+        // Mantener la lógica actual de admisión
+        const admissions = batch.map(item => ({
+          tipo_documento: item.tipo_documento,
+          numero_documento: item.numero_documento,
+          ...item._admision,
+        }));
+
         await prisma.$executeRaw`
-          INSERT INTO "admisiones" ("id_cliente", "producto", "linea_credito", "estado", "fecha")
-          SELECT c."id_cliente", x.producto, x.linea_credito, x.estado, x.fecha
-          FROM jsonb_to_recordset(${JSON.stringify(admissions)}::jsonb) AS x(
-            tipo_documento text, numero_documento text, producto text, linea_credito numeric, estado text, fecha timestamp
+          INSERT INTO "admisiones" (
+            "id_cliente",
+            "producto",
+            "linea_credito",
+            "estado",
+            "fecha"
           )
-          INNER JOIN "clientes" c ON c."tipo_documento" = x.tipo_documento::"TipoDocumento" AND c."numero_documento" = x.numero_documento
-          ON CONFLICT ("id_cliente") DO UPDATE SET
-            "producto" = EXCLUDED."producto", "linea_credito" = EXCLUDED."linea_credito",
-            "estado" = EXCLUDED."estado", "fecha" = EXCLUDED."fecha"
+
+          SELECT
+            c."id_cliente",
+            x.producto,
+            x.linea_credito,
+            x.estado,
+            x.fecha
+
+          FROM jsonb_to_recordset(
+            ${JSON.stringify(admissions)}::jsonb
+          ) AS x(
+            tipo_documento text,
+            numero_documento text,
+            producto text,
+            linea_credito numeric,
+            estado text,
+            fecha timestamp
+          )
+
+          INNER JOIN "clientes" c
+            ON c."tipo_documento" = x.tipo_documento::"TipoDocumento"
+            AND c."numero_documento" = x.numero_documento
+
+          ON CONFLICT ("id_cliente")
+          DO UPDATE SET
+            "producto" = EXCLUDED."producto",
+            "linea_credito" = EXCLUDED."linea_credito",
+            "estado" = EXCLUDED."estado",
+            "fecha" = EXCLUDED."fecha"
         `;
+
       } else {
+        // AQUÍ DEJAS TU CÓDIGO ACTUAL DE ASESORES
         const originalSize = batch.length;
-        batch = [...new Map(batch.map(item => [item.numero_documento, item])).values()];
+
+        batch = [
+          ...new Map(
+            batch.map(item => [
+              item.numero_documento,
+              item
+            ])
+          ).values()
+        ];
+
         omitted += originalSize - batch.length;
-        const existing = await prisma.asesor.count({ where: { dni: { in: batch.map(item => item.numero_documento) } } });
+
+        const existing = await prisma.asesor.count({
+          where: {
+            dni: {
+              in: batch.map(item => item.numero_documento)
+            }
+          }
+        });
+
         const affected = await prisma.$executeRaw`
-          INSERT INTO "asesores" ("dni", "nombres", "apellido_paterno", "apellido_materno", "telefono", "correo", "distrito", "estado", "latitud", "longitud", "fecha_actualizar")
-          SELECT x.numero_documento, x.nombres, x.apellido_paterno, x.apellido_materno, x.telefono, x.correo,
-                 x.distrito, x.estado, x.latitud, x.longitud, CURRENT_TIMESTAMP
-          FROM jsonb_to_recordset(${JSON.stringify(batch)}::jsonb) AS x(
-            dni text, nombres text, apellido_paterno text, apellido_materno text, telefono text,
-            correo text, distrito text, estado text, latitud numeric, longitud numeric
+          INSERT INTO "asesores" (
+            "dni",
+            "nombres",
+            "apellido_paterno",
+            "apellido_materno",
+            "telefono",
+            "correo",
+            "distrito",
+            "estado",
+            "latitud",
+            "longitud",
+            "fecha_actualizar"
           )
-          ON CONFLICT ("dni") DO UPDATE SET
-            "nombres" = EXCLUDED."nombres", "apellido_paterno" = EXCLUDED."apellido_paterno",
-            "apellido_materno" = EXCLUDED."apellido_materno", "telefono" = EXCLUDED."telefono",
-            "correo" = EXCLUDED."correo", "distrito" = COALESCE(EXCLUDED."distrito", "asesores"."distrito"),
-            "estado" = EXCLUDED."estado", "latitud" = EXCLUDED."latitud",
-            "longitud" = EXCLUDED."longitud", "fecha_actualizar" = CURRENT_TIMESTAMP
+
+          SELECT
+            x.numero_documento,
+            x.nombres,
+            x.apellido_paterno,
+            x.apellido_materno,
+            x.telefono,
+            x.correo,
+            x.distrito,
+            x.estado,
+            x.latitud,
+            x.longitud,
+            CURRENT_TIMESTAMP
+
+          FROM jsonb_to_recordset(
+            ${JSON.stringify(batch)}::jsonb
+          ) AS x(
+            dni text,
+            nombres text,
+            apellido_paterno text,
+            apellido_materno text,
+            telefono text,
+            correo text,
+            distrito text,
+            estado text,
+            latitud numeric,
+            longitud numeric
+          )
+
+          ON CONFLICT ("dni")
+          DO UPDATE SET
+            "nombres" = EXCLUDED."nombres",
+            "apellido_paterno" = EXCLUDED."apellido_paterno",
+            "apellido_materno" = EXCLUDED."apellido_materno",
+            "telefono" = EXCLUDED."telefono",
+            "correo" = EXCLUDED."correo",
+            "distrito" = COALESCE(
+              EXCLUDED."distrito",
+              "asesores"."distrito"
+            ),
+            "estado" = EXCLUDED."estado",
+            "latitud" = EXCLUDED."latitud",
+            "longitud" = EXCLUDED."longitud",
+            "fecha_actualizar" = CURRENT_TIMESTAMP
         `;
+
         updated += existing;
         inserted += Number(affected) - existing;
       }
+
       batch = [];
-      await prisma.importacionMasiva.update({ where: { id_importacion: id }, data: { procesadas: processed, insertadas: inserted, actualizadas: updated, omitidas: omitted, errores: errors } });
-    };
+
+      await prisma.importacionMasiva.update({
+        where: {
+          id_importacion: id
+        },
+        data: {
+          procesadas: processed,
+          insertadas: inserted,
+          actualizadas: updated,
+          omitidas: omitted,
+          errores: errors
+        }
+      });
+};
     for await (const worksheet of workbook) {
       for await (const excelRow of worksheet) {
         const values = Array.from({ length: excelRow.cellCount }, (_, index) => plainValue(excelRow.getCell(index + 1).value));
         if (!headers) {
           if (values.length > 100) throw Object.assign(new Error('El archivo supera el máximo de 100 columnas'), { code: 'COLUMN_LIMIT_EXCEEDED' });
           headers = values.map(normalizeHeader);
+
+          console.log('HOJA LEIDA:', worksheet.name);
+  console.log('VALORES ORIGINALES:', values);
+  console.log('HEADERS NORMALIZADOS:', headers);
+  
           const hasDocumentType = headers.some(header => ['tipo_documento', 'tipo_doc', 'tipo_docuemento', 'tipo_document'].includes(header));
           const hasDocumentNumber = headers.some(header => ['numero_documento', 'numero', 'documento', 'doc_identidad', 'num_doc'].includes(header));
           const hasClientDebt = headers.includes('deuda_cliente');
@@ -458,7 +1661,14 @@ async function processJob(id) {
           record = await (job.tipo === 'CLIENTES' ? clientRecord(row) : advisorRecord(row));
         } catch (rowError) {
           errors++;
-          if (details.length < MAX_ERRORS) details.push({ fila: excelRow.number, error: `Ubicación no válida: ${rowError.message}` });
+
+          if (details.length < MAX_ERRORS) {
+            details.push({
+              fila: excelRow.number,
+              error: rowError.message
+            });
+          }
+
           continue;
         }
         if (!record) {

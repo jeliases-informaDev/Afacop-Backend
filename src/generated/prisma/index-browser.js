@@ -129,14 +129,23 @@ exports.Prisma.ClienteScalarFieldEnum = {
   apellido_paterno: 'apellido_paterno',
   apellido_materno: 'apellido_materno',
   direccion: 'direccion',
+  direccion_normalizada: 'direccion_normalizada',
+  provincia: 'provincia',
+  departamento: 'departamento',
+  ubigeo: 'ubigeo',
   distrito: 'distrito',
   deuda_castigada: 'deuda_castigada',
+  deuda_cliente: 'deuda_cliente',
   deuda_vigente: 'deuda_vigente',
   otras_deudas: 'otras_deudas',
   estado: 'estado',
   ultima_gestion: 'ultima_gestion',
   latitud: 'latitud',
-  longitud: 'longitud'
+  longitud: 'longitud',
+  estado_geocodificacion: 'estado_geocodificacion',
+  precision_geocodificacion: 'precision_geocodificacion',
+  fecha_geocodificacion: 'fecha_geocodificacion',
+  datos_adicionales: 'datos_adicionales'
 };
 
 exports.Prisma.AdmisionScalarFieldEnum = {
@@ -262,6 +271,8 @@ exports.Prisma.AuditoriaSeguridadScalarFieldEnum = {
 exports.Prisma.ImportacionMasivaScalarFieldEnum = {
   id_importacion: 'id_importacion',
   tipo: 'tipo',
+  modo: 'modo',
+  periodo: 'periodo',
   estado: 'estado',
   archivo: 'archivo',
   ruta_temporal: 'ruta_temporal',
@@ -329,15 +340,15 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
 };
 exports.TipoDocumento = exports.$Enums.TipoDocumento = {
   DNI: 'DNI',
