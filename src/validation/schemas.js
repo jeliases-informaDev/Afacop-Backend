@@ -19,13 +19,71 @@ export const mfaChallengeBody = z.object({ challengeToken: z.string().min(20).ma
 export const mfaCodeBody = z.object({ code: z.string().regex(/^\d{6}$/) }).strict();
 export const passwordBody = z.object({ password: z.string().min(1).max(128) }).strict();
 export const listQuery = z.object({
-  page: z.coerce.number().int().min(1).max(100000).optional(),
-  limit: z.coerce.number().int().min(1).max(1000).optional(),
-  search: z.string().trim().max(150).optional(), estado: z.string().trim().max(30).optional(),
-  distrito: z.string().trim().max(100).optional(),
-  fecha_pago: z.union([z.iso.date(), z.literal('')]).transform(value => value || undefined).optional(),
-  lat: z.coerce.number().min(-90).max(90).optional(), lng: z.coerce.number().min(-180).max(180).optional(),
-  radio: z.coerce.number().positive().max(1000).optional(), offset: z.coerce.number().int().min(0).optional(),
+  page: z.coerce.number()
+    .int()
+    .min(1)
+    .max(100000)
+    .optional(),
+
+  limit: z.coerce.number()
+    .int()
+    .min(1)
+    .max(9999)
+    .optional(),
+
+  search: z.string()
+    .trim()
+    .max(150)
+    .optional(),
+
+  // Estado propio del cliente
+  estado: z.string()
+    .trim()
+    .max(30)
+    .optional(),
+
+  // Estado operativo de gestión
+  estado_gestion: z.enum([
+    'LIBRE',
+    'EN_VISITA',
+    'GESTIONADO',
+    'REPROGRAMADO',
+    'NO_ENCONTRADO',
+  ]).optional(),
+
+  distrito: z.string()
+    .trim()
+    .max(100)
+    .optional(),
+
+  fecha_pago: z
+    .union([
+      z.iso.date(),
+      z.literal('')
+    ])
+    .transform(value => value || undefined)
+    .optional(),
+
+  lat: z.coerce.number()
+    .min(-90)
+    .max(90)
+    .optional(),
+
+  lng: z.coerce.number()
+    .min(-180)
+    .max(180)
+    .optional(),
+
+  radio: z.coerce.number()
+    .positive()
+    .max(1000)
+    .optional(),
+
+  offset: z.coerce.number()
+    .int()
+    .min(0)
+    .optional(),
+
 }).strict();
 export const mapQuery = z.object({
   estado: z.string().trim().max(30).optional(), fecha_pago: z.iso.date().optional(),
