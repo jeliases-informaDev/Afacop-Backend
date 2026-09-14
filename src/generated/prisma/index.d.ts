@@ -2128,6 +2128,7 @@ export namespace Prisma {
   export type ClienteAvgAggregateOutputType = {
     id_cliente: number | null
     deuda_castigada: Decimal | null
+    deuda_cliente: Decimal | null
     deuda_vigente: Decimal | null
     otras_deudas: Decimal | null
     latitud: Decimal | null
@@ -2137,6 +2138,7 @@ export namespace Prisma {
   export type ClienteSumAggregateOutputType = {
     id_cliente: number | null
     deuda_castigada: Decimal | null
+    deuda_cliente: Decimal | null
     deuda_vigente: Decimal | null
     otras_deudas: Decimal | null
     latitud: Decimal | null
@@ -2152,14 +2154,22 @@ export namespace Prisma {
     apellido_paterno: string | null
     apellido_materno: string | null
     direccion: string | null
+    direccion_normalizada: string | null
+    provincia: string | null
+    departamento: string | null
+    ubigeo: string | null
     distrito: string | null
     deuda_castigada: Decimal | null
+    deuda_cliente: Decimal | null
     deuda_vigente: Decimal | null
     otras_deudas: Decimal | null
     estado: string | null
     ultima_gestion: Date | null
     latitud: Decimal | null
     longitud: Decimal | null
+    estado_geocodificacion: string | null
+    precision_geocodificacion: string | null
+    fecha_geocodificacion: Date | null
   }
 
   export type ClienteMaxAggregateOutputType = {
@@ -2171,14 +2181,22 @@ export namespace Prisma {
     apellido_paterno: string | null
     apellido_materno: string | null
     direccion: string | null
+    direccion_normalizada: string | null
+    provincia: string | null
+    departamento: string | null
+    ubigeo: string | null
     distrito: string | null
     deuda_castigada: Decimal | null
+    deuda_cliente: Decimal | null
     deuda_vigente: Decimal | null
     otras_deudas: Decimal | null
     estado: string | null
     ultima_gestion: Date | null
     latitud: Decimal | null
     longitud: Decimal | null
+    estado_geocodificacion: string | null
+    precision_geocodificacion: string | null
+    fecha_geocodificacion: Date | null
   }
 
   export type ClienteCountAggregateOutputType = {
@@ -2190,14 +2208,23 @@ export namespace Prisma {
     apellido_paterno: number
     apellido_materno: number
     direccion: number
+    direccion_normalizada: number
+    provincia: number
+    departamento: number
+    ubigeo: number
     distrito: number
     deuda_castigada: number
+    deuda_cliente: number
     deuda_vigente: number
     otras_deudas: number
     estado: number
     ultima_gestion: number
     latitud: number
     longitud: number
+    estado_geocodificacion: number
+    precision_geocodificacion: number
+    fecha_geocodificacion: number
+    datos_adicionales: number
     _all: number
   }
 
@@ -2205,6 +2232,7 @@ export namespace Prisma {
   export type ClienteAvgAggregateInputType = {
     id_cliente?: true
     deuda_castigada?: true
+    deuda_cliente?: true
     deuda_vigente?: true
     otras_deudas?: true
     latitud?: true
@@ -2214,6 +2242,7 @@ export namespace Prisma {
   export type ClienteSumAggregateInputType = {
     id_cliente?: true
     deuda_castigada?: true
+    deuda_cliente?: true
     deuda_vigente?: true
     otras_deudas?: true
     latitud?: true
@@ -2229,14 +2258,22 @@ export namespace Prisma {
     apellido_paterno?: true
     apellido_materno?: true
     direccion?: true
+    direccion_normalizada?: true
+    provincia?: true
+    departamento?: true
+    ubigeo?: true
     distrito?: true
     deuda_castigada?: true
+    deuda_cliente?: true
     deuda_vigente?: true
     otras_deudas?: true
     estado?: true
     ultima_gestion?: true
     latitud?: true
     longitud?: true
+    estado_geocodificacion?: true
+    precision_geocodificacion?: true
+    fecha_geocodificacion?: true
   }
 
   export type ClienteMaxAggregateInputType = {
@@ -2248,14 +2285,22 @@ export namespace Prisma {
     apellido_paterno?: true
     apellido_materno?: true
     direccion?: true
+    direccion_normalizada?: true
+    provincia?: true
+    departamento?: true
+    ubigeo?: true
     distrito?: true
     deuda_castigada?: true
+    deuda_cliente?: true
     deuda_vigente?: true
     otras_deudas?: true
     estado?: true
     ultima_gestion?: true
     latitud?: true
     longitud?: true
+    estado_geocodificacion?: true
+    precision_geocodificacion?: true
+    fecha_geocodificacion?: true
   }
 
   export type ClienteCountAggregateInputType = {
@@ -2267,14 +2312,23 @@ export namespace Prisma {
     apellido_paterno?: true
     apellido_materno?: true
     direccion?: true
+    direccion_normalizada?: true
+    provincia?: true
+    departamento?: true
+    ubigeo?: true
     distrito?: true
     deuda_castigada?: true
+    deuda_cliente?: true
     deuda_vigente?: true
     otras_deudas?: true
     estado?: true
     ultima_gestion?: true
     latitud?: true
     longitud?: true
+    estado_geocodificacion?: true
+    precision_geocodificacion?: true
+    fecha_geocodificacion?: true
+    datos_adicionales?: true
     _all?: true
   }
 
@@ -2373,14 +2427,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion: string | null
+    direccion_normalizada: string | null
+    provincia: string | null
+    departamento: string | null
+    ubigeo: string | null
     distrito: string | null
     deuda_castigada: Decimal
+    deuda_cliente: Decimal
     deuda_vigente: Decimal
     otras_deudas: Decimal
     estado: string
     ultima_gestion: Date | null
     latitud: Decimal | null
     longitud: Decimal | null
+    estado_geocodificacion: string | null
+    precision_geocodificacion: string | null
+    fecha_geocodificacion: Date | null
+    datos_adicionales: JsonValue | null
     _count: ClienteCountAggregateOutputType | null
     _avg: ClienteAvgAggregateOutputType | null
     _sum: ClienteSumAggregateOutputType | null
@@ -2411,14 +2474,23 @@ export namespace Prisma {
     apellido_paterno?: boolean
     apellido_materno?: boolean
     direccion?: boolean
+    direccion_normalizada?: boolean
+    provincia?: boolean
+    departamento?: boolean
+    ubigeo?: boolean
     distrito?: boolean
     deuda_castigada?: boolean
+    deuda_cliente?: boolean
     deuda_vigente?: boolean
     otras_deudas?: boolean
     estado?: boolean
     ultima_gestion?: boolean
     latitud?: boolean
     longitud?: boolean
+    estado_geocodificacion?: boolean
+    precision_geocodificacion?: boolean
+    fecha_geocodificacion?: boolean
+    datos_adicionales?: boolean
     admisiones?: boolean | Cliente$admisionesArgs<ExtArgs>
     asignaciones?: boolean | Cliente$asignacionesArgs<ExtArgs>
     rutas_clientes?: boolean | Cliente$rutas_clientesArgs<ExtArgs>
@@ -2435,14 +2507,23 @@ export namespace Prisma {
     apellido_paterno?: boolean
     apellido_materno?: boolean
     direccion?: boolean
+    direccion_normalizada?: boolean
+    provincia?: boolean
+    departamento?: boolean
+    ubigeo?: boolean
     distrito?: boolean
     deuda_castigada?: boolean
+    deuda_cliente?: boolean
     deuda_vigente?: boolean
     otras_deudas?: boolean
     estado?: boolean
     ultima_gestion?: boolean
     latitud?: boolean
     longitud?: boolean
+    estado_geocodificacion?: boolean
+    precision_geocodificacion?: boolean
+    fecha_geocodificacion?: boolean
+    datos_adicionales?: boolean
   }, ExtArgs["result"]["cliente"]>
 
   export type ClienteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2454,14 +2535,23 @@ export namespace Prisma {
     apellido_paterno?: boolean
     apellido_materno?: boolean
     direccion?: boolean
+    direccion_normalizada?: boolean
+    provincia?: boolean
+    departamento?: boolean
+    ubigeo?: boolean
     distrito?: boolean
     deuda_castigada?: boolean
+    deuda_cliente?: boolean
     deuda_vigente?: boolean
     otras_deudas?: boolean
     estado?: boolean
     ultima_gestion?: boolean
     latitud?: boolean
     longitud?: boolean
+    estado_geocodificacion?: boolean
+    precision_geocodificacion?: boolean
+    fecha_geocodificacion?: boolean
+    datos_adicionales?: boolean
   }, ExtArgs["result"]["cliente"]>
 
   export type ClienteSelectScalar = {
@@ -2473,17 +2563,26 @@ export namespace Prisma {
     apellido_paterno?: boolean
     apellido_materno?: boolean
     direccion?: boolean
+    direccion_normalizada?: boolean
+    provincia?: boolean
+    departamento?: boolean
+    ubigeo?: boolean
     distrito?: boolean
     deuda_castigada?: boolean
+    deuda_cliente?: boolean
     deuda_vigente?: boolean
     otras_deudas?: boolean
     estado?: boolean
     ultima_gestion?: boolean
     latitud?: boolean
     longitud?: boolean
+    estado_geocodificacion?: boolean
+    precision_geocodificacion?: boolean
+    fecha_geocodificacion?: boolean
+    datos_adicionales?: boolean
   }
 
-  export type ClienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_cliente" | "tipo_documento" | "numero_documento" | "telefono" | "nombres" | "apellido_paterno" | "apellido_materno" | "direccion" | "distrito" | "deuda_castigada" | "deuda_vigente" | "otras_deudas" | "estado" | "ultima_gestion" | "latitud" | "longitud", ExtArgs["result"]["cliente"]>
+  export type ClienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_cliente" | "tipo_documento" | "numero_documento" | "telefono" | "nombres" | "apellido_paterno" | "apellido_materno" | "direccion" | "direccion_normalizada" | "provincia" | "departamento" | "ubigeo" | "distrito" | "deuda_castigada" | "deuda_cliente" | "deuda_vigente" | "otras_deudas" | "estado" | "ultima_gestion" | "latitud" | "longitud" | "estado_geocodificacion" | "precision_geocodificacion" | "fecha_geocodificacion" | "datos_adicionales", ExtArgs["result"]["cliente"]>
   export type ClienteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     admisiones?: boolean | Cliente$admisionesArgs<ExtArgs>
     asignaciones?: boolean | Cliente$asignacionesArgs<ExtArgs>
@@ -2511,14 +2610,23 @@ export namespace Prisma {
       apellido_paterno: string
       apellido_materno: string
       direccion: string | null
+      direccion_normalizada: string | null
+      provincia: string | null
+      departamento: string | null
+      ubigeo: string | null
       distrito: string | null
       deuda_castigada: Prisma.Decimal
+      deuda_cliente: Prisma.Decimal
       deuda_vigente: Prisma.Decimal
       otras_deudas: Prisma.Decimal
       estado: string
       ultima_gestion: Date | null
       latitud: Prisma.Decimal | null
       longitud: Prisma.Decimal | null
+      estado_geocodificacion: string | null
+      precision_geocodificacion: string | null
+      fecha_geocodificacion: Date | null
+      datos_adicionales: Prisma.JsonValue | null
     }, ExtArgs["result"]["cliente"]>
     composites: {}
   }
@@ -2954,14 +3062,23 @@ export namespace Prisma {
     readonly apellido_paterno: FieldRef<"Cliente", 'String'>
     readonly apellido_materno: FieldRef<"Cliente", 'String'>
     readonly direccion: FieldRef<"Cliente", 'String'>
+    readonly direccion_normalizada: FieldRef<"Cliente", 'String'>
+    readonly provincia: FieldRef<"Cliente", 'String'>
+    readonly departamento: FieldRef<"Cliente", 'String'>
+    readonly ubigeo: FieldRef<"Cliente", 'String'>
     readonly distrito: FieldRef<"Cliente", 'String'>
     readonly deuda_castigada: FieldRef<"Cliente", 'Decimal'>
+    readonly deuda_cliente: FieldRef<"Cliente", 'Decimal'>
     readonly deuda_vigente: FieldRef<"Cliente", 'Decimal'>
     readonly otras_deudas: FieldRef<"Cliente", 'Decimal'>
     readonly estado: FieldRef<"Cliente", 'String'>
     readonly ultima_gestion: FieldRef<"Cliente", 'DateTime'>
     readonly latitud: FieldRef<"Cliente", 'Decimal'>
     readonly longitud: FieldRef<"Cliente", 'Decimal'>
+    readonly estado_geocodificacion: FieldRef<"Cliente", 'String'>
+    readonly precision_geocodificacion: FieldRef<"Cliente", 'String'>
+    readonly fecha_geocodificacion: FieldRef<"Cliente", 'DateTime'>
+    readonly datos_adicionales: FieldRef<"Cliente", 'Json'>
   }
     
 
@@ -13236,6 +13353,8 @@ export namespace Prisma {
   export type ImportacionMasivaMinAggregateOutputType = {
     id_importacion: string | null
     tipo: string | null
+    modo: string | null
+    periodo: string | null
     estado: string | null
     archivo: string | null
     ruta_temporal: string | null
@@ -13254,6 +13373,8 @@ export namespace Prisma {
   export type ImportacionMasivaMaxAggregateOutputType = {
     id_importacion: string | null
     tipo: string | null
+    modo: string | null
+    periodo: string | null
     estado: string | null
     archivo: string | null
     ruta_temporal: string | null
@@ -13272,6 +13393,8 @@ export namespace Prisma {
   export type ImportacionMasivaCountAggregateOutputType = {
     id_importacion: number
     tipo: number
+    modo: number
+    periodo: number
     estado: number
     archivo: number
     ruta_temporal: number
@@ -13311,6 +13434,8 @@ export namespace Prisma {
   export type ImportacionMasivaMinAggregateInputType = {
     id_importacion?: true
     tipo?: true
+    modo?: true
+    periodo?: true
     estado?: true
     archivo?: true
     ruta_temporal?: true
@@ -13329,6 +13454,8 @@ export namespace Prisma {
   export type ImportacionMasivaMaxAggregateInputType = {
     id_importacion?: true
     tipo?: true
+    modo?: true
+    periodo?: true
     estado?: true
     archivo?: true
     ruta_temporal?: true
@@ -13347,6 +13474,8 @@ export namespace Prisma {
   export type ImportacionMasivaCountAggregateInputType = {
     id_importacion?: true
     tipo?: true
+    modo?: true
+    periodo?: true
     estado?: true
     archivo?: true
     ruta_temporal?: true
@@ -13453,6 +13582,8 @@ export namespace Prisma {
   export type ImportacionMasivaGroupByOutputType = {
     id_importacion: string
     tipo: string
+    modo: string | null
+    periodo: string | null
     estado: string
     archivo: string
     ruta_temporal: string
@@ -13491,6 +13622,8 @@ export namespace Prisma {
   export type ImportacionMasivaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_importacion?: boolean
     tipo?: boolean
+    modo?: boolean
+    periodo?: boolean
     estado?: boolean
     archivo?: boolean
     ruta_temporal?: boolean
@@ -13510,6 +13643,8 @@ export namespace Prisma {
   export type ImportacionMasivaSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_importacion?: boolean
     tipo?: boolean
+    modo?: boolean
+    periodo?: boolean
     estado?: boolean
     archivo?: boolean
     ruta_temporal?: boolean
@@ -13529,6 +13664,8 @@ export namespace Prisma {
   export type ImportacionMasivaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_importacion?: boolean
     tipo?: boolean
+    modo?: boolean
+    periodo?: boolean
     estado?: boolean
     archivo?: boolean
     ruta_temporal?: boolean
@@ -13548,6 +13685,8 @@ export namespace Prisma {
   export type ImportacionMasivaSelectScalar = {
     id_importacion?: boolean
     tipo?: boolean
+    modo?: boolean
+    periodo?: boolean
     estado?: boolean
     archivo?: boolean
     ruta_temporal?: boolean
@@ -13564,7 +13703,7 @@ export namespace Prisma {
     fecha_fin?: boolean
   }
 
-  export type ImportacionMasivaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_importacion" | "tipo" | "estado" | "archivo" | "ruta_temporal" | "actor_id" | "total_filas" | "procesadas" | "insertadas" | "actualizadas" | "omitidas" | "errores" | "detalle_error" | "fecha_creacion" | "fecha_inicio" | "fecha_fin", ExtArgs["result"]["importacionMasiva"]>
+  export type ImportacionMasivaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_importacion" | "tipo" | "modo" | "periodo" | "estado" | "archivo" | "ruta_temporal" | "actor_id" | "total_filas" | "procesadas" | "insertadas" | "actualizadas" | "omitidas" | "errores" | "detalle_error" | "fecha_creacion" | "fecha_inicio" | "fecha_fin", ExtArgs["result"]["importacionMasiva"]>
 
   export type $ImportacionMasivaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ImportacionMasiva"
@@ -13572,6 +13711,8 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id_importacion: string
       tipo: string
+      modo: string | null
+      periodo: string | null
       estado: string
       archivo: string
       ruta_temporal: string
@@ -14011,6 +14152,8 @@ export namespace Prisma {
   interface ImportacionMasivaFieldRefs {
     readonly id_importacion: FieldRef<"ImportacionMasiva", 'String'>
     readonly tipo: FieldRef<"ImportacionMasiva", 'String'>
+    readonly modo: FieldRef<"ImportacionMasiva", 'String'>
+    readonly periodo: FieldRef<"ImportacionMasiva", 'String'>
     readonly estado: FieldRef<"ImportacionMasiva", 'String'>
     readonly archivo: FieldRef<"ImportacionMasiva", 'String'>
     readonly ruta_temporal: FieldRef<"ImportacionMasiva", 'String'>
@@ -16881,14 +17024,23 @@ export namespace Prisma {
     apellido_paterno: 'apellido_paterno',
     apellido_materno: 'apellido_materno',
     direccion: 'direccion',
+    direccion_normalizada: 'direccion_normalizada',
+    provincia: 'provincia',
+    departamento: 'departamento',
+    ubigeo: 'ubigeo',
     distrito: 'distrito',
     deuda_castigada: 'deuda_castigada',
+    deuda_cliente: 'deuda_cliente',
     deuda_vigente: 'deuda_vigente',
     otras_deudas: 'otras_deudas',
     estado: 'estado',
     ultima_gestion: 'ultima_gestion',
     latitud: 'latitud',
-    longitud: 'longitud'
+    longitud: 'longitud',
+    estado_geocodificacion: 'estado_geocodificacion',
+    precision_geocodificacion: 'precision_geocodificacion',
+    fecha_geocodificacion: 'fecha_geocodificacion',
+    datos_adicionales: 'datos_adicionales'
   };
 
   export type ClienteScalarFieldEnum = (typeof ClienteScalarFieldEnum)[keyof typeof ClienteScalarFieldEnum]
@@ -17041,6 +17193,8 @@ export namespace Prisma {
   export const ImportacionMasivaScalarFieldEnum: {
     id_importacion: 'id_importacion',
     tipo: 'tipo',
+    modo: 'modo',
+    periodo: 'periodo',
     estado: 'estado',
     archivo: 'archivo',
     ruta_temporal: 'ruta_temporal',
@@ -17126,14 +17280,6 @@ export namespace Prisma {
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-  export const NullsOrder: {
-    first: 'first',
-    last: 'last'
-  };
-
-  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
   export const JsonNullValueFilter: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull,
@@ -17141,6 +17287,14 @@ export namespace Prisma {
   };
 
   export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -17219,13 +17373,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -17236,6 +17383,13 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -17268,14 +17422,23 @@ export namespace Prisma {
     apellido_paterno?: StringFilter<"Cliente"> | string
     apellido_materno?: StringFilter<"Cliente"> | string
     direccion?: StringNullableFilter<"Cliente"> | string | null
+    direccion_normalizada?: StringNullableFilter<"Cliente"> | string | null
+    provincia?: StringNullableFilter<"Cliente"> | string | null
+    departamento?: StringNullableFilter<"Cliente"> | string | null
+    ubigeo?: StringNullableFilter<"Cliente"> | string | null
     distrito?: StringNullableFilter<"Cliente"> | string | null
     deuda_castigada?: DecimalFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
     estado?: StringFilter<"Cliente"> | string
     ultima_gestion?: DateTimeNullableFilter<"Cliente"> | Date | string | null
     latitud?: DecimalNullableFilter<"Cliente"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Cliente"> | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
+    precision_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
+    fecha_geocodificacion?: DateTimeNullableFilter<"Cliente"> | Date | string | null
+    datos_adicionales?: JsonNullableFilter<"Cliente">
     admisiones?: AdmisionListRelationFilter
     asignaciones?: AsignacionClienteListRelationFilter
     rutas_clientes?: RutaClienteListRelationFilter
@@ -17291,14 +17454,23 @@ export namespace Prisma {
     apellido_paterno?: SortOrder
     apellido_materno?: SortOrder
     direccion?: SortOrderInput | SortOrder
+    direccion_normalizada?: SortOrderInput | SortOrder
+    provincia?: SortOrderInput | SortOrder
+    departamento?: SortOrderInput | SortOrder
+    ubigeo?: SortOrderInput | SortOrder
     distrito?: SortOrderInput | SortOrder
     deuda_castigada?: SortOrder
+    deuda_cliente?: SortOrder
     deuda_vigente?: SortOrder
     otras_deudas?: SortOrder
     estado?: SortOrder
     ultima_gestion?: SortOrderInput | SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
+    estado_geocodificacion?: SortOrderInput | SortOrder
+    precision_geocodificacion?: SortOrderInput | SortOrder
+    fecha_geocodificacion?: SortOrderInput | SortOrder
+    datos_adicionales?: SortOrderInput | SortOrder
     admisiones?: AdmisionOrderByRelationAggregateInput
     asignaciones?: AsignacionClienteOrderByRelationAggregateInput
     rutas_clientes?: RutaClienteOrderByRelationAggregateInput
@@ -17318,14 +17490,23 @@ export namespace Prisma {
     apellido_paterno?: StringFilter<"Cliente"> | string
     apellido_materno?: StringFilter<"Cliente"> | string
     direccion?: StringNullableFilter<"Cliente"> | string | null
+    direccion_normalizada?: StringNullableFilter<"Cliente"> | string | null
+    provincia?: StringNullableFilter<"Cliente"> | string | null
+    departamento?: StringNullableFilter<"Cliente"> | string | null
+    ubigeo?: StringNullableFilter<"Cliente"> | string | null
     distrito?: StringNullableFilter<"Cliente"> | string | null
     deuda_castigada?: DecimalFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
     estado?: StringFilter<"Cliente"> | string
     ultima_gestion?: DateTimeNullableFilter<"Cliente"> | Date | string | null
     latitud?: DecimalNullableFilter<"Cliente"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Cliente"> | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
+    precision_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
+    fecha_geocodificacion?: DateTimeNullableFilter<"Cliente"> | Date | string | null
+    datos_adicionales?: JsonNullableFilter<"Cliente">
     admisiones?: AdmisionListRelationFilter
     asignaciones?: AsignacionClienteListRelationFilter
     rutas_clientes?: RutaClienteListRelationFilter
@@ -17341,14 +17522,23 @@ export namespace Prisma {
     apellido_paterno?: SortOrder
     apellido_materno?: SortOrder
     direccion?: SortOrderInput | SortOrder
+    direccion_normalizada?: SortOrderInput | SortOrder
+    provincia?: SortOrderInput | SortOrder
+    departamento?: SortOrderInput | SortOrder
+    ubigeo?: SortOrderInput | SortOrder
     distrito?: SortOrderInput | SortOrder
     deuda_castigada?: SortOrder
+    deuda_cliente?: SortOrder
     deuda_vigente?: SortOrder
     otras_deudas?: SortOrder
     estado?: SortOrder
     ultima_gestion?: SortOrderInput | SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
+    estado_geocodificacion?: SortOrderInput | SortOrder
+    precision_geocodificacion?: SortOrderInput | SortOrder
+    fecha_geocodificacion?: SortOrderInput | SortOrder
+    datos_adicionales?: SortOrderInput | SortOrder
     _count?: ClienteCountOrderByAggregateInput
     _avg?: ClienteAvgOrderByAggregateInput
     _max?: ClienteMaxOrderByAggregateInput
@@ -17368,14 +17558,23 @@ export namespace Prisma {
     apellido_paterno?: StringWithAggregatesFilter<"Cliente"> | string
     apellido_materno?: StringWithAggregatesFilter<"Cliente"> | string
     direccion?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
+    direccion_normalizada?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
+    provincia?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
+    departamento?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
+    ubigeo?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
     distrito?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
     deuda_castigada?: DecimalWithAggregatesFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalWithAggregatesFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalWithAggregatesFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalWithAggregatesFilter<"Cliente"> | Decimal | DecimalJsLike | number | string
     estado?: StringWithAggregatesFilter<"Cliente"> | string
     ultima_gestion?: DateTimeNullableWithAggregatesFilter<"Cliente"> | Date | string | null
     latitud?: DecimalNullableWithAggregatesFilter<"Cliente"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableWithAggregatesFilter<"Cliente"> | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
+    precision_geocodificacion?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
+    fecha_geocodificacion?: DateTimeNullableWithAggregatesFilter<"Cliente"> | Date | string | null
+    datos_adicionales?: JsonNullableWithAggregatesFilter<"Cliente">
   }
 
   export type AdmisionWhereInput = {
@@ -18145,6 +18344,8 @@ export namespace Prisma {
     NOT?: ImportacionMasivaWhereInput | ImportacionMasivaWhereInput[]
     id_importacion?: UuidFilter<"ImportacionMasiva"> | string
     tipo?: StringFilter<"ImportacionMasiva"> | string
+    modo?: StringNullableFilter<"ImportacionMasiva"> | string | null
+    periodo?: StringNullableFilter<"ImportacionMasiva"> | string | null
     estado?: StringFilter<"ImportacionMasiva"> | string
     archivo?: StringFilter<"ImportacionMasiva"> | string
     ruta_temporal?: StringFilter<"ImportacionMasiva"> | string
@@ -18164,6 +18365,8 @@ export namespace Prisma {
   export type ImportacionMasivaOrderByWithRelationInput = {
     id_importacion?: SortOrder
     tipo?: SortOrder
+    modo?: SortOrderInput | SortOrder
+    periodo?: SortOrderInput | SortOrder
     estado?: SortOrder
     archivo?: SortOrder
     ruta_temporal?: SortOrder
@@ -18186,6 +18389,8 @@ export namespace Prisma {
     OR?: ImportacionMasivaWhereInput[]
     NOT?: ImportacionMasivaWhereInput | ImportacionMasivaWhereInput[]
     tipo?: StringFilter<"ImportacionMasiva"> | string
+    modo?: StringNullableFilter<"ImportacionMasiva"> | string | null
+    periodo?: StringNullableFilter<"ImportacionMasiva"> | string | null
     estado?: StringFilter<"ImportacionMasiva"> | string
     archivo?: StringFilter<"ImportacionMasiva"> | string
     ruta_temporal?: StringFilter<"ImportacionMasiva"> | string
@@ -18205,6 +18410,8 @@ export namespace Prisma {
   export type ImportacionMasivaOrderByWithAggregationInput = {
     id_importacion?: SortOrder
     tipo?: SortOrder
+    modo?: SortOrderInput | SortOrder
+    periodo?: SortOrderInput | SortOrder
     estado?: SortOrder
     archivo?: SortOrder
     ruta_temporal?: SortOrder
@@ -18232,6 +18439,8 @@ export namespace Prisma {
     NOT?: ImportacionMasivaScalarWhereWithAggregatesInput | ImportacionMasivaScalarWhereWithAggregatesInput[]
     id_importacion?: UuidWithAggregatesFilter<"ImportacionMasiva"> | string
     tipo?: StringWithAggregatesFilter<"ImportacionMasiva"> | string
+    modo?: StringNullableWithAggregatesFilter<"ImportacionMasiva"> | string | null
+    periodo?: StringNullableWithAggregatesFilter<"ImportacionMasiva"> | string | null
     estado?: StringWithAggregatesFilter<"ImportacionMasiva"> | string
     archivo?: StringWithAggregatesFilter<"ImportacionMasiva"> | string
     ruta_temporal?: StringWithAggregatesFilter<"ImportacionMasiva"> | string
@@ -18470,14 +18679,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteCreateNestedManyWithoutClienteInput
@@ -18493,14 +18711,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteUncheckedCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteUncheckedCreateNestedManyWithoutClienteInput
@@ -18515,14 +18742,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUpdateManyWithoutClienteNestedInput
@@ -18538,14 +18774,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUncheckedUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUncheckedUpdateManyWithoutClienteNestedInput
@@ -18561,14 +18806,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type ClienteUpdateManyMutationInput = {
@@ -18579,14 +18833,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type ClienteUncheckedUpdateManyInput = {
@@ -18598,14 +18861,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AdmisionCreateInput = {
@@ -19447,6 +19719,8 @@ export namespace Prisma {
   export type ImportacionMasivaCreateInput = {
     id_importacion?: string
     tipo: string
+    modo?: string | null
+    periodo?: string | null
     estado?: string
     archivo: string
     ruta_temporal: string
@@ -19466,6 +19740,8 @@ export namespace Prisma {
   export type ImportacionMasivaUncheckedCreateInput = {
     id_importacion?: string
     tipo: string
+    modo?: string | null
+    periodo?: string | null
     estado?: string
     archivo: string
     ruta_temporal: string
@@ -19485,6 +19761,8 @@ export namespace Prisma {
   export type ImportacionMasivaUpdateInput = {
     id_importacion?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
+    modo?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     archivo?: StringFieldUpdateOperationsInput | string
     ruta_temporal?: StringFieldUpdateOperationsInput | string
@@ -19504,6 +19782,8 @@ export namespace Prisma {
   export type ImportacionMasivaUncheckedUpdateInput = {
     id_importacion?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
+    modo?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     archivo?: StringFieldUpdateOperationsInput | string
     ruta_temporal?: StringFieldUpdateOperationsInput | string
@@ -19523,6 +19803,8 @@ export namespace Prisma {
   export type ImportacionMasivaCreateManyInput = {
     id_importacion?: string
     tipo: string
+    modo?: string | null
+    periodo?: string | null
     estado?: string
     archivo: string
     ruta_temporal: string
@@ -19542,6 +19824,8 @@ export namespace Prisma {
   export type ImportacionMasivaUpdateManyMutationInput = {
     id_importacion?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
+    modo?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     archivo?: StringFieldUpdateOperationsInput | string
     ruta_temporal?: StringFieldUpdateOperationsInput | string
@@ -19561,6 +19845,8 @@ export namespace Prisma {
   export type ImportacionMasivaUncheckedUpdateManyInput = {
     id_importacion?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
+    modo?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     archivo?: StringFieldUpdateOperationsInput | string
     ruta_temporal?: StringFieldUpdateOperationsInput | string
@@ -19912,6 +20198,29 @@ export namespace Prisma {
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type AdmisionListRelationFilter = {
     every?: AdmisionWhereInput
@@ -19972,19 +20281,29 @@ export namespace Prisma {
     apellido_paterno?: SortOrder
     apellido_materno?: SortOrder
     direccion?: SortOrder
+    direccion_normalizada?: SortOrder
+    provincia?: SortOrder
+    departamento?: SortOrder
+    ubigeo?: SortOrder
     distrito?: SortOrder
     deuda_castigada?: SortOrder
+    deuda_cliente?: SortOrder
     deuda_vigente?: SortOrder
     otras_deudas?: SortOrder
     estado?: SortOrder
     ultima_gestion?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    estado_geocodificacion?: SortOrder
+    precision_geocodificacion?: SortOrder
+    fecha_geocodificacion?: SortOrder
+    datos_adicionales?: SortOrder
   }
 
   export type ClienteAvgOrderByAggregateInput = {
     id_cliente?: SortOrder
     deuda_castigada?: SortOrder
+    deuda_cliente?: SortOrder
     deuda_vigente?: SortOrder
     otras_deudas?: SortOrder
     latitud?: SortOrder
@@ -20000,14 +20319,22 @@ export namespace Prisma {
     apellido_paterno?: SortOrder
     apellido_materno?: SortOrder
     direccion?: SortOrder
+    direccion_normalizada?: SortOrder
+    provincia?: SortOrder
+    departamento?: SortOrder
+    ubigeo?: SortOrder
     distrito?: SortOrder
     deuda_castigada?: SortOrder
+    deuda_cliente?: SortOrder
     deuda_vigente?: SortOrder
     otras_deudas?: SortOrder
     estado?: SortOrder
     ultima_gestion?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    estado_geocodificacion?: SortOrder
+    precision_geocodificacion?: SortOrder
+    fecha_geocodificacion?: SortOrder
   }
 
   export type ClienteMinOrderByAggregateInput = {
@@ -20019,19 +20346,28 @@ export namespace Prisma {
     apellido_paterno?: SortOrder
     apellido_materno?: SortOrder
     direccion?: SortOrder
+    direccion_normalizada?: SortOrder
+    provincia?: SortOrder
+    departamento?: SortOrder
+    ubigeo?: SortOrder
     distrito?: SortOrder
     deuda_castigada?: SortOrder
+    deuda_cliente?: SortOrder
     deuda_vigente?: SortOrder
     otras_deudas?: SortOrder
     estado?: SortOrder
     ultima_gestion?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    estado_geocodificacion?: SortOrder
+    precision_geocodificacion?: SortOrder
+    fecha_geocodificacion?: SortOrder
   }
 
   export type ClienteSumOrderByAggregateInput = {
     id_cliente?: SortOrder
     deuda_castigada?: SortOrder
+    deuda_cliente?: SortOrder
     deuda_vigente?: SortOrder
     otras_deudas?: SortOrder
     latitud?: SortOrder
@@ -20144,6 +20480,32 @@ export namespace Prisma {
     _sum?: NestedDecimalNullableFilter<$PrismaModel>
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type ClienteScalarRelationFilter = {
@@ -20769,33 +21131,12 @@ export namespace Prisma {
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type ImportacionMasivaCountOrderByAggregateInput = {
     id_importacion?: SortOrder
     tipo?: SortOrder
+    modo?: SortOrder
+    periodo?: SortOrder
     estado?: SortOrder
     archivo?: SortOrder
     ruta_temporal?: SortOrder
@@ -20824,6 +21165,8 @@ export namespace Prisma {
   export type ImportacionMasivaMaxOrderByAggregateInput = {
     id_importacion?: SortOrder
     tipo?: SortOrder
+    modo?: SortOrder
+    periodo?: SortOrder
     estado?: SortOrder
     archivo?: SortOrder
     ruta_temporal?: SortOrder
@@ -20842,6 +21185,8 @@ export namespace Prisma {
   export type ImportacionMasivaMinOrderByAggregateInput = {
     id_importacion?: SortOrder
     tipo?: SortOrder
+    modo?: SortOrder
+    periodo?: SortOrder
     estado?: SortOrder
     archivo?: SortOrder
     ruta_temporal?: SortOrder
@@ -20864,32 +21209,6 @@ export namespace Prisma {
     actualizadas?: SortOrder
     omitidas?: SortOrder
     errores?: SortOrder
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type HistorialCalidadListRelationFilter = {
@@ -21901,6 +22220,29 @@ export namespace Prisma {
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -22015,29 +22357,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type AdmisionCreateWithoutClienteInput = {
@@ -22316,14 +22635,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     asignaciones?: AsignacionClienteCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteCreateNestedManyWithoutClienteInput
     visitas?: VisitaCreateNestedManyWithoutClienteInput
@@ -22338,14 +22666,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     asignaciones?: AsignacionClienteUncheckedCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteUncheckedCreateNestedManyWithoutClienteInput
     visitas?: VisitaUncheckedCreateNestedManyWithoutClienteInput
@@ -22375,14 +22712,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     asignaciones?: AsignacionClienteUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUpdateManyWithoutClienteNestedInput
     visitas?: VisitaUpdateManyWithoutClienteNestedInput
@@ -22397,14 +22743,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     asignaciones?: AsignacionClienteUncheckedUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUncheckedUpdateManyWithoutClienteNestedInput
     visitas?: VisitaUncheckedUpdateManyWithoutClienteNestedInput
@@ -22701,14 +23056,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteCreateNestedManyWithoutClienteInput
     visitas?: VisitaCreateNestedManyWithoutClienteInput
@@ -22723,14 +23087,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteUncheckedCreateNestedManyWithoutClienteInput
     visitas?: VisitaUncheckedCreateNestedManyWithoutClienteInput
@@ -22802,14 +23175,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUpdateManyWithoutClienteNestedInput
     visitas?: VisitaUpdateManyWithoutClienteNestedInput
@@ -22824,14 +23206,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUncheckedUpdateManyWithoutClienteNestedInput
     visitas?: VisitaUncheckedUpdateManyWithoutClienteNestedInput
@@ -23056,14 +23447,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteCreateNestedManyWithoutClienteInput
     visitas?: VisitaCreateNestedManyWithoutClienteInput
@@ -23078,14 +23478,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteUncheckedCreateNestedManyWithoutClienteInput
     visitas?: VisitaUncheckedCreateNestedManyWithoutClienteInput
@@ -23204,14 +23613,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUpdateManyWithoutClienteNestedInput
     visitas?: VisitaUpdateManyWithoutClienteNestedInput
@@ -23226,14 +23644,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUncheckedUpdateManyWithoutClienteNestedInput
     visitas?: VisitaUncheckedUpdateManyWithoutClienteNestedInput
@@ -23289,14 +23716,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteCreateNestedManyWithoutClienteInput
@@ -23311,14 +23747,23 @@ export namespace Prisma {
     apellido_paterno: string
     apellido_materno: string
     direccion?: string | null
+    direccion_normalizada?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    ubigeo?: string | null
     distrito?: string | null
     deuda_castigada?: Decimal | DecimalJsLike | number | string
+    deuda_cliente?: Decimal | DecimalJsLike | number | string
     deuda_vigente?: Decimal | DecimalJsLike | number | string
     otras_deudas?: Decimal | DecimalJsLike | number | string
     estado?: string
     ultima_gestion?: Date | string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: string | null
+    precision_geocodificacion?: string | null
+    fecha_geocodificacion?: Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteUncheckedCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteUncheckedCreateNestedManyWithoutClienteInput
@@ -23422,14 +23867,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUpdateManyWithoutClienteNestedInput
@@ -23444,14 +23898,23 @@ export namespace Prisma {
     apellido_paterno?: StringFieldUpdateOperationsInput | string
     apellido_materno?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    ubigeo?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     deuda_castigada?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    deuda_cliente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     deuda_vigente?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     otras_deudas?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     estado?: StringFieldUpdateOperationsInput | string
     ultima_gestion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUncheckedUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUncheckedUpdateManyWithoutClienteNestedInput
