@@ -9,6 +9,12 @@ import { listQuery } from "../../validation/schemas.js";
 const router = Router();
 
 router.use(authMiddleware);
+
+router.get(
+  "/evaluar/:dni", roleMiddleware(ADMISSION_READERS),
+  admisionController.evaluarCliente
+);
+
 router.get("/", roleMiddleware(ADMISSION_READERS), validate({ query: listQuery }), admisionController.obtenerAdmisiones);
 
 export default router;

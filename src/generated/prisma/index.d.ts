@@ -73,6 +73,11 @@ export type RegistroCalidad = $Result.DefaultSelection<Prisma.$RegistroCalidadPa
  * Evidencia inmutable de cada modificación del registro de calidad.
  */
 export type HistorialCalidad = $Result.DefaultSelection<Prisma.$HistorialCalidadPayload>
+/**
+ * Model ConsultaCrediticia
+ * 
+ */
+export type ConsultaCrediticia = $Result.DefaultSelection<Prisma.$ConsultaCrediticiaPayload>
 
 /**
  * Enums
@@ -333,6 +338,16 @@ export class PrismaClient<
     * ```
     */
   get historialCalidad(): Prisma.HistorialCalidadDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.consultaCrediticia`: Exposes CRUD operations for the **ConsultaCrediticia** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ConsultaCrediticias
+    * const consultaCrediticias = await prisma.consultaCrediticia.findMany()
+    * ```
+    */
+  get consultaCrediticia(): Prisma.ConsultaCrediticiaDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -791,7 +806,8 @@ export namespace Prisma {
     AuditoriaSeguridad: 'AuditoriaSeguridad',
     ImportacionMasiva: 'ImportacionMasiva',
     RegistroCalidad: 'RegistroCalidad',
-    HistorialCalidad: 'HistorialCalidad'
+    HistorialCalidad: 'HistorialCalidad',
+    ConsultaCrediticia: 'ConsultaCrediticia'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -807,7 +823,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "cliente" | "admision" | "asesor" | "asignacionCliente" | "ruta" | "rutaCliente" | "visita" | "usuario" | "auditoriaSeguridad" | "importacionMasiva" | "registroCalidad" | "historialCalidad"
+      modelProps: "cliente" | "admision" | "asesor" | "asignacionCliente" | "ruta" | "rutaCliente" | "visita" | "usuario" | "auditoriaSeguridad" | "importacionMasiva" | "registroCalidad" | "historialCalidad" | "consultaCrediticia"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1699,6 +1715,80 @@ export namespace Prisma {
           }
         }
       }
+      ConsultaCrediticia: {
+        payload: Prisma.$ConsultaCrediticiaPayload<ExtArgs>
+        fields: Prisma.ConsultaCrediticiaFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ConsultaCrediticiaFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ConsultaCrediticiaFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload>
+          }
+          findFirst: {
+            args: Prisma.ConsultaCrediticiaFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ConsultaCrediticiaFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload>
+          }
+          findMany: {
+            args: Prisma.ConsultaCrediticiaFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload>[]
+          }
+          create: {
+            args: Prisma.ConsultaCrediticiaCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload>
+          }
+          createMany: {
+            args: Prisma.ConsultaCrediticiaCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ConsultaCrediticiaCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload>[]
+          }
+          delete: {
+            args: Prisma.ConsultaCrediticiaDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload>
+          }
+          update: {
+            args: Prisma.ConsultaCrediticiaUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload>
+          }
+          deleteMany: {
+            args: Prisma.ConsultaCrediticiaDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ConsultaCrediticiaUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ConsultaCrediticiaUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload>[]
+          }
+          upsert: {
+            args: Prisma.ConsultaCrediticiaUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConsultaCrediticiaPayload>
+          }
+          aggregate: {
+            args: Prisma.ConsultaCrediticiaAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateConsultaCrediticia>
+          }
+          groupBy: {
+            args: Prisma.ConsultaCrediticiaGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ConsultaCrediticiaGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ConsultaCrediticiaCountArgs<ExtArgs>
+            result: $Utils.Optional<ConsultaCrediticiaCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1834,6 +1924,7 @@ export namespace Prisma {
     importacionMasiva?: ImportacionMasivaOmit
     registroCalidad?: RegistroCalidadOmit
     historialCalidad?: HistorialCalidadOmit
+    consultaCrediticia?: ConsultaCrediticiaOmit
   }
 
   /* Types for Logging */
@@ -2075,6 +2166,37 @@ export namespace Prisma {
    */
   export type RutaClienteCountOutputTypeCountVisitasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: VisitaWhereInput
+  }
+
+
+  /**
+   * Count Type UsuarioCountOutputType
+   */
+
+  export type UsuarioCountOutputType = {
+    consultas_crediticias: number
+  }
+
+  export type UsuarioCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    consultas_crediticias?: boolean | UsuarioCountOutputTypeCountConsultas_crediticiasArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UsuarioCountOutputType
+     */
+    select?: UsuarioCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeCountConsultas_crediticiasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ConsultaCrediticiaWhereInput
   }
 
 
@@ -11198,6 +11320,8 @@ export namespace Prisma {
     ultimo_acceso?: boolean
     password_cambio?: boolean
     asesor?: boolean | Usuario$asesorArgs<ExtArgs>
+    consultas_crediticias?: boolean | Usuario$consultas_crediticiasArgs<ExtArgs>
+    _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["usuario"]>
 
   export type UsuarioSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -11277,6 +11401,8 @@ export namespace Prisma {
   export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "password_hash" | "rol" | "estado" | "id_asesor" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio", ExtArgs["result"]["usuario"]>
   export type UsuarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asesor?: boolean | Usuario$asesorArgs<ExtArgs>
+    consultas_crediticias?: boolean | Usuario$consultas_crediticiasArgs<ExtArgs>
+    _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UsuarioIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asesor?: boolean | Usuario$asesorArgs<ExtArgs>
@@ -11289,6 +11415,7 @@ export namespace Prisma {
     name: "Usuario"
     objects: {
       asesor: Prisma.$AsesorPayload<ExtArgs> | null
+      consultas_crediticias: Prisma.$ConsultaCrediticiaPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id_usuario: string
@@ -11707,6 +11834,7 @@ export namespace Prisma {
   export interface Prisma__UsuarioClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     asesor<T extends Usuario$asesorArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$asesorArgs<ExtArgs>>): Prisma__AsesorClient<$Result.GetResult<Prisma.$AsesorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    consultas_crediticias<T extends Usuario$consultas_crediticiasArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$consultas_crediticiasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12174,6 +12302,30 @@ export namespace Prisma {
      */
     include?: AsesorInclude<ExtArgs> | null
     where?: AsesorWhereInput
+  }
+
+  /**
+   * Usuario.consultas_crediticias
+   */
+  export type Usuario$consultas_crediticiasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    where?: ConsultaCrediticiaWhereInput
+    orderBy?: ConsultaCrediticiaOrderByWithRelationInput | ConsultaCrediticiaOrderByWithRelationInput[]
+    cursor?: ConsultaCrediticiaWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ConsultaCrediticiaScalarFieldEnum | ConsultaCrediticiaScalarFieldEnum[]
   }
 
   /**
@@ -17002,6 +17154,1108 @@ export namespace Prisma {
 
 
   /**
+   * Model ConsultaCrediticia
+   */
+
+  export type AggregateConsultaCrediticia = {
+    _count: ConsultaCrediticiaCountAggregateOutputType | null
+    _min: ConsultaCrediticiaMinAggregateOutputType | null
+    _max: ConsultaCrediticiaMaxAggregateOutputType | null
+  }
+
+  export type ConsultaCrediticiaMinAggregateOutputType = {
+    id_consulta: string | null
+    token_consulta: string | null
+    documento: string | null
+    codigo_sbs: string | null
+    periodo: string | null
+    actor_id: string | null
+    estado: string | null
+    fecha_consulta: Date | null
+  }
+
+  export type ConsultaCrediticiaMaxAggregateOutputType = {
+    id_consulta: string | null
+    token_consulta: string | null
+    documento: string | null
+    codigo_sbs: string | null
+    periodo: string | null
+    actor_id: string | null
+    estado: string | null
+    fecha_consulta: Date | null
+  }
+
+  export type ConsultaCrediticiaCountAggregateOutputType = {
+    id_consulta: number
+    token_consulta: number
+    documento: number
+    codigo_sbs: number
+    periodo: number
+    actor_id: number
+    estado: number
+    fecha_consulta: number
+    _all: number
+  }
+
+
+  export type ConsultaCrediticiaMinAggregateInputType = {
+    id_consulta?: true
+    token_consulta?: true
+    documento?: true
+    codigo_sbs?: true
+    periodo?: true
+    actor_id?: true
+    estado?: true
+    fecha_consulta?: true
+  }
+
+  export type ConsultaCrediticiaMaxAggregateInputType = {
+    id_consulta?: true
+    token_consulta?: true
+    documento?: true
+    codigo_sbs?: true
+    periodo?: true
+    actor_id?: true
+    estado?: true
+    fecha_consulta?: true
+  }
+
+  export type ConsultaCrediticiaCountAggregateInputType = {
+    id_consulta?: true
+    token_consulta?: true
+    documento?: true
+    codigo_sbs?: true
+    periodo?: true
+    actor_id?: true
+    estado?: true
+    fecha_consulta?: true
+    _all?: true
+  }
+
+  export type ConsultaCrediticiaAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ConsultaCrediticia to aggregate.
+     */
+    where?: ConsultaCrediticiaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConsultaCrediticias to fetch.
+     */
+    orderBy?: ConsultaCrediticiaOrderByWithRelationInput | ConsultaCrediticiaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ConsultaCrediticiaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConsultaCrediticias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConsultaCrediticias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ConsultaCrediticias
+    **/
+    _count?: true | ConsultaCrediticiaCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ConsultaCrediticiaMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ConsultaCrediticiaMaxAggregateInputType
+  }
+
+  export type GetConsultaCrediticiaAggregateType<T extends ConsultaCrediticiaAggregateArgs> = {
+        [P in keyof T & keyof AggregateConsultaCrediticia]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateConsultaCrediticia[P]>
+      : GetScalarType<T[P], AggregateConsultaCrediticia[P]>
+  }
+
+
+
+
+  export type ConsultaCrediticiaGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ConsultaCrediticiaWhereInput
+    orderBy?: ConsultaCrediticiaOrderByWithAggregationInput | ConsultaCrediticiaOrderByWithAggregationInput[]
+    by: ConsultaCrediticiaScalarFieldEnum[] | ConsultaCrediticiaScalarFieldEnum
+    having?: ConsultaCrediticiaScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ConsultaCrediticiaCountAggregateInputType | true
+    _min?: ConsultaCrediticiaMinAggregateInputType
+    _max?: ConsultaCrediticiaMaxAggregateInputType
+  }
+
+  export type ConsultaCrediticiaGroupByOutputType = {
+    id_consulta: string
+    token_consulta: string
+    documento: string
+    codigo_sbs: string | null
+    periodo: string | null
+    actor_id: string
+    estado: string
+    fecha_consulta: Date
+    _count: ConsultaCrediticiaCountAggregateOutputType | null
+    _min: ConsultaCrediticiaMinAggregateOutputType | null
+    _max: ConsultaCrediticiaMaxAggregateOutputType | null
+  }
+
+  type GetConsultaCrediticiaGroupByPayload<T extends ConsultaCrediticiaGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ConsultaCrediticiaGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ConsultaCrediticiaGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ConsultaCrediticiaGroupByOutputType[P]>
+            : GetScalarType<T[P], ConsultaCrediticiaGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ConsultaCrediticiaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id_consulta?: boolean
+    token_consulta?: boolean
+    documento?: boolean
+    codigo_sbs?: boolean
+    periodo?: boolean
+    actor_id?: boolean
+    estado?: boolean
+    fecha_consulta?: boolean
+    actor?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["consultaCrediticia"]>
+
+  export type ConsultaCrediticiaSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id_consulta?: boolean
+    token_consulta?: boolean
+    documento?: boolean
+    codigo_sbs?: boolean
+    periodo?: boolean
+    actor_id?: boolean
+    estado?: boolean
+    fecha_consulta?: boolean
+    actor?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["consultaCrediticia"]>
+
+  export type ConsultaCrediticiaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id_consulta?: boolean
+    token_consulta?: boolean
+    documento?: boolean
+    codigo_sbs?: boolean
+    periodo?: boolean
+    actor_id?: boolean
+    estado?: boolean
+    fecha_consulta?: boolean
+    actor?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["consultaCrediticia"]>
+
+  export type ConsultaCrediticiaSelectScalar = {
+    id_consulta?: boolean
+    token_consulta?: boolean
+    documento?: boolean
+    codigo_sbs?: boolean
+    periodo?: boolean
+    actor_id?: boolean
+    estado?: boolean
+    fecha_consulta?: boolean
+  }
+
+  export type ConsultaCrediticiaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_consulta" | "token_consulta" | "documento" | "codigo_sbs" | "periodo" | "actor_id" | "estado" | "fecha_consulta", ExtArgs["result"]["consultaCrediticia"]>
+  export type ConsultaCrediticiaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    actor?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }
+  export type ConsultaCrediticiaIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    actor?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }
+  export type ConsultaCrediticiaIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    actor?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }
+
+  export type $ConsultaCrediticiaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ConsultaCrediticia"
+    objects: {
+      actor: Prisma.$UsuarioPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id_consulta: string
+      token_consulta: string
+      documento: string
+      codigo_sbs: string | null
+      periodo: string | null
+      actor_id: string
+      estado: string
+      fecha_consulta: Date
+    }, ExtArgs["result"]["consultaCrediticia"]>
+    composites: {}
+  }
+
+  type ConsultaCrediticiaGetPayload<S extends boolean | null | undefined | ConsultaCrediticiaDefaultArgs> = $Result.GetResult<Prisma.$ConsultaCrediticiaPayload, S>
+
+  type ConsultaCrediticiaCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ConsultaCrediticiaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ConsultaCrediticiaCountAggregateInputType | true
+    }
+
+  export interface ConsultaCrediticiaDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ConsultaCrediticia'], meta: { name: 'ConsultaCrediticia' } }
+    /**
+     * Find zero or one ConsultaCrediticia that matches the filter.
+     * @param {ConsultaCrediticiaFindUniqueArgs} args - Arguments to find a ConsultaCrediticia
+     * @example
+     * // Get one ConsultaCrediticia
+     * const consultaCrediticia = await prisma.consultaCrediticia.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ConsultaCrediticiaFindUniqueArgs>(args: SelectSubset<T, ConsultaCrediticiaFindUniqueArgs<ExtArgs>>): Prisma__ConsultaCrediticiaClient<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ConsultaCrediticia that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ConsultaCrediticiaFindUniqueOrThrowArgs} args - Arguments to find a ConsultaCrediticia
+     * @example
+     * // Get one ConsultaCrediticia
+     * const consultaCrediticia = await prisma.consultaCrediticia.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ConsultaCrediticiaFindUniqueOrThrowArgs>(args: SelectSubset<T, ConsultaCrediticiaFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ConsultaCrediticiaClient<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ConsultaCrediticia that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConsultaCrediticiaFindFirstArgs} args - Arguments to find a ConsultaCrediticia
+     * @example
+     * // Get one ConsultaCrediticia
+     * const consultaCrediticia = await prisma.consultaCrediticia.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ConsultaCrediticiaFindFirstArgs>(args?: SelectSubset<T, ConsultaCrediticiaFindFirstArgs<ExtArgs>>): Prisma__ConsultaCrediticiaClient<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ConsultaCrediticia that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConsultaCrediticiaFindFirstOrThrowArgs} args - Arguments to find a ConsultaCrediticia
+     * @example
+     * // Get one ConsultaCrediticia
+     * const consultaCrediticia = await prisma.consultaCrediticia.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ConsultaCrediticiaFindFirstOrThrowArgs>(args?: SelectSubset<T, ConsultaCrediticiaFindFirstOrThrowArgs<ExtArgs>>): Prisma__ConsultaCrediticiaClient<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ConsultaCrediticias that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConsultaCrediticiaFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ConsultaCrediticias
+     * const consultaCrediticias = await prisma.consultaCrediticia.findMany()
+     * 
+     * // Get first 10 ConsultaCrediticias
+     * const consultaCrediticias = await prisma.consultaCrediticia.findMany({ take: 10 })
+     * 
+     * // Only select the `id_consulta`
+     * const consultaCrediticiaWithId_consultaOnly = await prisma.consultaCrediticia.findMany({ select: { id_consulta: true } })
+     * 
+     */
+    findMany<T extends ConsultaCrediticiaFindManyArgs>(args?: SelectSubset<T, ConsultaCrediticiaFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ConsultaCrediticia.
+     * @param {ConsultaCrediticiaCreateArgs} args - Arguments to create a ConsultaCrediticia.
+     * @example
+     * // Create one ConsultaCrediticia
+     * const ConsultaCrediticia = await prisma.consultaCrediticia.create({
+     *   data: {
+     *     // ... data to create a ConsultaCrediticia
+     *   }
+     * })
+     * 
+     */
+    create<T extends ConsultaCrediticiaCreateArgs>(args: SelectSubset<T, ConsultaCrediticiaCreateArgs<ExtArgs>>): Prisma__ConsultaCrediticiaClient<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ConsultaCrediticias.
+     * @param {ConsultaCrediticiaCreateManyArgs} args - Arguments to create many ConsultaCrediticias.
+     * @example
+     * // Create many ConsultaCrediticias
+     * const consultaCrediticia = await prisma.consultaCrediticia.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ConsultaCrediticiaCreateManyArgs>(args?: SelectSubset<T, ConsultaCrediticiaCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ConsultaCrediticias and returns the data saved in the database.
+     * @param {ConsultaCrediticiaCreateManyAndReturnArgs} args - Arguments to create many ConsultaCrediticias.
+     * @example
+     * // Create many ConsultaCrediticias
+     * const consultaCrediticia = await prisma.consultaCrediticia.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ConsultaCrediticias and only return the `id_consulta`
+     * const consultaCrediticiaWithId_consultaOnly = await prisma.consultaCrediticia.createManyAndReturn({
+     *   select: { id_consulta: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ConsultaCrediticiaCreateManyAndReturnArgs>(args?: SelectSubset<T, ConsultaCrediticiaCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ConsultaCrediticia.
+     * @param {ConsultaCrediticiaDeleteArgs} args - Arguments to delete one ConsultaCrediticia.
+     * @example
+     * // Delete one ConsultaCrediticia
+     * const ConsultaCrediticia = await prisma.consultaCrediticia.delete({
+     *   where: {
+     *     // ... filter to delete one ConsultaCrediticia
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ConsultaCrediticiaDeleteArgs>(args: SelectSubset<T, ConsultaCrediticiaDeleteArgs<ExtArgs>>): Prisma__ConsultaCrediticiaClient<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ConsultaCrediticia.
+     * @param {ConsultaCrediticiaUpdateArgs} args - Arguments to update one ConsultaCrediticia.
+     * @example
+     * // Update one ConsultaCrediticia
+     * const consultaCrediticia = await prisma.consultaCrediticia.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ConsultaCrediticiaUpdateArgs>(args: SelectSubset<T, ConsultaCrediticiaUpdateArgs<ExtArgs>>): Prisma__ConsultaCrediticiaClient<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ConsultaCrediticias.
+     * @param {ConsultaCrediticiaDeleteManyArgs} args - Arguments to filter ConsultaCrediticias to delete.
+     * @example
+     * // Delete a few ConsultaCrediticias
+     * const { count } = await prisma.consultaCrediticia.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ConsultaCrediticiaDeleteManyArgs>(args?: SelectSubset<T, ConsultaCrediticiaDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ConsultaCrediticias.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConsultaCrediticiaUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ConsultaCrediticias
+     * const consultaCrediticia = await prisma.consultaCrediticia.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ConsultaCrediticiaUpdateManyArgs>(args: SelectSubset<T, ConsultaCrediticiaUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ConsultaCrediticias and returns the data updated in the database.
+     * @param {ConsultaCrediticiaUpdateManyAndReturnArgs} args - Arguments to update many ConsultaCrediticias.
+     * @example
+     * // Update many ConsultaCrediticias
+     * const consultaCrediticia = await prisma.consultaCrediticia.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ConsultaCrediticias and only return the `id_consulta`
+     * const consultaCrediticiaWithId_consultaOnly = await prisma.consultaCrediticia.updateManyAndReturn({
+     *   select: { id_consulta: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ConsultaCrediticiaUpdateManyAndReturnArgs>(args: SelectSubset<T, ConsultaCrediticiaUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ConsultaCrediticia.
+     * @param {ConsultaCrediticiaUpsertArgs} args - Arguments to update or create a ConsultaCrediticia.
+     * @example
+     * // Update or create a ConsultaCrediticia
+     * const consultaCrediticia = await prisma.consultaCrediticia.upsert({
+     *   create: {
+     *     // ... data to create a ConsultaCrediticia
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ConsultaCrediticia we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ConsultaCrediticiaUpsertArgs>(args: SelectSubset<T, ConsultaCrediticiaUpsertArgs<ExtArgs>>): Prisma__ConsultaCrediticiaClient<$Result.GetResult<Prisma.$ConsultaCrediticiaPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ConsultaCrediticias.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConsultaCrediticiaCountArgs} args - Arguments to filter ConsultaCrediticias to count.
+     * @example
+     * // Count the number of ConsultaCrediticias
+     * const count = await prisma.consultaCrediticia.count({
+     *   where: {
+     *     // ... the filter for the ConsultaCrediticias we want to count
+     *   }
+     * })
+    **/
+    count<T extends ConsultaCrediticiaCountArgs>(
+      args?: Subset<T, ConsultaCrediticiaCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ConsultaCrediticiaCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ConsultaCrediticia.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConsultaCrediticiaAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ConsultaCrediticiaAggregateArgs>(args: Subset<T, ConsultaCrediticiaAggregateArgs>): Prisma.PrismaPromise<GetConsultaCrediticiaAggregateType<T>>
+
+    /**
+     * Group by ConsultaCrediticia.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConsultaCrediticiaGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ConsultaCrediticiaGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ConsultaCrediticiaGroupByArgs['orderBy'] }
+        : { orderBy?: ConsultaCrediticiaGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ConsultaCrediticiaGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetConsultaCrediticiaGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ConsultaCrediticia model
+   */
+  readonly fields: ConsultaCrediticiaFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ConsultaCrediticia.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ConsultaCrediticiaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    actor<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ConsultaCrediticia model
+   */
+  interface ConsultaCrediticiaFieldRefs {
+    readonly id_consulta: FieldRef<"ConsultaCrediticia", 'String'>
+    readonly token_consulta: FieldRef<"ConsultaCrediticia", 'String'>
+    readonly documento: FieldRef<"ConsultaCrediticia", 'String'>
+    readonly codigo_sbs: FieldRef<"ConsultaCrediticia", 'String'>
+    readonly periodo: FieldRef<"ConsultaCrediticia", 'String'>
+    readonly actor_id: FieldRef<"ConsultaCrediticia", 'String'>
+    readonly estado: FieldRef<"ConsultaCrediticia", 'String'>
+    readonly fecha_consulta: FieldRef<"ConsultaCrediticia", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ConsultaCrediticia findUnique
+   */
+  export type ConsultaCrediticiaFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    /**
+     * Filter, which ConsultaCrediticia to fetch.
+     */
+    where: ConsultaCrediticiaWhereUniqueInput
+  }
+
+  /**
+   * ConsultaCrediticia findUniqueOrThrow
+   */
+  export type ConsultaCrediticiaFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    /**
+     * Filter, which ConsultaCrediticia to fetch.
+     */
+    where: ConsultaCrediticiaWhereUniqueInput
+  }
+
+  /**
+   * ConsultaCrediticia findFirst
+   */
+  export type ConsultaCrediticiaFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    /**
+     * Filter, which ConsultaCrediticia to fetch.
+     */
+    where?: ConsultaCrediticiaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConsultaCrediticias to fetch.
+     */
+    orderBy?: ConsultaCrediticiaOrderByWithRelationInput | ConsultaCrediticiaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ConsultaCrediticias.
+     */
+    cursor?: ConsultaCrediticiaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConsultaCrediticias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConsultaCrediticias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConsultaCrediticias.
+     */
+    distinct?: ConsultaCrediticiaScalarFieldEnum | ConsultaCrediticiaScalarFieldEnum[]
+  }
+
+  /**
+   * ConsultaCrediticia findFirstOrThrow
+   */
+  export type ConsultaCrediticiaFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    /**
+     * Filter, which ConsultaCrediticia to fetch.
+     */
+    where?: ConsultaCrediticiaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConsultaCrediticias to fetch.
+     */
+    orderBy?: ConsultaCrediticiaOrderByWithRelationInput | ConsultaCrediticiaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ConsultaCrediticias.
+     */
+    cursor?: ConsultaCrediticiaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConsultaCrediticias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConsultaCrediticias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConsultaCrediticias.
+     */
+    distinct?: ConsultaCrediticiaScalarFieldEnum | ConsultaCrediticiaScalarFieldEnum[]
+  }
+
+  /**
+   * ConsultaCrediticia findMany
+   */
+  export type ConsultaCrediticiaFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    /**
+     * Filter, which ConsultaCrediticias to fetch.
+     */
+    where?: ConsultaCrediticiaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConsultaCrediticias to fetch.
+     */
+    orderBy?: ConsultaCrediticiaOrderByWithRelationInput | ConsultaCrediticiaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ConsultaCrediticias.
+     */
+    cursor?: ConsultaCrediticiaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConsultaCrediticias from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConsultaCrediticias.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConsultaCrediticias.
+     */
+    distinct?: ConsultaCrediticiaScalarFieldEnum | ConsultaCrediticiaScalarFieldEnum[]
+  }
+
+  /**
+   * ConsultaCrediticia create
+   */
+  export type ConsultaCrediticiaCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ConsultaCrediticia.
+     */
+    data: XOR<ConsultaCrediticiaCreateInput, ConsultaCrediticiaUncheckedCreateInput>
+  }
+
+  /**
+   * ConsultaCrediticia createMany
+   */
+  export type ConsultaCrediticiaCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ConsultaCrediticias.
+     */
+    data: ConsultaCrediticiaCreateManyInput | ConsultaCrediticiaCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ConsultaCrediticia createManyAndReturn
+   */
+  export type ConsultaCrediticiaCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * The data used to create many ConsultaCrediticias.
+     */
+    data: ConsultaCrediticiaCreateManyInput | ConsultaCrediticiaCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ConsultaCrediticia update
+   */
+  export type ConsultaCrediticiaUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ConsultaCrediticia.
+     */
+    data: XOR<ConsultaCrediticiaUpdateInput, ConsultaCrediticiaUncheckedUpdateInput>
+    /**
+     * Choose, which ConsultaCrediticia to update.
+     */
+    where: ConsultaCrediticiaWhereUniqueInput
+  }
+
+  /**
+   * ConsultaCrediticia updateMany
+   */
+  export type ConsultaCrediticiaUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ConsultaCrediticias.
+     */
+    data: XOR<ConsultaCrediticiaUpdateManyMutationInput, ConsultaCrediticiaUncheckedUpdateManyInput>
+    /**
+     * Filter which ConsultaCrediticias to update
+     */
+    where?: ConsultaCrediticiaWhereInput
+    /**
+     * Limit how many ConsultaCrediticias to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConsultaCrediticia updateManyAndReturn
+   */
+  export type ConsultaCrediticiaUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * The data used to update ConsultaCrediticias.
+     */
+    data: XOR<ConsultaCrediticiaUpdateManyMutationInput, ConsultaCrediticiaUncheckedUpdateManyInput>
+    /**
+     * Filter which ConsultaCrediticias to update
+     */
+    where?: ConsultaCrediticiaWhereInput
+    /**
+     * Limit how many ConsultaCrediticias to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ConsultaCrediticia upsert
+   */
+  export type ConsultaCrediticiaUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ConsultaCrediticia to update in case it exists.
+     */
+    where: ConsultaCrediticiaWhereUniqueInput
+    /**
+     * In case the ConsultaCrediticia found by the `where` argument doesn't exist, create a new ConsultaCrediticia with this data.
+     */
+    create: XOR<ConsultaCrediticiaCreateInput, ConsultaCrediticiaUncheckedCreateInput>
+    /**
+     * In case the ConsultaCrediticia was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ConsultaCrediticiaUpdateInput, ConsultaCrediticiaUncheckedUpdateInput>
+  }
+
+  /**
+   * ConsultaCrediticia delete
+   */
+  export type ConsultaCrediticiaDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+    /**
+     * Filter which ConsultaCrediticia to delete.
+     */
+    where: ConsultaCrediticiaWhereUniqueInput
+  }
+
+  /**
+   * ConsultaCrediticia deleteMany
+   */
+  export type ConsultaCrediticiaDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ConsultaCrediticias to delete
+     */
+    where?: ConsultaCrediticiaWhereInput
+    /**
+     * Limit how many ConsultaCrediticias to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConsultaCrediticia without action
+   */
+  export type ConsultaCrediticiaDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConsultaCrediticia
+     */
+    select?: ConsultaCrediticiaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConsultaCrediticia
+     */
+    omit?: ConsultaCrediticiaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ConsultaCrediticiaInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -17254,6 +18508,20 @@ export namespace Prisma {
   };
 
   export type HistorialCalidadScalarFieldEnum = (typeof HistorialCalidadScalarFieldEnum)[keyof typeof HistorialCalidadScalarFieldEnum]
+
+
+  export const ConsultaCrediticiaScalarFieldEnum: {
+    id_consulta: 'id_consulta',
+    token_consulta: 'token_consulta',
+    documento: 'documento',
+    codigo_sbs: 'codigo_sbs',
+    periodo: 'periodo',
+    actor_id: 'actor_id',
+    estado: 'estado',
+    fecha_consulta: 'fecha_consulta'
+  };
+
+  export type ConsultaCrediticiaScalarFieldEnum = (typeof ConsultaCrediticiaScalarFieldEnum)[keyof typeof ConsultaCrediticiaScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -18138,6 +19406,7 @@ export namespace Prisma {
     ultimo_acceso?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     password_cambio?: DateTimeFilter<"Usuario"> | Date | string
     asesor?: XOR<AsesorNullableScalarRelationFilter, AsesorWhereInput> | null
+    consultas_crediticias?: ConsultaCrediticiaListRelationFilter
   }
 
   export type UsuarioOrderByWithRelationInput = {
@@ -18163,6 +19432,7 @@ export namespace Prisma {
     ultimo_acceso?: SortOrderInput | SortOrder
     password_cambio?: SortOrder
     asesor?: AsesorOrderByWithRelationInput
+    consultas_crediticias?: ConsultaCrediticiaOrderByRelationAggregateInput
   }
 
   export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
@@ -18191,6 +19461,7 @@ export namespace Prisma {
     ultimo_acceso?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     password_cambio?: DateTimeFilter<"Usuario"> | Date | string
     asesor?: XOR<AsesorNullableScalarRelationFilter, AsesorWhereInput> | null
+    consultas_crediticias?: ConsultaCrediticiaListRelationFilter
   }, "id_usuario" | "username" | "id_asesor">
 
   export type UsuarioOrderByWithAggregationInput = {
@@ -18669,6 +19940,76 @@ export namespace Prisma {
     actor?: StringNullableWithAggregatesFilter<"HistorialCalidad"> | string | null
     detalle?: JsonNullableWithAggregatesFilter<"HistorialCalidad">
     fecha?: DateTimeWithAggregatesFilter<"HistorialCalidad"> | Date | string
+  }
+
+  export type ConsultaCrediticiaWhereInput = {
+    AND?: ConsultaCrediticiaWhereInput | ConsultaCrediticiaWhereInput[]
+    OR?: ConsultaCrediticiaWhereInput[]
+    NOT?: ConsultaCrediticiaWhereInput | ConsultaCrediticiaWhereInput[]
+    id_consulta?: UuidFilter<"ConsultaCrediticia"> | string
+    token_consulta?: UuidFilter<"ConsultaCrediticia"> | string
+    documento?: StringFilter<"ConsultaCrediticia"> | string
+    codigo_sbs?: StringNullableFilter<"ConsultaCrediticia"> | string | null
+    periodo?: StringNullableFilter<"ConsultaCrediticia"> | string | null
+    actor_id?: UuidFilter<"ConsultaCrediticia"> | string
+    estado?: StringFilter<"ConsultaCrediticia"> | string
+    fecha_consulta?: DateTimeFilter<"ConsultaCrediticia"> | Date | string
+    actor?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }
+
+  export type ConsultaCrediticiaOrderByWithRelationInput = {
+    id_consulta?: SortOrder
+    token_consulta?: SortOrder
+    documento?: SortOrder
+    codigo_sbs?: SortOrderInput | SortOrder
+    periodo?: SortOrderInput | SortOrder
+    actor_id?: SortOrder
+    estado?: SortOrder
+    fecha_consulta?: SortOrder
+    actor?: UsuarioOrderByWithRelationInput
+  }
+
+  export type ConsultaCrediticiaWhereUniqueInput = Prisma.AtLeast<{
+    id_consulta?: string
+    token_consulta?: string
+    AND?: ConsultaCrediticiaWhereInput | ConsultaCrediticiaWhereInput[]
+    OR?: ConsultaCrediticiaWhereInput[]
+    NOT?: ConsultaCrediticiaWhereInput | ConsultaCrediticiaWhereInput[]
+    documento?: StringFilter<"ConsultaCrediticia"> | string
+    codigo_sbs?: StringNullableFilter<"ConsultaCrediticia"> | string | null
+    periodo?: StringNullableFilter<"ConsultaCrediticia"> | string | null
+    actor_id?: UuidFilter<"ConsultaCrediticia"> | string
+    estado?: StringFilter<"ConsultaCrediticia"> | string
+    fecha_consulta?: DateTimeFilter<"ConsultaCrediticia"> | Date | string
+    actor?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }, "id_consulta" | "token_consulta">
+
+  export type ConsultaCrediticiaOrderByWithAggregationInput = {
+    id_consulta?: SortOrder
+    token_consulta?: SortOrder
+    documento?: SortOrder
+    codigo_sbs?: SortOrderInput | SortOrder
+    periodo?: SortOrderInput | SortOrder
+    actor_id?: SortOrder
+    estado?: SortOrder
+    fecha_consulta?: SortOrder
+    _count?: ConsultaCrediticiaCountOrderByAggregateInput
+    _max?: ConsultaCrediticiaMaxOrderByAggregateInput
+    _min?: ConsultaCrediticiaMinOrderByAggregateInput
+  }
+
+  export type ConsultaCrediticiaScalarWhereWithAggregatesInput = {
+    AND?: ConsultaCrediticiaScalarWhereWithAggregatesInput | ConsultaCrediticiaScalarWhereWithAggregatesInput[]
+    OR?: ConsultaCrediticiaScalarWhereWithAggregatesInput[]
+    NOT?: ConsultaCrediticiaScalarWhereWithAggregatesInput | ConsultaCrediticiaScalarWhereWithAggregatesInput[]
+    id_consulta?: UuidWithAggregatesFilter<"ConsultaCrediticia"> | string
+    token_consulta?: UuidWithAggregatesFilter<"ConsultaCrediticia"> | string
+    documento?: StringWithAggregatesFilter<"ConsultaCrediticia"> | string
+    codigo_sbs?: StringNullableWithAggregatesFilter<"ConsultaCrediticia"> | string | null
+    periodo?: StringNullableWithAggregatesFilter<"ConsultaCrediticia"> | string | null
+    actor_id?: UuidWithAggregatesFilter<"ConsultaCrediticia"> | string
+    estado?: StringWithAggregatesFilter<"ConsultaCrediticia"> | string
+    fecha_consulta?: DateTimeWithAggregatesFilter<"ConsultaCrediticia"> | Date | string
   }
 
   export type ClienteCreateInput = {
@@ -19466,6 +20807,7 @@ export namespace Prisma {
     ultimo_acceso?: Date | string | null
     password_cambio?: Date | string
     asesor?: AsesorCreateNestedOneWithoutUsuarioInput
+    consultas_crediticias?: ConsultaCrediticiaCreateNestedManyWithoutActorInput
   }
 
   export type UsuarioUncheckedCreateInput = {
@@ -19490,6 +20832,7 @@ export namespace Prisma {
     bloqueado_hasta?: Date | string | null
     ultimo_acceso?: Date | string | null
     password_cambio?: Date | string
+    consultas_crediticias?: ConsultaCrediticiaUncheckedCreateNestedManyWithoutActorInput
   }
 
   export type UsuarioUpdateInput = {
@@ -19514,6 +20857,7 @@ export namespace Prisma {
     ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     asesor?: AsesorUpdateOneWithoutUsuarioNestedInput
+    consultas_crediticias?: ConsultaCrediticiaUpdateManyWithoutActorNestedInput
   }
 
   export type UsuarioUncheckedUpdateInput = {
@@ -19538,6 +20882,7 @@ export namespace Prisma {
     bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    consultas_crediticias?: ConsultaCrediticiaUncheckedUpdateManyWithoutActorNestedInput
   }
 
   export type UsuarioCreateManyInput = {
@@ -20116,6 +21461,82 @@ export namespace Prisma {
     actor?: NullableStringFieldUpdateOperationsInput | string | null
     detalle?: NullableJsonNullValueInput | InputJsonValue
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConsultaCrediticiaCreateInput = {
+    id_consulta?: string
+    token_consulta: string
+    documento: string
+    codigo_sbs?: string | null
+    periodo?: string | null
+    estado?: string
+    fecha_consulta?: Date | string
+    actor: UsuarioCreateNestedOneWithoutConsultas_crediticiasInput
+  }
+
+  export type ConsultaCrediticiaUncheckedCreateInput = {
+    id_consulta?: string
+    token_consulta: string
+    documento: string
+    codigo_sbs?: string | null
+    periodo?: string | null
+    actor_id: string
+    estado?: string
+    fecha_consulta?: Date | string
+  }
+
+  export type ConsultaCrediticiaUpdateInput = {
+    id_consulta?: StringFieldUpdateOperationsInput | string
+    token_consulta?: StringFieldUpdateOperationsInput | string
+    documento?: StringFieldUpdateOperationsInput | string
+    codigo_sbs?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_consulta?: DateTimeFieldUpdateOperationsInput | Date | string
+    actor?: UsuarioUpdateOneRequiredWithoutConsultas_crediticiasNestedInput
+  }
+
+  export type ConsultaCrediticiaUncheckedUpdateInput = {
+    id_consulta?: StringFieldUpdateOperationsInput | string
+    token_consulta?: StringFieldUpdateOperationsInput | string
+    documento?: StringFieldUpdateOperationsInput | string
+    codigo_sbs?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
+    actor_id?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_consulta?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConsultaCrediticiaCreateManyInput = {
+    id_consulta?: string
+    token_consulta: string
+    documento: string
+    codigo_sbs?: string | null
+    periodo?: string | null
+    actor_id: string
+    estado?: string
+    fecha_consulta?: Date | string
+  }
+
+  export type ConsultaCrediticiaUpdateManyMutationInput = {
+    id_consulta?: StringFieldUpdateOperationsInput | string
+    token_consulta?: StringFieldUpdateOperationsInput | string
+    documento?: StringFieldUpdateOperationsInput | string
+    codigo_sbs?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_consulta?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConsultaCrediticiaUncheckedUpdateManyInput = {
+    id_consulta?: StringFieldUpdateOperationsInput | string
+    token_consulta?: StringFieldUpdateOperationsInput | string
+    documento?: StringFieldUpdateOperationsInput | string
+    codigo_sbs?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
+    actor_id?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_consulta?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -20953,6 +22374,16 @@ export namespace Prisma {
     isNot?: AsesorWhereInput | null
   }
 
+  export type ConsultaCrediticiaListRelationFilter = {
+    every?: ConsultaCrediticiaWhereInput
+    some?: ConsultaCrediticiaWhereInput
+    none?: ConsultaCrediticiaWhereInput
+  }
+
+  export type ConsultaCrediticiaOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UsuarioCountOrderByAggregateInput = {
     id_usuario?: SortOrder
     username?: SortOrder
@@ -21346,6 +22777,44 @@ export namespace Prisma {
 
   export type HistorialCalidadSumOrderByAggregateInput = {
     version?: SortOrder
+  }
+
+  export type UsuarioScalarRelationFilter = {
+    is?: UsuarioWhereInput
+    isNot?: UsuarioWhereInput
+  }
+
+  export type ConsultaCrediticiaCountOrderByAggregateInput = {
+    id_consulta?: SortOrder
+    token_consulta?: SortOrder
+    documento?: SortOrder
+    codigo_sbs?: SortOrder
+    periodo?: SortOrder
+    actor_id?: SortOrder
+    estado?: SortOrder
+    fecha_consulta?: SortOrder
+  }
+
+  export type ConsultaCrediticiaMaxOrderByAggregateInput = {
+    id_consulta?: SortOrder
+    token_consulta?: SortOrder
+    documento?: SortOrder
+    codigo_sbs?: SortOrder
+    periodo?: SortOrder
+    actor_id?: SortOrder
+    estado?: SortOrder
+    fecha_consulta?: SortOrder
+  }
+
+  export type ConsultaCrediticiaMinOrderByAggregateInput = {
+    id_consulta?: SortOrder
+    token_consulta?: SortOrder
+    documento?: SortOrder
+    codigo_sbs?: SortOrder
+    periodo?: SortOrder
+    actor_id?: SortOrder
+    estado?: SortOrder
+    fecha_consulta?: SortOrder
   }
 
   export type AdmisionCreateNestedManyWithoutClienteInput = {
@@ -21948,6 +23417,20 @@ export namespace Prisma {
     connect?: AsesorWhereUniqueInput
   }
 
+  export type ConsultaCrediticiaCreateNestedManyWithoutActorInput = {
+    create?: XOR<ConsultaCrediticiaCreateWithoutActorInput, ConsultaCrediticiaUncheckedCreateWithoutActorInput> | ConsultaCrediticiaCreateWithoutActorInput[] | ConsultaCrediticiaUncheckedCreateWithoutActorInput[]
+    connectOrCreate?: ConsultaCrediticiaCreateOrConnectWithoutActorInput | ConsultaCrediticiaCreateOrConnectWithoutActorInput[]
+    createMany?: ConsultaCrediticiaCreateManyActorInputEnvelope
+    connect?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+  }
+
+  export type ConsultaCrediticiaUncheckedCreateNestedManyWithoutActorInput = {
+    create?: XOR<ConsultaCrediticiaCreateWithoutActorInput, ConsultaCrediticiaUncheckedCreateWithoutActorInput> | ConsultaCrediticiaCreateWithoutActorInput[] | ConsultaCrediticiaUncheckedCreateWithoutActorInput[]
+    connectOrCreate?: ConsultaCrediticiaCreateOrConnectWithoutActorInput | ConsultaCrediticiaCreateOrConnectWithoutActorInput[]
+    createMany?: ConsultaCrediticiaCreateManyActorInputEnvelope
+    connect?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+  }
+
   export type AsesorUpdateOneWithoutUsuarioNestedInput = {
     create?: XOR<AsesorCreateWithoutUsuarioInput, AsesorUncheckedCreateWithoutUsuarioInput>
     connectOrCreate?: AsesorCreateOrConnectWithoutUsuarioInput
@@ -21956,6 +23439,34 @@ export namespace Prisma {
     delete?: AsesorWhereInput | boolean
     connect?: AsesorWhereUniqueInput
     update?: XOR<XOR<AsesorUpdateToOneWithWhereWithoutUsuarioInput, AsesorUpdateWithoutUsuarioInput>, AsesorUncheckedUpdateWithoutUsuarioInput>
+  }
+
+  export type ConsultaCrediticiaUpdateManyWithoutActorNestedInput = {
+    create?: XOR<ConsultaCrediticiaCreateWithoutActorInput, ConsultaCrediticiaUncheckedCreateWithoutActorInput> | ConsultaCrediticiaCreateWithoutActorInput[] | ConsultaCrediticiaUncheckedCreateWithoutActorInput[]
+    connectOrCreate?: ConsultaCrediticiaCreateOrConnectWithoutActorInput | ConsultaCrediticiaCreateOrConnectWithoutActorInput[]
+    upsert?: ConsultaCrediticiaUpsertWithWhereUniqueWithoutActorInput | ConsultaCrediticiaUpsertWithWhereUniqueWithoutActorInput[]
+    createMany?: ConsultaCrediticiaCreateManyActorInputEnvelope
+    set?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+    disconnect?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+    delete?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+    connect?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+    update?: ConsultaCrediticiaUpdateWithWhereUniqueWithoutActorInput | ConsultaCrediticiaUpdateWithWhereUniqueWithoutActorInput[]
+    updateMany?: ConsultaCrediticiaUpdateManyWithWhereWithoutActorInput | ConsultaCrediticiaUpdateManyWithWhereWithoutActorInput[]
+    deleteMany?: ConsultaCrediticiaScalarWhereInput | ConsultaCrediticiaScalarWhereInput[]
+  }
+
+  export type ConsultaCrediticiaUncheckedUpdateManyWithoutActorNestedInput = {
+    create?: XOR<ConsultaCrediticiaCreateWithoutActorInput, ConsultaCrediticiaUncheckedCreateWithoutActorInput> | ConsultaCrediticiaCreateWithoutActorInput[] | ConsultaCrediticiaUncheckedCreateWithoutActorInput[]
+    connectOrCreate?: ConsultaCrediticiaCreateOrConnectWithoutActorInput | ConsultaCrediticiaCreateOrConnectWithoutActorInput[]
+    upsert?: ConsultaCrediticiaUpsertWithWhereUniqueWithoutActorInput | ConsultaCrediticiaUpsertWithWhereUniqueWithoutActorInput[]
+    createMany?: ConsultaCrediticiaCreateManyActorInputEnvelope
+    set?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+    disconnect?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+    delete?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+    connect?: ConsultaCrediticiaWhereUniqueInput | ConsultaCrediticiaWhereUniqueInput[]
+    update?: ConsultaCrediticiaUpdateWithWhereUniqueWithoutActorInput | ConsultaCrediticiaUpdateWithWhereUniqueWithoutActorInput[]
+    updateMany?: ConsultaCrediticiaUpdateManyWithWhereWithoutActorInput | ConsultaCrediticiaUpdateManyWithWhereWithoutActorInput[]
+    deleteMany?: ConsultaCrediticiaScalarWhereInput | ConsultaCrediticiaScalarWhereInput[]
   }
 
   export type HistorialCalidadCreateNestedManyWithoutRegistroInput = {
@@ -22012,6 +23523,20 @@ export namespace Prisma {
     upsert?: RegistroCalidadUpsertWithoutHistorialInput
     connect?: RegistroCalidadWhereUniqueInput
     update?: XOR<XOR<RegistroCalidadUpdateToOneWithWhereWithoutHistorialInput, RegistroCalidadUpdateWithoutHistorialInput>, RegistroCalidadUncheckedUpdateWithoutHistorialInput>
+  }
+
+  export type UsuarioCreateNestedOneWithoutConsultas_crediticiasInput = {
+    create?: XOR<UsuarioCreateWithoutConsultas_crediticiasInput, UsuarioUncheckedCreateWithoutConsultas_crediticiasInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutConsultas_crediticiasInput
+    connect?: UsuarioWhereUniqueInput
+  }
+
+  export type UsuarioUpdateOneRequiredWithoutConsultas_crediticiasNestedInput = {
+    create?: XOR<UsuarioCreateWithoutConsultas_crediticiasInput, UsuarioUncheckedCreateWithoutConsultas_crediticiasInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutConsultas_crediticiasInput
+    upsert?: UsuarioUpsertWithoutConsultas_crediticiasInput
+    connect?: UsuarioWhereUniqueInput
+    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutConsultas_crediticiasInput, UsuarioUpdateWithoutConsultas_crediticiasInput>, UsuarioUncheckedUpdateWithoutConsultas_crediticiasInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -22899,6 +24424,7 @@ export namespace Prisma {
     bloqueado_hasta?: Date | string | null
     ultimo_acceso?: Date | string | null
     password_cambio?: Date | string
+    consultas_crediticias?: ConsultaCrediticiaCreateNestedManyWithoutActorInput
   }
 
   export type UsuarioUncheckedCreateWithoutAsesorInput = {
@@ -22922,6 +24448,7 @@ export namespace Prisma {
     bloqueado_hasta?: Date | string | null
     ultimo_acceso?: Date | string | null
     password_cambio?: Date | string
+    consultas_crediticias?: ConsultaCrediticiaUncheckedCreateNestedManyWithoutActorInput
   }
 
   export type UsuarioCreateOrConnectWithoutAsesorInput = {
@@ -23023,6 +24550,7 @@ export namespace Prisma {
     bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    consultas_crediticias?: ConsultaCrediticiaUpdateManyWithoutActorNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutAsesorInput = {
@@ -23046,6 +24574,7 @@ export namespace Prisma {
     bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    consultas_crediticias?: ConsultaCrediticiaUncheckedUpdateManyWithoutActorNestedInput
   }
 
   export type ClienteCreateWithoutAsignacionesInput = {
@@ -24010,6 +25539,36 @@ export namespace Prisma {
     create: XOR<AsesorCreateWithoutUsuarioInput, AsesorUncheckedCreateWithoutUsuarioInput>
   }
 
+  export type ConsultaCrediticiaCreateWithoutActorInput = {
+    id_consulta?: string
+    token_consulta: string
+    documento: string
+    codigo_sbs?: string | null
+    periodo?: string | null
+    estado?: string
+    fecha_consulta?: Date | string
+  }
+
+  export type ConsultaCrediticiaUncheckedCreateWithoutActorInput = {
+    id_consulta?: string
+    token_consulta: string
+    documento: string
+    codigo_sbs?: string | null
+    periodo?: string | null
+    estado?: string
+    fecha_consulta?: Date | string
+  }
+
+  export type ConsultaCrediticiaCreateOrConnectWithoutActorInput = {
+    where: ConsultaCrediticiaWhereUniqueInput
+    create: XOR<ConsultaCrediticiaCreateWithoutActorInput, ConsultaCrediticiaUncheckedCreateWithoutActorInput>
+  }
+
+  export type ConsultaCrediticiaCreateManyActorInputEnvelope = {
+    data: ConsultaCrediticiaCreateManyActorInput | ConsultaCrediticiaCreateManyActorInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AsesorUpsertWithoutUsuarioInput = {
     update: XOR<AsesorUpdateWithoutUsuarioInput, AsesorUncheckedUpdateWithoutUsuarioInput>
     create: XOR<AsesorCreateWithoutUsuarioInput, AsesorUncheckedCreateWithoutUsuarioInput>
@@ -24056,6 +25615,36 @@ export namespace Prisma {
     asignaciones?: AsignacionClienteUncheckedUpdateManyWithoutAsesorNestedInput
     rutas?: RutaUncheckedUpdateManyWithoutAsesorNestedInput
     visitas?: VisitaUncheckedUpdateManyWithoutAsesorNestedInput
+  }
+
+  export type ConsultaCrediticiaUpsertWithWhereUniqueWithoutActorInput = {
+    where: ConsultaCrediticiaWhereUniqueInput
+    update: XOR<ConsultaCrediticiaUpdateWithoutActorInput, ConsultaCrediticiaUncheckedUpdateWithoutActorInput>
+    create: XOR<ConsultaCrediticiaCreateWithoutActorInput, ConsultaCrediticiaUncheckedCreateWithoutActorInput>
+  }
+
+  export type ConsultaCrediticiaUpdateWithWhereUniqueWithoutActorInput = {
+    where: ConsultaCrediticiaWhereUniqueInput
+    data: XOR<ConsultaCrediticiaUpdateWithoutActorInput, ConsultaCrediticiaUncheckedUpdateWithoutActorInput>
+  }
+
+  export type ConsultaCrediticiaUpdateManyWithWhereWithoutActorInput = {
+    where: ConsultaCrediticiaScalarWhereInput
+    data: XOR<ConsultaCrediticiaUpdateManyMutationInput, ConsultaCrediticiaUncheckedUpdateManyWithoutActorInput>
+  }
+
+  export type ConsultaCrediticiaScalarWhereInput = {
+    AND?: ConsultaCrediticiaScalarWhereInput | ConsultaCrediticiaScalarWhereInput[]
+    OR?: ConsultaCrediticiaScalarWhereInput[]
+    NOT?: ConsultaCrediticiaScalarWhereInput | ConsultaCrediticiaScalarWhereInput[]
+    id_consulta?: UuidFilter<"ConsultaCrediticia"> | string
+    token_consulta?: UuidFilter<"ConsultaCrediticia"> | string
+    documento?: StringFilter<"ConsultaCrediticia"> | string
+    codigo_sbs?: StringNullableFilter<"ConsultaCrediticia"> | string | null
+    periodo?: StringNullableFilter<"ConsultaCrediticia"> | string | null
+    actor_id?: UuidFilter<"ConsultaCrediticia"> | string
+    estado?: StringFilter<"ConsultaCrediticia"> | string
+    fecha_consulta?: DateTimeFilter<"ConsultaCrediticia"> | Date | string
   }
 
   export type HistorialCalidadCreateWithoutRegistroInput = {
@@ -24232,6 +25821,118 @@ export namespace Prisma {
     actualizado_por?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UsuarioCreateWithoutConsultas_crediticiasInput = {
+    id_usuario?: string
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+    asesor?: AsesorCreateNestedOneWithoutUsuarioInput
+  }
+
+  export type UsuarioUncheckedCreateWithoutConsultas_crediticiasInput = {
+    id_usuario?: string
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    id_asesor?: number | null
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+  }
+
+  export type UsuarioCreateOrConnectWithoutConsultas_crediticiasInput = {
+    where: UsuarioWhereUniqueInput
+    create: XOR<UsuarioCreateWithoutConsultas_crediticiasInput, UsuarioUncheckedCreateWithoutConsultas_crediticiasInput>
+  }
+
+  export type UsuarioUpsertWithoutConsultas_crediticiasInput = {
+    update: XOR<UsuarioUpdateWithoutConsultas_crediticiasInput, UsuarioUncheckedUpdateWithoutConsultas_crediticiasInput>
+    create: XOR<UsuarioCreateWithoutConsultas_crediticiasInput, UsuarioUncheckedCreateWithoutConsultas_crediticiasInput>
+    where?: UsuarioWhereInput
+  }
+
+  export type UsuarioUpdateToOneWithWhereWithoutConsultas_crediticiasInput = {
+    where?: UsuarioWhereInput
+    data: XOR<UsuarioUpdateWithoutConsultas_crediticiasInput, UsuarioUncheckedUpdateWithoutConsultas_crediticiasInput>
+  }
+
+  export type UsuarioUpdateWithoutConsultas_crediticiasInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    asesor?: AsesorUpdateOneWithoutUsuarioNestedInput
+  }
+
+  export type UsuarioUncheckedUpdateWithoutConsultas_crediticiasInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    id_asesor?: NullableIntFieldUpdateOperationsInput | number | null
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AdmisionCreateManyClienteInput = {
@@ -24733,6 +26434,46 @@ export namespace Prisma {
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConsultaCrediticiaCreateManyActorInput = {
+    id_consulta?: string
+    token_consulta: string
+    documento: string
+    codigo_sbs?: string | null
+    periodo?: string | null
+    estado?: string
+    fecha_consulta?: Date | string
+  }
+
+  export type ConsultaCrediticiaUpdateWithoutActorInput = {
+    id_consulta?: StringFieldUpdateOperationsInput | string
+    token_consulta?: StringFieldUpdateOperationsInput | string
+    documento?: StringFieldUpdateOperationsInput | string
+    codigo_sbs?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_consulta?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConsultaCrediticiaUncheckedUpdateWithoutActorInput = {
+    id_consulta?: StringFieldUpdateOperationsInput | string
+    token_consulta?: StringFieldUpdateOperationsInput | string
+    documento?: StringFieldUpdateOperationsInput | string
+    codigo_sbs?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_consulta?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConsultaCrediticiaUncheckedUpdateManyWithoutActorInput = {
+    id_consulta?: StringFieldUpdateOperationsInput | string
+    token_consulta?: StringFieldUpdateOperationsInput | string
+    documento?: StringFieldUpdateOperationsInput | string
+    codigo_sbs?: NullableStringFieldUpdateOperationsInput | string | null
+    periodo?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_consulta?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type HistorialCalidadCreateManyRegistroInput = {
