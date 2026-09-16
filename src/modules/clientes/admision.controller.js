@@ -44,6 +44,47 @@ async function obtenerAdmisiones(req, res) {
   }
 }
 
+async function evaluarCliente(req, res, next) {
+  try {
+    const dni = String(
+      req.params.dni ?? ""
+    ).trim();
+
+    if (!/^\d{8}$/.test(dni)) {
+      return res.status(400).json({
+        mensaje:
+          "El DNI debe contener exactamente 8 dígitos.",
+        code: "INVALID_DNI",
+      });
+    }
+
+    const actorId =
+      req.user?.id_usuario ??
+      req.user?.id;
+
+    if (!actorId) {
+      return res.status(401).json({
+        mensaje:
+          "No se pudo identificar al usuario autenticado.",
+        code: "AUTH_USER_NOT_FOUND",
+      });
+    }
+
+    const resultado =
+      await admisionService.evaluarCliente({
+        dni,
+        actorId,
+      });
+
+    return res.status(200).json({
+      data: resultado,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   obtenerAdmisiones,
+  evaluarCliente,
 };

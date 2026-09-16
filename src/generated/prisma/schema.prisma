@@ -238,6 +238,8 @@ model Usuario {
   // Relación opcional al registro de Asesor
   asesor Asesor? @relation(fields: [id_asesor], references: [id_asesor], onDelete: SetNull, onUpdate: Cascade)
 
+  consultas_crediticias ConsultaCrediticia[]
+
   @@index([bloqueado_hasta], map: "usuarios_bloqueado_hasta_idx")
   @@map("usuarios")
 }
@@ -334,4 +336,31 @@ model HistorialCalidad {
   @@index([id_registro, fecha])
   @@index([fecha])
   @@map("historial_calidad")
+}
+
+// Registro de consultas crediticias realizadas por usuarios autenticados
+model ConsultaCrediticia {
+  id_consulta String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  // Token único generado por cada consulta
+  token_consulta String @unique @db.Uuid
+
+  // Persona consultada
+  documento  String  @db.VarChar(20)
+  codigo_sbs String? @db.VarChar(20)
+  periodo    String? @db.VarChar(6)
+
+  // Usuario autenticado que realizó la consulta
+  actor_id String  @db.Uuid
+  actor    Usuario @relation(fields: [actor_id], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
+
+  // Resultado de la consulta
+  estado String @default("EXITOSA") @db.VarChar(20)
+
+  // Momento en que se realizó
+  fecha_consulta DateTime @default(now()) @db.Timestamptz
+
+  @@index([documento, fecha_consulta])
+  @@index([actor_id, fecha_consulta])
+  @@map("consultas_crediticias")
 }

@@ -325,6 +325,17 @@ exports.Prisma.HistorialCalidadScalarFieldEnum = {
   fecha: 'fecha'
 };
 
+exports.Prisma.ConsultaCrediticiaScalarFieldEnum = {
+  id_consulta: 'id_consulta',
+  token_consulta: 'token_consulta',
+  documento: 'documento',
+  codigo_sbs: 'codigo_sbs',
+  periodo: 'periodo',
+  actor_id: 'actor_id',
+  estado: 'estado',
+  fecha_consulta: 'fecha_consulta'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -369,7 +380,8 @@ exports.Prisma.ModelName = {
   AuditoriaSeguridad: 'AuditoriaSeguridad',
   ImportacionMasiva: 'ImportacionMasiva',
   RegistroCalidad: 'RegistroCalidad',
-  HistorialCalidad: 'HistorialCalidad'
+  HistorialCalidad: 'HistorialCalidad',
+  ConsultaCrediticia: 'ConsultaCrediticia'
 };
 
 /**
