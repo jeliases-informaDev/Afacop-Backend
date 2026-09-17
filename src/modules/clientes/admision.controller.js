@@ -1,4 +1,5 @@
 import admisionService from "./admision.service.js";
+import { generarPdfEvaluacion, } from "./admision-pdf.service.js";
 
 /**
  * Controlador para obtener el listado de admisiones.
@@ -84,7 +85,81 @@ async function evaluarCliente(req, res, next) {
   }
 }
 
+async function exportarPdf(
+  req,
+  res,
+  next
+) {
+  try {
+
+    const evaluacion =
+      req.body?.evaluacion;
+
+    if (
+      !evaluacion ||
+      typeof evaluacion !== "object"
+    ) {
+      return res.status(400).json({
+        mensaje:
+          "Debe enviar la evaluación para generar el PDF.",
+        code: "PDF_DATA_REQUIRED",
+      });
+    }
+
+    const dni = String(
+      evaluacion.dni ?? ""
+    ).trim();
+
+    if (!/^\d{8}$/.test(dni)) {
+      return res.status(400).json({
+        mensaje:
+          "El DNI de la evaluación no es válido.",
+        code: "INVALID_DNI",
+      });
+    }
+
+    const pdf =
+      await generarPdfEvaluacion({
+        ...evaluacion,
+        dni,
+      });
+
+    const pdfBuffer =
+      Buffer.from(pdf);
+
+    res.setHeader(
+      "Content-Type",
+      "application/pdf"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="calificacion_crediticia_${dni}.pdf"`
+    );
+
+    res.setHeader(
+      "Content-Length",
+      pdfBuffer.length
+    );
+
+    return res
+      .status(200)
+      .send(pdfBuffer);
+
+  } catch (error) {
+
+    console.error(
+      "Error generando PDF de admisión:",
+      error
+    );
+
+    next(error);
+
+  }
+}
+
 export default {
   obtenerAdmisiones,
   evaluarCliente,
+  exportarPdf,
 };
