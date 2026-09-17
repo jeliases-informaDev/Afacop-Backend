@@ -15,6 +15,12 @@ router.get(
   admisionController.evaluarCliente
 );
 
+router.post(
+  "/pdf",
+  roleMiddleware(ADMISSION_READERS),
+  admisionController.exportarPdf
+);
+
 router.get("/", roleMiddleware(ADMISSION_READERS), validate({ query: listQuery }), admisionController.obtenerAdmisiones);
 
 export default router;
