@@ -1,5 +1,4 @@
 import prisma from "#core/config/prisma.js";
-import {  getRrccPool, sql, } from "#core/config/sqlserver.js";
 import crypto from "node:crypto";
 /**
  * Obtiene la lista de admisiones con paginación...
@@ -80,6 +79,118 @@ async function obtenerAdmisiones({ page = 1, limit = 12, search = "", estado } =
   };
 }
 
+async function consultarRrccApi(dni) {
+  const baseUrl = String(process.env.RRCC_API_URL || "").replace(/\/$/, "");
+  const apiKey = process.env.RRCC_API_KEY;
+
+  if (!baseUrl) {
+    const error = new Error("RRCC_API_URL no está configurado.");
+    error.statusCode = 500;
+    error.code = "RRCC_API_NOT_CONFIGURED";
+    throw error;
+  }
+
+  if (!apiKey) {
+    const error = new Error("RRCC_API_KEY no está configurado.");
+    error.statusCode = 500;
+    error.code = "RRCC_API_NOT_CONFIGURED";
+    throw error;
+  }
+
+  let response;
+
+  try {
+    response = await fetch(
+      `${baseUrl}/v1/rrcc/evaluar/${encodeURIComponent(dni)}`,
+      {
+        method: "GET",
+        headers: {
+          "x-api-key": apiKey,
+          Accept: "application/json",
+        },
+        signal: AbortSignal.timeout(15000),
+      }
+    );
+  } catch (error) {
+    console.error("Error conectando con RRCC-API:", error);
+
+    const serviceError = new Error(
+      "No se pudo establecer conexión con el servicio RRCC."
+    );
+
+    serviceError.statusCode = 502;
+    serviceError.code = "RRCC_SERVICE_UNAVAILABLE";
+
+    throw serviceError;
+  }
+
+  let payload = null;
+
+  try {
+    payload = await response.json();
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      const error = new Error(
+        payload?.error ||
+          "No se encontró información crediticia para el DNI consultado."
+      );
+
+      error.statusCode = 404;
+      error.code = payload?.code || "RRCC_CLIENT_NOT_FOUND";
+
+      throw error;
+    }
+
+    if (response.status === 400) {
+      const error = new Error(
+        payload?.error || "Solicitud inválida al servicio RRCC."
+      );
+
+      error.statusCode = 400;
+      error.code = payload?.code || "RRCC_BAD_REQUEST";
+
+      throw error;
+    }
+
+    if (response.status === 401 || response.status === 403) {
+      const error = new Error(
+        "No se pudo autenticar la comunicación con el servicio RRCC."
+      );
+
+      error.statusCode = 502;
+      error.code = "RRCC_SERVICE_AUTH_ERROR";
+
+      throw error;
+    }
+
+    const error = new Error(
+      "El servicio RRCC respondió con un error."
+    );
+
+    error.statusCode = 502;
+    error.code = "RRCC_SERVICE_ERROR";
+
+    throw error;
+  }
+
+  if (!payload?.data) {
+    const error = new Error(
+      "El servicio RRCC devolvió una respuesta inválida."
+    );
+
+    error.statusCode = 502;
+    error.code = "RRCC_INVALID_RESPONSE";
+
+    throw error;
+  }
+
+  return payload.data;
+}
+
 async function evaluarCliente({
   dni,
   actorId,
@@ -127,371 +238,28 @@ async function evaluarCliente({
   }
 
   // --------------------------------------------------
-  // CONEXIÓN SQL SERVER
+  // CONSULTAR MICROSERVICIO RRCC
   // --------------------------------------------------
 
-  const pool =
-    await getRrccPool();
+  const rrcc =
+    await consultarRrccApi(dni);
 
   // --------------------------------------------------
-  // 1. CALIFICACIÓN MÁS RECIENTE
+  // DATOS DEVUELTOS POR RRCC-API
   // --------------------------------------------------
 
-  const calificacionResult =
-    await pool
-      .request()
-      .input(
-        "dni",
-        sql.VarChar(20),
-        dni
-      )
-      .query(`
-        SELECT TOP 1
-          PERIODO,
-          CODIGOSBS,
-          DOCUMENTO,
-
-          NOR,
-          CPP,
-          DEF,
-          DUD,
-          PER,
-          REPORTAN,
-
-          APE_PAT,
-          APE_MAT,
-          PRI_NOMBRE,
-          SEG_NOMBRE,
-
-          FECHA_CARGA
-
-        FROM [RRCC].[Calificacion]
-
-        WHERE DOCUMENTO = @dni
-
-        ORDER BY
-          PERIODO DESC,
-          FECHA_CARGA DESC
-      `);
-
-  const calificacion =
-    calificacionResult.recordset[0];
+  const {
+    codigoSbs,
+    nombre,
+    periodo,
+    fechaCarga,
+    rating,
+    deudas = [],
+    lineas = [],
+  } = rrcc;
 
   // --------------------------------------------------
-  // CLIENTE NO ENCONTRADO
-  // --------------------------------------------------
-
-  if (!calificacion) {
-    throw Object.assign(
-      new Error(
-        "No se encontró información crediticia para el DNI consultado."
-      ),
-      {
-        statusCode: 404,
-        code: "RRCC_CLIENT_NOT_FOUND",
-      }
-    );
-  }
-
-  // --------------------------------------------------
-  // DATOS PRINCIPALES
-  // --------------------------------------------------
-
-  const periodo =
-    String(
-      calificacion.PERIODO ?? ""
-    ).trim();
-
-  const codigoSbs =
-    String(
-      calificacion.CODIGOSBS ?? ""
-    ).trim();
-
-  // --------------------------------------------------
-  // 2. DEUDAS
-  // --------------------------------------------------
-
-  const deudaResult =
-    await pool
-      .request()
-      .input(
-        "dni",
-        sql.VarChar(20),
-        dni
-      )
-      .input(
-        "periodo",
-        sql.VarChar(6),
-        periodo
-      )
-      .input(
-        "codigoSbs",
-        sql.VarChar(20),
-        codigoSbs
-      )
-      .query(`
-        SELECT
-          PERIODO,
-          CODIGOSBS,
-          DOCUMENTO,
-          RAZONSOCIAL,
-
-          CODIGOEMPRESA,
-          ENTIDAD,
-
-          TIPO_DEUDA,
-          DIAS,
-          CALIFICACION,
-
-          SALDO,
-
-          FECHA_CARGA
-
-        FROM [RRCC].[Deuda]
-
-        WHERE DOCUMENTO = @dni
-          AND CODIGOSBS = @codigoSbs
-          AND PERIODO = @periodo
-
-        ORDER BY
-          ENTIDAD,
-          TIPO_DEUDA
-      `);
-
-  // --------------------------------------------------
-  // 3. LÍNEAS DE CRÉDITO
-  // --------------------------------------------------
-
-  const lineasResult =
-    await pool
-      .request()
-      .input(
-        "dni",
-        sql.VarChar(20),
-        dni
-      )
-      .input(
-        "periodo",
-        sql.VarChar(6),
-        periodo
-      )
-      .input(
-        "codigoSbs",
-        sql.VarChar(20),
-        codigoSbs
-      )
-      .query(`
-        SELECT
-          PERIODO,
-          CODIGOSBS,
-          DOCUMENTO,
-          RAZONSOCIAL,
-
-          CODIGOEMPRESA,
-          ENTIDAD,
-
-          TIPO,
-
-          LINEA_CREDITO,
-          LINEA_NO_UTILIZADA,
-          LINEA_UTILIZADA,
-
-          FECHA_CARGA
-
-        FROM [RRCC].[LineasCredito]
-
-        WHERE DOCUMENTO = @dni
-          AND CODIGOSBS = @codigoSbs
-          AND PERIODO = @periodo
-
-        ORDER BY ENTIDAD
-      `);
-
-  // --------------------------------------------------
-  // 4. NOMBRE COMPLETO
-  // --------------------------------------------------
-
-  const nombre = [
-    calificacion.PRI_NOMBRE,
-    calificacion.SEG_NOMBRE,
-    calificacion.APE_PAT,
-    calificacion.APE_MAT,
-  ]
-    .filter(Boolean)
-    .map(value =>
-      String(value).trim()
-    )
-    .filter(Boolean)
-    .join(" ");
-
-  // --------------------------------------------------
-  // 5. CALIFICACIÓN CREDITICIA
-  // --------------------------------------------------
-
-  const rating = {
-    normal:
-      Number(
-        calificacion.NOR ?? 0
-      ),
-
-    problemas:
-      Number(
-        calificacion.CPP ?? 0
-      ),
-
-    deficiente:
-      Number(
-        calificacion.DEF ?? 0
-      ),
-
-    dudoso:
-      Number(
-        calificacion.DUD ?? 0
-      ),
-
-    perdida:
-      Number(
-        calificacion.PER ?? 0
-      ),
-
-    reportan:
-      Number(
-        calificacion.REPORTAN ?? 0
-      ),
-  };
-
-  // --------------------------------------------------
-  // 6. DETALLE DE DEUDA
-  // --------------------------------------------------
-
-  const deudas =
-    deudaResult.recordset.map(
-      deuda => ({
-        entidad:
-          deuda.ENTIDAD || "",
-
-        tipoDeuda:
-          deuda.TIPO_DEUDA || "",
-
-        calificacion:
-          deuda.CALIFICACION || "",
-
-        capital:
-          Number(
-            deuda.SALDO ?? 0
-          ),
-
-        dias:
-          Number(
-            deuda.DIAS ?? 0
-          ),
-
-        codigoEmpresa:
-          deuda.CODIGOEMPRESA || "",
-      })
-    );
-
-  // --------------------------------------------------
-  // 7. LÍNEAS DE CRÉDITO
-  // --------------------------------------------------
-
-  const lineas =
-    lineasResult.recordset.map(
-      linea => {
-        const lineaCredito =
-          Number(
-            linea.LINEA_CREDITO ?? 0
-          );
-
-        const lineaNoUtilizada =
-          Number(
-            linea.LINEA_NO_UTILIZADA ?? 0
-          );
-
-        const lineaUtilizada =
-          Number(
-            linea.LINEA_UTILIZADA ?? 0
-          );
-
-        // --------------------------------------------
-        // PORCENTAJE UTILIZADO
-        // --------------------------------------------
-
-        const porcentajeUtilizado =
-          lineaCredito > 0
-            ? (
-                lineaUtilizada /
-                lineaCredito
-              ) * 100
-            : 0;
-
-        // --------------------------------------------
-        // PORCENTAJE NO UTILIZADO
-        // --------------------------------------------
-
-        const porcentajeNoUtilizado =
-          lineaCredito > 0
-            ? (
-                lineaNoUtilizada /
-                lineaCredito
-              ) * 100
-            : 0;
-
-        // --------------------------------------------
-        // CONSISTENCIA DE LA LÍNEA
-        // --------------------------------------------
-
-        const sumaComponentes =
-          lineaUtilizada +
-          lineaNoUtilizada;
-
-        const diferencia =
-          lineaCredito -
-          sumaComponentes;
-
-        const consistente =
-          Math.abs(
-            diferencia
-          ) <= 0.01;
-
-        return {
-          entidad:
-            linea.ENTIDAD || "",
-
-          tipo:
-            linea.TIPO || "",
-
-          lineaCredito,
-
-          lineaUtilizada,
-
-          lineaNoUtilizada,
-
-          porcentajeUtilizado:
-            Number(
-              porcentajeUtilizado.toFixed(2)
-            ),
-
-          porcentajeNoUtilizado:
-            Number(
-              porcentajeNoUtilizado.toFixed(2)
-            ),
-
-          diferencia:
-            Number(
-              diferencia.toFixed(2)
-            ),
-
-          consistente,
-
-          codigoEmpresa:
-            linea.CODIGOEMPRESA || "",
-        };
-      }
-    );
-
-  // --------------------------------------------------
-  // 8. TOTALES
+  // TOTALES
   // --------------------------------------------------
 
   const totalCapital =
@@ -515,7 +283,7 @@ async function evaluarCliente({
     );
 
   // --------------------------------------------------
-  // 9. GENERAR TOKEN DE CONSULTA
+  // GENERAR TOKEN DE CONSULTA
   // --------------------------------------------------
 
   const tokenConsulta =
@@ -525,7 +293,7 @@ async function evaluarCliente({
     new Date();
 
   // --------------------------------------------------
-  // 10. REGISTRAR CONSULTA EN POSTGRESQL
+  // REGISTRAR CONSULTA EN POSTGRESQL
   // --------------------------------------------------
 
   await prisma.consultaCrediticia.create({
@@ -554,7 +322,7 @@ async function evaluarCliente({
   });
 
   // --------------------------------------------------
-  // 11. RESPUESTA FINAL
+  // RESPUESTA FINAL
   // --------------------------------------------------
 
   return {
@@ -572,8 +340,7 @@ async function evaluarCliente({
       fechaConsulta.toISOString(),
 
     fechaCarga:
-      calificacion.FECHA_CARGA ??
-      null,
+      fechaCarga ?? null,
 
     rating,
 
