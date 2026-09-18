@@ -39,6 +39,10 @@ const inter700 = readFileSync(
   )
 ).toString("base64");
 
+/* =========================================================
+   LOGO
+========================================================= */
+
 const logoBase64 = readFileSync(
   new URL(
     "../../assets/logo-informaPeru.png",
@@ -131,6 +135,7 @@ function formatFecha(fecha) {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "America/Lima",
     }
   );
 }
@@ -142,11 +147,7 @@ function formatNombre(texto) {
 
   return String(texto)
     .trim()
-    .toLowerCase()
-    .replace(
-      /\b\p{L}/gu,
-      (letra) => letra.toUpperCase()
-    );
+    .toUpperCase();
 }
 
 function formatEntidad(texto) {
@@ -222,22 +223,26 @@ function colorCalificacion(calificacion) {
 }
 
 /* =========================================================
-   HTML
+   CREACIÓN DEL HTML
 ========================================================= */
 
 function crearHtml(evaluacion) {
-  const rating = evaluacion.rating ?? {};
-  const deudas = Array.isArray(
-    evaluacion.deudas
-  )
-    ? evaluacion.deudas
-    : [];
+  const rating =
+    evaluacion.rating ?? {};
 
-  const lineas = Array.isArray(
-    evaluacion.lineas
-  )
-    ? evaluacion.lineas
-    : [];
+  const deudas =
+    Array.isArray(evaluacion.deudas)
+      ? evaluacion.deudas
+      : [];
+
+  const lineas =
+    Array.isArray(evaluacion.lineas)
+      ? evaluacion.lineas
+      : [];
+
+  /* =======================================================
+     CALIFICACIÓN
+  ======================================================= */
 
   const ratingCols = [
     {
@@ -278,44 +283,52 @@ function crearHtml(evaluacion) {
     },
   ];
 
-  const ratingHtml = ratingCols
-    .map(
-      (item) => `
-        <div class="rating-item">
-          <div class="rating-label">
-            ${escapeHtml(item.label)}
-          </div>
+  const ratingHtml =
+    ratingCols
+      .map(
+        (item) => `
+          <div class="rating-item">
 
+            <div class="rating-label">
+              ${escapeHtml(item.label)}
+            </div>
+
+            <div
+              class="rating-value"
+              style="color:${item.color}"
+            >
+              ${escapeHtml(item.value)}
+              ${item.porcentaje ? "%" : ""}
+            </div>
+
+          </div>
+        `
+      )
+      .join("");
+
+  const ratingBar =
+    ratingCols
+      .map((item) => {
+        const flex =
+          item.value > 0
+            ? item.value
+            : 0.5;
+
+        return `
           <div
-            class="rating-value"
-            style="color:${item.color}"
-          >
-            ${escapeHtml(item.value)}
-            ${item.porcentaje ? "%" : ""}
-          </div>
-        </div>
-      `
-    )
-    .join("");
+            style="
+              flex:${flex};
+              background:${item.color};
+              min-width:3px;
+            "
+          ></div>
+        `;
+      })
+      .join("");
 
-  const ratingBar = ratingCols
-    .map((item) => {
-      const flex =
-        item.value > 0
-          ? item.value
-          : 0.5;
-
-      return `
-        <div
-          style="
-            flex:${flex};
-            background:${item.color};
-            min-width:3px;
-          "
-        ></div>
-      `;
-    })
-    .join("");
+  /* =======================================================
+     DEUDAS
+  ======================================================= */
 
   const deudasHtml =
     deudas.length > 0
@@ -323,6 +336,7 @@ function crearHtml(evaluacion) {
           .map(
             (d) => `
               <tr>
+
                 <td class="entity">
                   ${escapeHtml(
                     formatEntidad(d.entidad)
@@ -337,6 +351,7 @@ function crearHtml(evaluacion) {
 
                 <td>
                   <div class="calificacion">
+
                     <strong>
                       ${escapeHtml(
                         d.calificacion || "—"
@@ -349,16 +364,11 @@ function crearHtml(evaluacion) {
                         background:
                         ${colorCalificacion(
                           d.calificacion
-                        )}
+                        )};
                       "
                     ></span>
-                  </div>
-                </td>
 
-                <td class="money">
-                  ${escapeHtml(
-                    formatMoneda(d.capital)
-                  )}
+                  </div>
                 </td>
 
                 <td class="number">
@@ -366,6 +376,15 @@ function crearHtml(evaluacion) {
                     d.dias ?? 0
                   )}
                 </td>
+
+                <td class="money">
+                  ${escapeHtml(
+                    formatMoneda(
+                      d.capital
+                    )
+                  )}
+                </td>
+
               </tr>
             `
           )
@@ -381,12 +400,17 @@ function crearHtml(evaluacion) {
           </tr>
         `;
 
+  /* =======================================================
+     LÍNEAS DE CRÉDITO
+  ======================================================= */
+
   const lineasHtml =
     lineas.length > 0
       ? lineas
           .map(
             (l) => `
               <tr>
+
                 <td class="entity">
                   ${escapeHtml(
                     formatEntidad(l.entidad)
@@ -396,14 +420,6 @@ function crearHtml(evaluacion) {
                 <td>
                   ${escapeHtml(
                     l.tipo || "—"
-                  )}
-                </td>
-
-                <td class="money">
-                  ${escapeHtml(
-                    formatMoneda(
-                      l.lineaCredito
-                    )
                   )}
                 </td>
 
@@ -422,6 +438,15 @@ function crearHtml(evaluacion) {
                     ).toFixed(2)
                   )}%
                 </td>
+
+                <td class="money">
+                  ${escapeHtml(
+                    formatMoneda(
+                      l.lineaCredito
+                    )
+                  )}
+                </td>
+
               </tr>
             `
           )
@@ -437,38 +462,59 @@ function crearHtml(evaluacion) {
           </tr>
         `;
 
+  /* =======================================================
+     HTML COMPLETO
+  ======================================================= */
+
   return `
 <!DOCTYPE html>
 
 <html lang="es">
+
 <head>
+
   <meta charset="UTF-8" />
 
   <style>
 
+    /* =====================================================
+       FUENTE
+    ===================================================== */
+
     @font-face {
       font-family: "Inter";
-      src: url(data:font/woff2;base64,${inter400})
+      src:
+        url(data:font/woff2;base64,${inter400})
         format("woff2");
+
       font-weight: 400;
       font-style: normal;
     }
 
     @font-face {
       font-family: "Inter";
-      src: url(data:font/woff2;base64,${inter600})
+      src:
+        url(data:font/woff2;base64,${inter600})
         format("woff2");
+
       font-weight: 600;
       font-style: normal;
     }
 
     @font-face {
       font-family: "Inter";
-      src: url(data:font/woff2;base64,${inter700})
+      src:
+        url(data:font/woff2;base64,${inter700})
         format("woff2");
+
       font-weight: 700;
       font-style: normal;
     }
+
+
+    /* =====================================================
+       PÁGINA
+    ===================================================== */
 
     @page {
       size: A4 landscape;
@@ -483,6 +529,7 @@ function crearHtml(evaluacion) {
     body {
       margin: 0;
       padding: 0;
+
       background: #ffffff;
       color: #292d32;
 
@@ -505,73 +552,78 @@ function crearHtml(evaluacion) {
       width: 100%;
     }
 
-    /* ==============================
-    CABECERA
-    ============================== */
+
+    /* =====================================================
+       CABECERA
+    ===================================================== */
 
     .document-header {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      position: relative;
 
-        min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-        margin-bottom: 14px;
-        padding-bottom: 10px;
+      min-height: 50px;
 
-        border-bottom: 1px solid #e1e5ea;
-        }
+      margin-bottom: 14px;
+      padding-bottom: 10px;
 
-        .document-brand {
-        position: relative;
+      border-bottom: 1px solid #e1e5ea;
 
-        width: 100%;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        }
-
-        .company-logo {
-        position: absolute;
-        left: 0;
-
-        width: 115px;
-        max-height: 45px;
-
-        object-fit: contain;
-        object-position: left center;
-        }
-
-        .document-brand > div {
-        text-align: center;
-        }
-
-        .document-title {
-        margin: 0;
-
-        font-size: 20px;
-        line-height: 1.2;
-        font-weight: 700;
-
-        letter-spacing: -0.03em;
-
-        color: #18212f;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
-    /* ==============================
+    .document-brand {
+      position: relative;
+
+      width: 100%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .company-logo {
+      position: absolute;
+      left: 0;
+
+      width: 115px;
+      max-height: 45px;
+
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    .document-brand > div {
+      text-align: center;
+    }
+
+    .document-title {
+      margin: 0;
+
+      color: #18212f;
+
+      font-size: 20px;
+      line-height: 1.2;
+      font-weight: 700;
+
+      letter-spacing: -0.03em;
+    }
+
+
+    /* =====================================================
        METADATOS
-    ============================== */
+    ===================================================== */
 
     .metadata-grid {
       display: grid;
 
       grid-template-columns:
         0.8fr
-        1.6fr
-        1.3fr
-        0.9fr;
+        1.8fr
+        1.3fr;
 
       gap: 6px;
 
@@ -618,9 +670,10 @@ function crearHtml(evaluacion) {
       overflow-wrap: break-word;
     }
 
-    /* ==============================
+
+    /* =====================================================
        SECCIONES
-    ============================== */
+    ===================================================== */
 
     .section {
       margin-bottom: 14px;
@@ -649,20 +702,10 @@ function crearHtml(evaluacion) {
       page-break-after: avoid;
     }
 
-    .section-title-note {
-      margin-left: 4px;
 
-      font-size: 9.5px;
-      font-weight: 400;
-
-      color: #7a838d;
-
-      letter-spacing: -0.005em;
-    }
-
-    /* ==============================
-       RATING
-    ============================== */
+    /* =====================================================
+       CALIFICACIÓN CREDITICIA
+    ===================================================== */
 
     .rating-section {
       break-inside: avoid;
@@ -709,20 +752,17 @@ function crearHtml(evaluacion) {
       letter-spacing: -0.02em;
     }
 
-    .rating-note {
-      padding: 6px 14px;
 
-      border-top: 1px solid #dfe4ea;
-
-      color: #727c86;
-
-      font-size: 9.5px;
-      font-weight: 400;
-    }
-
-    /* ==============================
+    /* =====================================================
        TABLAS
-    ============================== */
+    ===================================================== */
+
+    .table-section {
+      overflow: visible;
+
+      break-inside: auto;
+      page-break-inside: auto;
+    }
 
     table {
       width: 100%;
@@ -733,12 +773,20 @@ function crearHtml(evaluacion) {
     }
 
     thead {
-      display: table-header-group;
+      display: table-row-group;
+
+      break-after: avoid;
+      page-break-after: avoid;
     }
 
     tr {
       break-inside: avoid;
       page-break-inside: avoid;
+    }
+
+    tbody tr:nth-last-child(2) {
+      break-after: avoid;
+      page-break-after: avoid;
     }
 
     th,
@@ -780,6 +828,8 @@ function crearHtml(evaluacion) {
 
     .entity {
       font-weight: 600;
+
+      overflow-wrap: break-word;
     }
 
     .money {
@@ -789,13 +839,17 @@ function crearHtml(evaluacion) {
 
       font-variant-numeric:
         tabular-nums;
+
+      white-space: nowrap;
     }
 
     .number {
-      text-align: right;
+      text-align: left;
 
       font-variant-numeric:
         tabular-nums;
+
+      white-space: nowrap;
     }
 
     .calificacion {
@@ -803,26 +857,40 @@ function crearHtml(evaluacion) {
 
       align-items: center;
 
-      gap: 6px;
+      gap: 7px;
     }
 
     .status-dot {
-      width: 6px;
-      height: 6px;
+      width: 10px;
+      height: 10px;
 
       display: inline-block;
 
-      border-radius: 999px;
+      flex-shrink: 0;
+
+      border-radius: 50%;
     }
+
+
+    /* =====================================================
+       TOTAL
+    ===================================================== */
 
     .total-row {
       background: #f7f9fb !important;
-
       border-top: 2px solid #dfe4ea;
+      break-before: avoid;
+      page-break-before: avoid;
     }
 
     .total-row td {
       font-weight: 700;
+    }
+
+    .total-label {
+      text-align: left;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
     .empty {
@@ -833,85 +901,102 @@ function crearHtml(evaluacion) {
       color: #7a838d;
     }
 
-    /* ==============================
-       COLUMNAS
-    ============================== */
 
-    .debt-col-entity {
-      width: 34%;
-    }
+    /* =====================================================
+       ANCHOS DE COLUMNAS
+       IGUALES EN AMBAS TABLAS
+    ===================================================== */
 
-    .debt-col-type {
-      width: 22%;
-    }
-
-    .debt-col-rating {
-      width: 18%;
-    }
-
-    .debt-col-money {
-      width: 18%;
-      text-align: right;
-    }
-
-    .debt-col-days {
-      width: 8%;
-      text-align: right;
-    }
-
+    .debt-col-entity,
     .credit-col-entity {
-      width: 32%;
+      width: 28%;
     }
 
+    .debt-col-type,
     .credit-col-type {
-      width: 20%;
+      width: 24%;
     }
 
-    .credit-col-line {
-      width: 20%;
-      text-align: right;
-    }
-
+    .debt-col-rating,
     .credit-col-used {
-      width: 14%;
+      width: 20%;
+      text-align: left;
+    }
+
+    .debt-col-days,
+    .credit-col-unused {
+      width: 13%;
+      text-align: left;
+    }
+
+    .debt-col-money,
+    .credit-col-line {
+      width: 15%;
       text-align: right;
     }
 
-    .credit-col-unused {
-      width: 14%;
-      text-align: right;
+
+    /* =====================================================
+       REPORTE ACTUALIZADO
+    ===================================================== */
+
+    .report-updated {
+      margin-top: 2px;
+
+      color: #727c86;
+
+      font-size: 11px;
+      font-weight: 600;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
   </style>
+
 </head>
+
 
 <body>
 
   <main class="document">
 
+
+    <!-- ===================================================
+         CABECERA
+    ==================================================== -->
+
     <header class="document-header">
 
-        <div class="document-brand">
+      <div class="document-brand">
 
-            <img
-            src="${logoDataUri}"
-            class="company-logo"
-            alt="Logo"
-            />
+        <img
+          src="${logoDataUri}"
+          class="company-logo"
+          alt="Logo Informa Perú"
+        />
 
-            <div>
-                <h1 class="document-title">
-                    Reporte de información crediticia
-                </h1>
-            </div>
+        <div>
+
+          <h1 class="document-title">
+            Reporte de información crediticia
+          </h1>
 
         </div>
 
-        </header>
+      </div>
+
+    </header>
+
+
+    <!-- ===================================================
+         DATOS DEL CLIENTE
+    ==================================================== -->
 
     <section class="metadata-grid">
 
       <div class="metadata-card">
+
         <div class="metadata-label">
           DNI
         </div>
@@ -921,10 +1006,12 @@ function crearHtml(evaluacion) {
             evaluacion.dni || "—"
           )}
         </div>
+
       </div>
 
 
       <div class="metadata-card">
+
         <div class="metadata-label">
           Nombre
         </div>
@@ -936,10 +1023,12 @@ function crearHtml(evaluacion) {
             )
           )}
         </div>
+
       </div>
 
 
       <div class="metadata-card">
+
         <div class="metadata-label">
           Consulta
         </div>
@@ -951,25 +1040,15 @@ function crearHtml(evaluacion) {
             )
           )}
         </div>
-      </div>
 
-
-      <div class="metadata-card">
-        <div class="metadata-label">
-          Período
-        </div>
-
-        <div class="metadata-value">
-          ${escapeHtml(
-            formatPeriodo(
-              evaluacion.periodo
-            )
-          )}
-        </div>
       </div>
 
     </section>
 
+
+    <!-- ===================================================
+         CALIFICACIÓN CREDITICIA
+    ==================================================== -->
 
     <section
       class="section rating-section"
@@ -987,15 +1066,16 @@ function crearHtml(evaluacion) {
         ${ratingHtml}
       </div>
 
-      <div class="rating-note">
-        Cifras redondeadas. No se muestra
-        información menor a 0.5%
-      </div>
-
     </section>
 
 
-    <section class="section">
+    <!-- ===================================================
+         DETALLE DE DEUDA
+    ==================================================== -->
+
+    <section
+      class="section table-section"
+    >
 
       <div class="section-title">
         Detalle de deuda
@@ -1003,8 +1083,18 @@ function crearHtml(evaluacion) {
 
       <table>
 
+        <colgroup>
+          <col style="width:28%">
+          <col style="width:24%">
+          <col style="width:20%">
+          <col style="width:13%">
+          <col style="width:15%">
+        </colgroup>
+
         <thead>
+
           <tr>
+
             <th class="debt-col-entity">
               Entidad
             </th>
@@ -1017,43 +1107,48 @@ function crearHtml(evaluacion) {
               Calificación
             </th>
 
+            <th class="debt-col-days">
+              Días
+            </th>
+
             <th class="debt-col-money">
               Capital
             </th>
 
-            <th class="debt-col-days">
-              Días
-            </th>
           </tr>
+
         </thead>
+
 
         <tbody>
 
           ${deudasHtml}
 
-          <tr class="total-row">
-            <td></td>
+          ${
+            deudas.length > 0
+              ? `
+                <tr class="total-row">
 
-            <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
 
-            <td
-              style="
-                text-align:right;
-              "
-            >
-              TOTAL CAPITAL
-            </td>
+                  <td class="total-label">
+                    TOTAL
+                  </td>
 
-            <td class="money">
-              ${escapeHtml(
-                formatMoneda(
-                  evaluacion.totalCapital
-                )
-              )}
-            </td>
+                  <td class="money">
+                    ${escapeHtml(
+                      formatMoneda(
+                        evaluacion.totalCapital
+                      )
+                    )}
+                  </td>
 
-            <td></td>
-          </tr>
+                </tr>
+              `
+              : ""
+          }
 
         </tbody>
 
@@ -1062,19 +1157,30 @@ function crearHtml(evaluacion) {
     </section>
 
 
-    <section class="section">
+    <!-- ===================================================
+         LÍNEAS DE CRÉDITO
+    ==================================================== -->
+
+    <section
+      class="section table-section"
+    >
 
       <div class="section-title">
         Líneas de crédito
-
-        <span class="section-title-note">
-          — otorgadas y no utilizadas
-        </span>
       </div>
 
       <table>
 
+        <colgroup>
+          <col style="width:28%">
+          <col style="width:24%">
+          <col style="width:20%">
+          <col style="width:13%">
+          <col style="width:15%">
+        </colgroup>
+
         <thead>
+
           <tr>
 
             <th class="credit-col-entity">
@@ -1085,50 +1191,52 @@ function crearHtml(evaluacion) {
               Tipo de línea
             </th>
 
-            <th class="credit-col-line">
-              Línea de crédito
-            </th>
-
             <th class="credit-col-used">
               % utilizado
             </th>
 
             <th class="credit-col-unused">
-              % no utilizado
+              % No utilizado
+            </th>
+
+            <th class="credit-col-line">
+              Línea de crédito
             </th>
 
           </tr>
+
         </thead>
+
 
         <tbody>
 
           ${lineasHtml}
 
-          <tr class="total-row">
+          ${
+            lineas.length > 0
+              ? `
+                <tr class="total-row">
 
-            <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
 
-            <td
-              style="
-                text-align:right;
-              "
-            >
-              TOTAL LÍNEA DE CRÉDITO
-            </td>
+                  <td class="total-label">
+                    TOTAL
+                  </td>
 
-            <td class="money">
-              ${escapeHtml(
-                formatMoneda(
-                  evaluacion.totalLineaCredito
-                )
-              )}
-            </td>
+                  <td class="money">
+                    ${escapeHtml(
+                      formatMoneda(
+                        evaluacion.totalLineaCredito
+                      )
+                    )}
+                  </td>
 
-            <td></td>
-
-            <td></td>
-
-          </tr>
+                </tr>
+              `
+              : ""
+          }
 
         </tbody>
 
@@ -1136,12 +1244,28 @@ function crearHtml(evaluacion) {
 
     </section>
 
+
+    <!-- ===================================================
+         PERÍODO
+    ==================================================== -->
+
+    <div class="report-updated">
+      Reporte actualizado con el periodo ${escapeHtml(
+        formatPeriodo(
+          evaluacion.periodo
+        )
+      )}
+    </div>
+
+
   </main>
 
 </body>
+
 </html>
   `;
 }
+
 
 /* =========================================================
    GENERACIÓN DEL PDF
@@ -1153,6 +1277,7 @@ export async function generarPdfEvaluacion(
   let browser;
 
   try {
+
     browser = await puppeteer.launch({
       headless: true,
 
@@ -1163,11 +1288,14 @@ export async function generarPdfEvaluacion(
       ],
     });
 
+
     const page =
       await browser.newPage();
 
+
     const html =
       crearHtml(evaluacion);
+
 
     await page.setContent(
       html,
@@ -1176,25 +1304,32 @@ export async function generarPdfEvaluacion(
       }
     );
 
-    await page.evaluate(async () => {
-      await document.fonts.ready;
-    });
 
-    const pdf = await page.pdf({
-      format: "A4",
-      landscape: true,
+    await page.evaluate(
+      async () => {
+        await document.fonts.ready;
+      }
+    );
 
-      printBackground: true,
 
-      preferCSSPageSize: true,
+    const pdf =
+      await page.pdf({
+        format: "A4",
 
-      margin: {
-        top: "10mm",
-        right: "10mm",
-        bottom: "10mm",
-        left: "10mm",
-      },
-    });
+        landscape: true,
+
+        printBackground: true,
+
+        preferCSSPageSize: true,
+
+        margin: {
+          top: "10mm",
+          right: "10mm",
+          bottom: "10mm",
+          left: "10mm",
+        },
+      });
+
 
     return pdf;
 
