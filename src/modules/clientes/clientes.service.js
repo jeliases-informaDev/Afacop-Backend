@@ -40,6 +40,7 @@ async function obtenerClientes({
   page = 1,
   limit = 12,
   search = "",
+  departamento,
   distrito,
   estado,
   estado_gestion,
@@ -58,6 +59,13 @@ async function obtenerClientes({
         id_asesor: Number(asesorId),
         estado: "ACTIVA",
       },
+    };
+  }
+
+  if (departamento) {
+    where.departamento = {
+      equals: departamento.trim(),
+      mode: "insensitive",
     };
   }
 
@@ -181,7 +189,7 @@ async function obtenerClientes({
     clientes = await prisma.cliente.findMany({
       where,
       orderBy: {
-        id_cliente: "asc",
+        id_cliente: "desc",
       },
       include: includeGestion,
     });
@@ -196,7 +204,7 @@ async function obtenerClientes({
         skip,
         take,
         orderBy: {
-          id_cliente: "asc",
+          id_cliente: "desc",
         },
         include: includeGestion,
       }),
@@ -279,6 +287,7 @@ async function obtenerClientes({
       telefono: cliente.telefono,
       direccion: cliente.direccion,
       distrito: cliente.distrito,
+      departamento: cliente.departamento,
 
       deuda_cliente,
       deuda_total,
@@ -402,7 +411,7 @@ async function obtenerPuntosMapa({ estado, fecha_pago, zoom = 6, west, east, sou
   if (asesorId) where.asignaciones = { some: { id_asesor: Number(asesorId), estado: "ACTIVA" } };
   const clientes = await prisma.cliente.findMany({ where, select: {
     id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true,
-    direccion: true, distrito: true, ultima_gestion: true, deuda_castigada: true, deuda_vigente: true,
+    direccion: true, distrito: true, ultima_gestion: true, deuda_castigada: true, deuda_cliente: true, deuda_vigente: true,
     otras_deudas: true, latitud: true, longitud: true,
     asignaciones: {
       where: { estado: 'ACTIVA' }, take: 1,
@@ -445,13 +454,39 @@ async function obtenerPuntosMapa({ estado, fecha_pago, zoom = 6, west, east, sou
       && Number(cliente.longitud) >= west && Number(cliente.longitud) <= east
     ))
     : clientesOperativos;
-  const individualPoint = c => ({
-    cluster: false, id: c.id_cliente, dni: c.numero_documento, nombres: c.nombres,
-    apellidos: `${c.apellido_paterno || ''} ${c.apellido_materno || ''}`.trim(),
-    direccion: c.direccion, distrito: c.distrito, estado: c.estado,
-    deuda_total: Number(c.deuda_castigada || 0) + Number(c.deuda_vigente || 0) + Number(c.otras_deudas || 0),
-    latitud: Number(c.latitud), longitud: Number(c.longitud),
-  });
+    const individualPoint = c => {
+  const deudaTotal =
+    Number(c.deuda_castigada || 0) +
+    Number(c.deuda_cliente || 0) +
+    Number(c.deuda_vigente || 0) +
+    Number(c.otras_deudas || 0);
+
+  return {
+    cluster: false,
+
+    id: c.id_cliente,
+    dni: c.numero_documento,
+
+    nombres: c.nombres,
+
+    apellidos:
+      `${c.apellido_paterno || ''} ${c.apellido_materno || ''}`.trim(),
+
+    direccion: c.direccion,
+    distrito: c.distrito,
+
+    estado: c.estado,
+
+    deuda_cliente:
+      Number(c.deuda_cliente || 0),
+
+    deuda_total:
+      Number(deudaTotal.toFixed(2)),
+
+    latitud: Number(c.latitud),
+    longitud: Number(c.longitud),
+  };
+};
   if (Number(zoom) >= 10) {
     // El mapa operativo necesita conservar el conjunto completo de clientes.
     // Leaflet se encarga de dibujar solamente los que estén dentro del viewport.

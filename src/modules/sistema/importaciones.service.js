@@ -1636,11 +1636,7 @@ const existingKeys = new Set(
         if (!headers) {
           if (values.length > 100) throw Object.assign(new Error('El archivo supera el máximo de 100 columnas'), { code: 'COLUMN_LIMIT_EXCEEDED' });
           headers = values.map(normalizeHeader);
-
-          console.log('HOJA LEIDA:', worksheet.name);
-  console.log('VALORES ORIGINALES:', values);
-  console.log('HEADERS NORMALIZADOS:', headers);
-  
+        
           const hasDocumentType = headers.some(header => ['tipo_documento', 'tipo_doc', 'tipo_docuemento', 'tipo_document'].includes(header));
           const hasDocumentNumber = headers.some(header => ['numero_documento', 'numero', 'documento', 'doc_identidad', 'num_doc'].includes(header));
           const hasClientDebt = headers.includes('deuda_cliente');
