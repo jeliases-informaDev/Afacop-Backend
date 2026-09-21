@@ -7,7 +7,34 @@ const DELAY_MS = 1200;
 const sleep = ms =>
   new Promise(resolve => setTimeout(resolve, ms));
 
-function getPrecision(result) {
+function normalizarNumero(valor) {
+  return String(valor || '')
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, '');
+}
+
+function obtenerNumeroDireccion(address) {
+  const match = String(address || '').match(/\b(\d{1,6}[A-Z]?)\b/i);
+
+  return match
+    ? normalizarNumero(match[1])
+    : null;
+}
+
+function getPrecision(result, numeroSolicitado = null) {
+  const numeroEncontrado = normalizarNumero(
+    result.address?.house_number
+  );
+
+  if (
+    numeroSolicitado &&
+    numeroEncontrado &&
+    numeroEncontrado === numeroSolicitado
+  ) {
+    return 'EXACTA';
+  }
+
   const type = String(
     result.addresstype || result.type || ''
   ).toLowerCase();
@@ -16,10 +43,11 @@ function getPrecision(result) {
     [
       'house',
       'building',
-      'residential',
     ].includes(type)
   ) {
-    return 'EXACTA';
+    return numeroSolicitado
+      ? 'APROXIMADA'
+      : 'EXACTA';
   }
 
   if (
@@ -27,6 +55,7 @@ function getPrecision(result) {
       'road',
       'street',
       'pedestrian',
+      'residential',
     ].includes(type)
   ) {
     return 'APROXIMADA';
@@ -62,10 +91,18 @@ async function geocodeAddress(address) {
     'https://nominatim.openstreetmap.org/search'
   );
 
+  const numeroSolicitado =
+    obtenerNumeroDireccion(address);
+
   url.searchParams.set('format', 'jsonv2');
   url.searchParams.set('q', address);
   url.searchParams.set('countrycodes', 'pe');
-  url.searchParams.set('limit', '1');
+
+  // Antes era 1.
+  // Pedimos varios resultados para intentar encontrar
+  // el número exacto.
+  url.searchParams.set('limit', '5');
+
   url.searchParams.set('addressdetails', '1');
 
   const response = await fetch(url, {
@@ -86,11 +123,72 @@ async function geocodeAddress(address) {
 
   const results = await response.json();
 
-  if (!Array.isArray(results) || results.length === 0) {
+  if (
+    !Array.isArray(results) ||
+    results.length === 0
+  ) {
     return null;
   }
 
-  const result = results[0];
+  // --------------------------------------------------
+  // DIRECCIÓN CON NÚMERO
+  // --------------------------------------------------
+  //
+  // Ejemplo:
+  // Av. Petit Thouars 1113
+  //
+  // No aceptamos automáticamente el centro de la calle.
+  // Primero buscamos un resultado cuyo house_number
+  // coincida realmente con 1113.
+  // --------------------------------------------------
+
+  let result = null;
+
+  if (numeroSolicitado) {
+    result = results.find(item => {
+
+      const numeroEncontrado =
+        normalizarNumero(
+          item.address?.house_number
+        );
+
+      return (
+        numeroEncontrado &&
+        numeroEncontrado === numeroSolicitado
+      );
+    });
+
+    /*
+     * Si pedimos una dirección con número y Nominatim
+     * solamente encontró la calle/distrito, NO guardamos
+     * esa ubicación como si fuera el domicilio.
+     */
+    if (!result) {
+      logger.warn(
+        {
+          direccion: address,
+          numeroSolicitado,
+          resultados: results.map(item => ({
+            display_name: item.display_name,
+            house_number:
+              item.address?.house_number || null,
+            addresstype:
+              item.addresstype || null,
+            type: item.type || null,
+          })),
+        },
+        'client_geocoding_house_number_not_found'
+      );
+
+      return null;
+    }
+
+  } else {
+
+    // Si la dirección no tiene número,
+    // usamos el mejor resultado de Nominatim.
+    result = results[0];
+  }
 
   const latitud = Number(result.lat);
   const longitud = Number(result.lon);
@@ -105,7 +203,12 @@ async function geocodeAddress(address) {
   return {
     latitud,
     longitud,
-    precision: getPrecision(result),
+
+    precision: getPrecision(
+      result,
+      numeroSolicitado
+    ),
+
     direccionEncontrada:
       result.display_name || null,
   };
