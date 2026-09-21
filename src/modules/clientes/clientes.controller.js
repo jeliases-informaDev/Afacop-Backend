@@ -12,7 +12,7 @@ import { ROLES } from "#core/security/roles.js";
 async function obtenerClientes(req, res) {
   try {
     // 1. Leer query parameters
-    const { page, limit, search, distrito, estado, estado_gestion, fecha_pago, lat, lng, radio } = req.query;
+    const { page, limit, search, distrito, departamento, estado, estado_gestion, fecha_pago, lat, lng, radio } = req.query;
 
     // 2. Validar y normalizar parámetros de paginación
     let parsedPage = parseInt(page, 10);
@@ -36,6 +36,7 @@ async function obtenerClientes(req, res) {
       limit: parsedLimit,
       search: searchStr,
       distrito,
+      departamento,
       estado,
       estado_gestion,
       fecha_pago,

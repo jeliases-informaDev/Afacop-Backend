@@ -130,7 +130,7 @@ async function obtenerRutas() {
           nombres: true,
           apellido_paterno: true,
           apellido_materno: true,
-          dni: true, // <-- REVERTIDO A DNI PARA EL ASESOR
+          dni: true,
           distrito: true,
         }
       },
@@ -141,11 +141,17 @@ async function obtenerRutas() {
         include: {
           cliente: {
             select: {
+              id_cliente: true,
               nombres: true,
               apellido_paterno: true,
               apellido_materno: true,
-              tipo_documento: true,   // <-- SE MANTIENE EL NUEVO FORMATO PARA EL CLIENTE
-              numero_documento: true, // <-- SE MANTIENE EL NUEVO FORMATO PARA EL CLIENTE
+              tipo_documento: true,
+              numero_documento: true,
+
+              deuda_cliente: true,
+              deuda_castigada: true,
+              deuda_vigente: true,
+              otras_deudas: true,
             }
           }
         }
@@ -153,7 +159,48 @@ async function obtenerRutas() {
     }
   });
 
-  return rutas;
+  const rutasConDeuda = rutas.map(ruta => ({
+    ...ruta,
+
+    rutas_clientes: ruta.rutas_clientes.map(item => {
+      const cliente = item.cliente;
+
+      const deuda_cliente =
+        Number(cliente.deuda_cliente ?? 0);
+
+      const deuda_castigada =
+        Number(cliente.deuda_castigada ?? 0);
+
+      const deuda_vigente =
+        Number(cliente.deuda_vigente ?? 0);
+
+      const otras_deudas =
+        Number(cliente.otras_deudas ?? 0);
+
+      const deuda_total = Number(
+        (
+          deuda_cliente +
+          deuda_castigada +
+          deuda_vigente +
+          otras_deudas
+        ).toFixed(2)
+      );
+
+      return {
+        ...item,
+        cliente: {
+          ...cliente,
+          deuda_cliente,
+          deuda_castigada,
+          deuda_vigente,
+          otras_deudas,
+          deuda_total,
+        }
+      };
+    })
+  }));
+
+  return rutasConDeuda;
 }
 
 /**
