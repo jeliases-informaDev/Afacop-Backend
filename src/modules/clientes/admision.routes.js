@@ -11,7 +11,8 @@ const router = Router();
 router.use(authMiddleware);
 
 router.get(
-  "/evaluar/:dni", roleMiddleware(ADMISSION_READERS),
+  "/evaluar/:documento",
+  roleMiddleware(ADMISSION_READERS),
   admisionController.evaluarCliente
 );
 

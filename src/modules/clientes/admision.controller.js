@@ -45,17 +45,27 @@ async function obtenerAdmisiones(req, res) {
   }
 }
 
-async function evaluarCliente(req, res, next) {
+async function evaluarCliente(
+  req,
+  res,
+  next
+) {
   try {
-    const dni = String(
-      req.params.dni ?? ""
-    ).trim();
+    const documento = String(
+      req.params.documento ?? ""
+    )
+      .trim()
+      .toUpperCase();
 
-    if (!/^\d{8}$/.test(dni)) {
+    if (
+      !/^[A-Z0-9]{3,20}$/.test(
+        documento
+      )
+    ) {
       return res.status(400).json({
         mensaje:
-          "El DNI debe contener exactamente 8 dígitos.",
-        code: "INVALID_DNI",
+          "El número de documento no tiene un formato válido.",
+        code: "INVALID_DOCUMENT",
       });
     }
 
@@ -73,13 +83,14 @@ async function evaluarCliente(req, res, next) {
 
     const resultado =
       await admisionService.evaluarCliente({
-        dni,
+        documento,
         actorId,
       });
 
     return res.status(200).json({
       data: resultado,
     });
+
   } catch (error) {
     next(error);
   }
@@ -106,22 +117,28 @@ async function exportarPdf(
       });
     }
 
-    const dni = String(
-      evaluacion.dni ?? ""
-    ).trim();
+    const documento = String(
+      evaluacion.documento ?? ""
+    )
+      .trim()
+      .toUpperCase();
 
-    if (!/^\d{8}$/.test(dni)) {
+    if (
+      !/^[A-Z0-9]{3,20}$/.test(
+        documento
+      )
+    ) {
       return res.status(400).json({
         mensaje:
-          "El DNI de la evaluación no es válido.",
-        code: "INVALID_DNI",
+          "El documento de la evaluación no es válido.",
+        code: "INVALID_DOCUMENT",
       });
     }
 
     const pdf =
       await generarPdfEvaluacion({
         ...evaluacion,
-        dni,
+        documento,
       });
 
     const pdfBuffer =
@@ -134,7 +151,7 @@ async function exportarPdf(
 
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="calificacion_crediticia_${dni}.pdf"`
+      `attachment; filename="calificacion_crediticia_${documento}.pdf"`
     );
 
     res.setHeader(
