@@ -998,12 +998,12 @@ function crearHtml(evaluacion) {
       <div class="metadata-card">
 
         <div class="metadata-label">
-          DNI
+          Documento
         </div>
 
         <div class="metadata-value">
           ${escapeHtml(
-            evaluacion.dni || "—"
+            evaluacion.documento || "—"
           )}
         </div>
 

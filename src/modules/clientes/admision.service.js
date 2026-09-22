@@ -79,7 +79,7 @@ async function obtenerAdmisiones({ page = 1, limit = 12, search = "", estado } =
   };
 }
 
-async function consultarRrccApi(dni) {
+async function consultarRrccApi(documento) {
   const baseUrl = String(process.env.RRCC_API_URL || "").replace(/\/$/, "");
   const apiKey = process.env.RRCC_API_KEY;
 
@@ -101,7 +101,7 @@ async function consultarRrccApi(dni) {
 
   try {
     response = await fetch(
-      `${baseUrl}/v1/rrcc/evaluar/${encodeURIComponent(dni)}`,
+      `${baseUrl}/v1/rrcc/evaluar/${encodeURIComponent(documento)}`,
       {
         method: "GET",
         headers: {
@@ -136,7 +136,7 @@ async function consultarRrccApi(dni) {
     if (response.status === 404) {
       const error = new Error(
         payload?.error ||
-          "No se encontró información crediticia para el DNI consultado."
+          "No se encontró información crediticia para el documento consultado."
       );
 
       error.statusCode = 404;
@@ -192,31 +192,37 @@ async function consultarRrccApi(dni) {
 }
 
 async function evaluarCliente({
-  dni,
+  documento,
   actorId,
 }) {
-  // --------------------------------------------------
-  // VALIDACIÓN DNI
-  // --------------------------------------------------
 
-  if (!dni) {
+  const documentoNormalizado =
+    String(documento ?? "")
+      .trim()
+      .toUpperCase();
+
+  if (!documentoNormalizado) {
     throw Object.assign(
-      new Error("DNI requerido."),
+      new Error("Documento requerido."),
       {
         statusCode: 400,
-        code: "DNI_REQUIRED",
+        code: "DOCUMENT_REQUIRED",
       }
     );
   }
 
-  if (!/^\d{8}$/.test(dni)) {
+  if (
+    !/^[A-Z0-9]{3,20}$/.test(
+      documentoNormalizado
+    )
+  ) {
     throw Object.assign(
       new Error(
-        "El DNI debe contener exactamente 8 dígitos."
+        "El número de documento no tiene un formato válido."
       ),
       {
         statusCode: 400,
-        code: "INVALID_DNI",
+        code: "INVALID_DOCUMENT",
       }
     );
   }
@@ -242,7 +248,9 @@ async function evaluarCliente({
   // --------------------------------------------------
 
   const rrcc =
-    await consultarRrccApi(dni);
+  await consultarRrccApi(
+    documentoNormalizado
+  );
 
   // --------------------------------------------------
   // DATOS DEVUELTOS POR RRCC-API
@@ -302,7 +310,7 @@ async function evaluarCliente({
         tokenConsulta,
 
       documento:
-        dni,
+        documentoNormalizado,
 
       codigo_sbs:
         codigoSbs || null,
@@ -328,7 +336,7 @@ async function evaluarCliente({
   return {
     tokenConsulta,
 
-    dni,
+    documento: documentoNormalizado,
 
     codigoSbs,
 
