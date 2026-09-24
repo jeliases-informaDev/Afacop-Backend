@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "afacop-backend",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d C:\\Afacop-Backend && npm run dev"],
+      "port": 4000
+    },
+    {
+      "name": "afacop-app-web",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d C:\\App-Afaccop\\Aplicativo && npm run web"],
+      "port": 8081
+    }
+  ]
+}
