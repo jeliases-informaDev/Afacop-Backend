@@ -14,6 +14,15 @@ function requireAdvisor(id) {
 const clientSelect = { id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true, telefono: true, direccion: true, distrito: true, deuda_castigada: true, deuda_vigente: true, otras_deudas: true, ultima_gestion: true, latitud: true, longitud: true };
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
+// Compatibilidad temporal: versiones de la app instaladas antes de este cambio
+// todavía envían la firma como base64 embebido. Quitar cuando se confirme que
+// todos los asesores actualizaron a la versión que sube la firma a B2.
+function validateLegacySignature(value) {
+  if (typeof value !== 'string' || !/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(value) || value.length > 700000) {
+    throw Object.assign(new Error('La firma es obligatoria o no tiene un formato válido.'), { statusCode: 400 });
+  }
+  return value;
+}
 
 async function routeForToday(id_asesor) {
   const advisorId = requireAdvisor(id_asesor); const { start, end } = todayBounds();
@@ -200,20 +209,21 @@ async function registerVisit(id_asesor, payload) {
   if (!payload.foto_evidencia_key || payload.foto_evidencia_key === payload.foto_adicional_evidencia_key) {
     throw Object.assign(new Error('Debes registrar dos fotografías diferentes.'), { statusCode: 400 });
   }
-  if (!payload.firma_evidencia_key) {
+  if (!payload.firma_evidencia_key && !payload.firma_evidencia) {
     throw Object.assign(new Error('La firma es obligatoria.'), { statusCode: 400 });
   }
+  const legacyFirma = payload.firma_evidencia_key ? null : validateLegacySignature(payload.firma_evidencia);
   const [fotoKey, fotoAdicionalKey, firmaKey] = await Promise.all([
     storageService.verifyObject(payload.foto_evidencia_key, advisorId, clientId, 'foto'),
     storageService.verifyObject(payload.foto_adicional_evidencia_key, advisorId, clientId, 'foto'),
-    storageService.verifyObject(payload.firma_evidencia_key, advisorId, clientId, 'firma'),
+    payload.firma_evidencia_key ? storageService.verifyObject(payload.firma_evidencia_key, advisorId, clientId, 'firma') : Promise.resolve(null),
   ]);
   return prisma.$transaction(async tx => {
     const link = await tx.rutaCliente.findFirst({ where: { id_ruta: routeId, id_cliente: clientId, ruta: { id_asesor: advisorId, estado: 'EN_PROCESO' } }, include: { cliente: { select: { nombres: true, apellido_paterno: true, deuda_castigada: true, deuda_vigente: true, otras_deudas: true } } } });
     if (!link) throw Object.assign(new Error('El cliente no pertenece a tu ruta activa.'), { statusCode: 403 });
     const deudaTotal = Number(link.cliente.deuda_castigada || 0) + Number(link.cliente.deuda_vigente || 0) + Number(link.cliente.otras_deudas || 0);
     const montoRecuperado = payload.resultado === 'GESTIONADO' ? deudaTotal : null;
-    const visit = await tx.visita.create({ data: { client_sync_id: clientSyncId || null, id_ruta_cliente: link.id_ruta_cliente, id_cliente: clientId, id_asesor: advisorId, tipo_visita: 'PROGRAMADA', fecha_hora_checkin: new Date(), fecha_hora_checkout: new Date(), latitud: lat, longitud: lng, resultado: payload.resultado, es_efectiva: payload.resultado === 'GESTIONADO', monto_recaudado: montoRecuperado, fecha_promesa: payload.fecha_promesa ? new Date(payload.fecha_promesa) : null, observaciones, foto_url: fotoKey, foto_adicional_url: fotoAdicionalKey, firma_url: firmaKey } });
+    const visit = await tx.visita.create({ data: { client_sync_id: clientSyncId || null, id_ruta_cliente: link.id_ruta_cliente, id_cliente: clientId, id_asesor: advisorId, tipo_visita: 'PROGRAMADA', fecha_hora_checkin: new Date(), fecha_hora_checkout: new Date(), latitud: lat, longitud: lng, resultado: payload.resultado, es_efectiva: payload.resultado === 'GESTIONADO', monto_recaudado: montoRecuperado, fecha_promesa: payload.fecha_promesa ? new Date(payload.fecha_promesa) : null, observaciones, foto_url: fotoKey, foto_adicional_url: fotoAdicionalKey, firma_url: firmaKey, firma_evidencia: legacyFirma } });
     await tx.rutaCliente.update({ where: { id_ruta_cliente: link.id_ruta_cliente }, data: { estado_visita: payload.resultado === 'GESTIONADO' ? 'VISITADO' : payload.resultado } });
     await tx.cliente.update({ where: { id_cliente: clientId }, data: { ultima_gestion: new Date() } });
     return serialize({ ...visit, foto_url: undefined, foto_adicional_url: undefined, video_url: undefined, firma_url: undefined, firma_evidencia: undefined, cliente_nombre: `${link.cliente.nombres} ${link.cliente.apellido_paterno}` });
