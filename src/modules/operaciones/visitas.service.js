@@ -45,7 +45,7 @@ async function obtenerResumen() {
 }
 
 function evidenceWhere({ buscar = "", resultado = "", desde = "", hasta = "" } = {}) {
-  const where = { OR: [{ foto_url: { not: null } }, { foto_adicional_url: { not: null } }, { foto_evidencia: { not: null } }, { firma_evidencia: { not: null } }] };
+  const where = { OR: [{ foto_url: { not: null } }, { foto_adicional_url: { not: null } }, { foto_evidencia: { not: null } }, { firma_url: { not: null } }, { firma_evidencia: { not: null } }] };
   const and = [];
   const term = String(buscar).trim();
   if (term) and.push({ OR: [
@@ -88,7 +88,7 @@ async function obtenerEvidencias(filters = {}) {
   const [withPhoto, withSecondPhoto, withSignature] = ids.length ? await Promise.all([
     prisma.visita.findMany({ where: { id_visita: { in: ids }, OR: [{ foto_url: { not: null } }, { foto_evidencia: { not: null } }] }, select: { id_visita: true } }),
     prisma.visita.findMany({ where: { id_visita: { in: ids }, foto_adicional_url: { not: null } }, select: { id_visita: true } }),
-    prisma.visita.findMany({ where: { id_visita: { in: ids }, firma_evidencia: { not: null } }, select: { id_visita: true } }),
+    prisma.visita.findMany({ where: { id_visita: { in: ids }, OR: [{ firma_url: { not: null } }, { firma_evidencia: { not: null } }] }, select: { id_visita: true } }),
   ]) : [[], [], []];
   const photoIds = new Set(withPhoto.map(item => item.id_visita));
   const secondPhotoIds = new Set(withSecondPhoto.map(item => item.id_visita));
@@ -101,7 +101,7 @@ async function obtenerEvidencias(filters = {}) {
 
 async function obtenerEvidencia(id) {
   const item = await prisma.visita.findFirst({
-    where: { id_visita: Number(id), OR: [{ foto_url: { not: null } }, { foto_adicional_url: { not: null } }, { foto_evidencia: { not: null } }, { firma_evidencia: { not: null } }] },
+    where: { id_visita: Number(id), OR: [{ foto_url: { not: null } }, { foto_adicional_url: { not: null } }, { foto_evidencia: { not: null } }, { firma_url: { not: null } }, { firma_evidencia: { not: null } }] },
     include: {
       cliente: { select: { id_cliente: true, dni: true, nombres: true, apellido_paterno: true, apellido_materno: true, telefono: true, direccion: true, distrito: true } },
       asesor: { select: { id_asesor: true, dni: true, nombres: true, apellido_paterno: true, apellido_materno: true } },
@@ -109,17 +109,20 @@ async function obtenerEvidencia(id) {
     },
   });
   if (!item) return null;
-  const [signedPhoto, signedSecondPhoto] = await Promise.all([
+  const [signedPhoto, signedSecondPhoto, signedFirma] = await Promise.all([
     item.foto_url ? storageService.createDownloadUrl(item.foto_url) : null,
     item.foto_adicional_url ? storageService.createDownloadUrl(item.foto_adicional_url) : null,
+    item.firma_url ? storageService.createDownloadUrl(item.firma_url) : null,
   ]);
   return {
     ...item,
     foto_url: undefined,
     foto_adicional_url: undefined,
+    firma_url: undefined,
     video_url: undefined,
     foto_evidencia: signedPhoto || item.foto_evidencia,
     foto_adicional_evidencia: signedSecondPhoto,
+    firma_evidencia: signedFirma || item.firma_evidencia,
   };
 }
 
@@ -132,6 +135,7 @@ async function obtenerSugerenciasEvidencias(buscar = "") {
       { foto_url: { not: null } },
       { foto_adicional_url: { not: null } },
       { foto_evidencia: { not: null } },
+      { firma_url: { not: null } },
       { firma_evidencia: { not: null } },
     ],
   };

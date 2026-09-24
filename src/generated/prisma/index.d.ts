@@ -9658,6 +9658,7 @@ export namespace Prisma {
     observaciones: string | null
     foto_url: string | null
     foto_adicional_url: string | null
+    firma_url: string | null
     video_url: string | null
     foto_evidencia: string | null
     firma_evidencia: string | null
@@ -9683,6 +9684,7 @@ export namespace Prisma {
     observaciones: string | null
     foto_url: string | null
     foto_adicional_url: string | null
+    firma_url: string | null
     video_url: string | null
     foto_evidencia: string | null
     firma_evidencia: string | null
@@ -9708,6 +9710,7 @@ export namespace Prisma {
     observaciones: number
     foto_url: number
     foto_adicional_url: number
+    firma_url: number
     video_url: number
     foto_evidencia: number
     firma_evidencia: number
@@ -9755,6 +9758,7 @@ export namespace Prisma {
     observaciones?: true
     foto_url?: true
     foto_adicional_url?: true
+    firma_url?: true
     video_url?: true
     foto_evidencia?: true
     firma_evidencia?: true
@@ -9780,6 +9784,7 @@ export namespace Prisma {
     observaciones?: true
     foto_url?: true
     foto_adicional_url?: true
+    firma_url?: true
     video_url?: true
     foto_evidencia?: true
     firma_evidencia?: true
@@ -9805,6 +9810,7 @@ export namespace Prisma {
     observaciones?: true
     foto_url?: true
     foto_adicional_url?: true
+    firma_url?: true
     video_url?: true
     foto_evidencia?: true
     firma_evidencia?: true
@@ -9917,6 +9923,7 @@ export namespace Prisma {
     observaciones: string | null
     foto_url: string | null
     foto_adicional_url: string | null
+    firma_url: string | null
     video_url: string | null
     foto_evidencia: string | null
     firma_evidencia: string | null
@@ -9961,6 +9968,7 @@ export namespace Prisma {
     observaciones?: boolean
     foto_url?: boolean
     foto_adicional_url?: boolean
+    firma_url?: boolean
     video_url?: boolean
     foto_evidencia?: boolean
     firma_evidencia?: boolean
@@ -9989,6 +9997,7 @@ export namespace Prisma {
     observaciones?: boolean
     foto_url?: boolean
     foto_adicional_url?: boolean
+    firma_url?: boolean
     video_url?: boolean
     foto_evidencia?: boolean
     firma_evidencia?: boolean
@@ -10017,6 +10026,7 @@ export namespace Prisma {
     observaciones?: boolean
     foto_url?: boolean
     foto_adicional_url?: boolean
+    firma_url?: boolean
     video_url?: boolean
     foto_evidencia?: boolean
     firma_evidencia?: boolean
@@ -10045,6 +10055,7 @@ export namespace Prisma {
     observaciones?: boolean
     foto_url?: boolean
     foto_adicional_url?: boolean
+    firma_url?: boolean
     video_url?: boolean
     foto_evidencia?: boolean
     firma_evidencia?: boolean
@@ -10052,7 +10063,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type VisitaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_visita" | "client_sync_id" | "id_ruta_cliente" | "id_cliente" | "id_asesor" | "tipo_visita" | "fecha_hora_checkin" | "fecha_hora_checkout" | "latitud" | "longitud" | "resultado" | "es_efectiva" | "monto_recaudado" | "fecha_promesa" | "observaciones" | "foto_url" | "foto_adicional_url" | "video_url" | "foto_evidencia" | "firma_evidencia" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["visita"]>
+  export type VisitaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_visita" | "client_sync_id" | "id_ruta_cliente" | "id_cliente" | "id_asesor" | "tipo_visita" | "fecha_hora_checkin" | "fecha_hora_checkout" | "latitud" | "longitud" | "resultado" | "es_efectiva" | "monto_recaudado" | "fecha_promesa" | "observaciones" | "foto_url" | "foto_adicional_url" | "firma_url" | "video_url" | "foto_evidencia" | "firma_evidencia" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["visita"]>
   export type VisitaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     ruta_cliente?: boolean | Visita$ruta_clienteArgs<ExtArgs>
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
@@ -10094,6 +10105,7 @@ export namespace Prisma {
       observaciones: string | null
       foto_url: string | null
       foto_adicional_url: string | null
+      firma_url: string | null
       video_url: string | null
       foto_evidencia: string | null
       firma_evidencia: string | null
@@ -10542,6 +10554,7 @@ export namespace Prisma {
     readonly observaciones: FieldRef<"Visita", 'String'>
     readonly foto_url: FieldRef<"Visita", 'String'>
     readonly foto_adicional_url: FieldRef<"Visita", 'String'>
+    readonly firma_url: FieldRef<"Visita", 'String'>
     readonly video_url: FieldRef<"Visita", 'String'>
     readonly foto_evidencia: FieldRef<"Visita", 'String'>
     readonly firma_evidencia: FieldRef<"Visita", 'String'>
@@ -18389,6 +18402,7 @@ export namespace Prisma {
     observaciones: 'observaciones',
     foto_url: 'foto_url',
     foto_adicional_url: 'foto_adicional_url',
+    firma_url: 'firma_url',
     video_url: 'video_url',
     foto_evidencia: 'foto_evidencia',
     firma_evidencia: 'firma_evidencia',
@@ -19253,6 +19267,7 @@ export namespace Prisma {
     observaciones?: StringNullableFilter<"Visita"> | string | null
     foto_url?: StringNullableFilter<"Visita"> | string | null
     foto_adicional_url?: StringNullableFilter<"Visita"> | string | null
+    firma_url?: StringNullableFilter<"Visita"> | string | null
     video_url?: StringNullableFilter<"Visita"> | string | null
     foto_evidencia?: StringNullableFilter<"Visita"> | string | null
     firma_evidencia?: StringNullableFilter<"Visita"> | string | null
@@ -19281,6 +19296,7 @@ export namespace Prisma {
     observaciones?: SortOrderInput | SortOrder
     foto_url?: SortOrderInput | SortOrder
     foto_adicional_url?: SortOrderInput | SortOrder
+    firma_url?: SortOrderInput | SortOrder
     video_url?: SortOrderInput | SortOrder
     foto_evidencia?: SortOrderInput | SortOrder
     firma_evidencia?: SortOrderInput | SortOrder
@@ -19312,6 +19328,7 @@ export namespace Prisma {
     observaciones?: StringNullableFilter<"Visita"> | string | null
     foto_url?: StringNullableFilter<"Visita"> | string | null
     foto_adicional_url?: StringNullableFilter<"Visita"> | string | null
+    firma_url?: StringNullableFilter<"Visita"> | string | null
     video_url?: StringNullableFilter<"Visita"> | string | null
     foto_evidencia?: StringNullableFilter<"Visita"> | string | null
     firma_evidencia?: StringNullableFilter<"Visita"> | string | null
@@ -19340,6 +19357,7 @@ export namespace Prisma {
     observaciones?: SortOrderInput | SortOrder
     foto_url?: SortOrderInput | SortOrder
     foto_adicional_url?: SortOrderInput | SortOrder
+    firma_url?: SortOrderInput | SortOrder
     video_url?: SortOrderInput | SortOrder
     foto_evidencia?: SortOrderInput | SortOrder
     firma_evidencia?: SortOrderInput | SortOrder
@@ -19373,6 +19391,7 @@ export namespace Prisma {
     observaciones?: StringNullableWithAggregatesFilter<"Visita"> | string | null
     foto_url?: StringNullableWithAggregatesFilter<"Visita"> | string | null
     foto_adicional_url?: StringNullableWithAggregatesFilter<"Visita"> | string | null
+    firma_url?: StringNullableWithAggregatesFilter<"Visita"> | string | null
     video_url?: StringNullableWithAggregatesFilter<"Visita"> | string | null
     foto_evidencia?: StringNullableWithAggregatesFilter<"Visita"> | string | null
     firma_evidencia?: StringNullableWithAggregatesFilter<"Visita"> | string | null
@@ -20630,6 +20649,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -20658,6 +20678,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -20679,6 +20700,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20707,6 +20729,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20732,6 +20755,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -20753,6 +20777,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20778,6 +20803,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22256,6 +22282,7 @@ export namespace Prisma {
     observaciones?: SortOrder
     foto_url?: SortOrder
     foto_adicional_url?: SortOrder
+    firma_url?: SortOrder
     video_url?: SortOrder
     foto_evidencia?: SortOrder
     firma_evidencia?: SortOrder
@@ -22291,6 +22318,7 @@ export namespace Prisma {
     observaciones?: SortOrder
     foto_url?: SortOrder
     foto_adicional_url?: SortOrder
+    firma_url?: SortOrder
     video_url?: SortOrder
     foto_evidencia?: SortOrder
     firma_evidencia?: SortOrder
@@ -22316,6 +22344,7 @@ export namespace Prisma {
     observaciones?: SortOrder
     foto_url?: SortOrder
     foto_adicional_url?: SortOrder
+    firma_url?: SortOrder
     video_url?: SortOrder
     foto_evidencia?: SortOrder
     firma_evidencia?: SortOrder
@@ -23979,6 +24008,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -24005,6 +24035,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -24145,6 +24176,7 @@ export namespace Prisma {
     observaciones?: StringNullableFilter<"Visita"> | string | null
     foto_url?: StringNullableFilter<"Visita"> | string | null
     foto_adicional_url?: StringNullableFilter<"Visita"> | string | null
+    firma_url?: StringNullableFilter<"Visita"> | string | null
     video_url?: StringNullableFilter<"Visita"> | string | null
     foto_evidencia?: StringNullableFilter<"Visita"> | string | null
     firma_evidencia?: StringNullableFilter<"Visita"> | string | null
@@ -24360,6 +24392,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -24386,6 +24419,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -25048,6 +25082,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -25074,6 +25109,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -25978,6 +26014,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -26076,6 +26113,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26102,6 +26140,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26126,6 +26165,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26168,6 +26208,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -26243,6 +26284,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26269,6 +26311,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26293,6 +26336,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26358,6 +26402,7 @@ export namespace Prisma {
     observaciones?: string | null
     foto_url?: string | null
     foto_adicional_url?: string | null
+    firma_url?: string | null
     video_url?: string | null
     foto_evidencia?: string | null
     firma_evidencia?: string | null
@@ -26379,6 +26424,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26405,6 +26451,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26429,6 +26476,7 @@ export namespace Prisma {
     observaciones?: NullableStringFieldUpdateOperationsInput | string | null
     foto_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_adicional_url?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_url?: NullableStringFieldUpdateOperationsInput | string | null
     video_url?: NullableStringFieldUpdateOperationsInput | string | null
     foto_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null

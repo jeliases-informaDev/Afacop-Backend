@@ -222,6 +222,7 @@ exports.Prisma.VisitaScalarFieldEnum = {
   observaciones: 'observaciones',
   foto_url: 'foto_url',
   foto_adicional_url: 'foto_adicional_url',
+  firma_url: 'firma_url',
   video_url: 'video_url',
   foto_evidencia: 'foto_evidencia',
   firma_evidencia: 'firma_evidencia',
