@@ -1,10 +1,11 @@
 import crypto from 'node:crypto';
-import { HeadObjectCommand, PutObjectCommand, S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { env } from '#core/config/env.js';
 
 const TYPES = {
   foto: { contentTypes: { 'image/jpeg': 'jpg' }, maxBytes: 4 * 1024 * 1024 },
+  firma: { contentTypes: { 'image/png': 'png' }, maxBytes: 700 * 1024 },
 };
 let client;
 function configured() { return Boolean(env.B2_ENDPOINT && env.B2_REGION && env.B2_BUCKET && env.B2_KEY_ID && env.B2_APPLICATION_KEY); }
@@ -34,14 +35,14 @@ function safeClientName(value) {
   }
   return normalized;
 }
-function ownershipSignature({ advisorId, clientId, type, slot, timestamp, id }) {
+export function ownershipSignature({ advisorId, clientId, type, slot, timestamp, id }) {
   return crypto
     .createHmac('sha256', env.JWT_SECRET)
     .update([Number(advisorId), Number(clientId), type, Number(slot), timestamp, id].join(':'))
     .digest('hex')
     .slice(0, 24);
 }
-function validateOwnedKey(key, advisorId, clientId, type) {
+export function validateOwnedKey(key, advisorId, clientId, type) {
   const config = TYPES[type];
   const validExtension = config && Object.values(config.contentTypes).some(extension => key?.endsWith(`.${extension}`));
   const filename = typeof key === 'string' ? key.split('/').at(-1) : '';
@@ -89,7 +90,12 @@ async function verifyObject(key, advisorId, clientId, type) {
 }
 async function createDownloadUrl(key) {
   if (!key) return null;
-  return getSignedUrl(getClient(), new GetObjectCommand({ Bucket: env.B2_BUCKET, Key: key }), { expiresIn: 600 });
+  const command = new GetObjectCommand({ Bucket: env.B2_BUCKET, Key: key, ResponseCacheControl: 'no-store' });
+  return getSignedUrl(getClient(), command, { expiresIn: 600 });
+}
+async function deleteObject(key) {
+  if (!key) return;
+  await getClient().send(new DeleteObjectCommand({ Bucket: env.B2_BUCKET, Key: key }));
 }
 
-export default { createUpload, verifyObject, createDownloadUrl };
+export default { createUpload, verifyObject, createDownloadUrl, deleteObject };

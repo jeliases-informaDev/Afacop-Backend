@@ -2,8 +2,12 @@ import { logger } from '#core/config/logger.js';
 import crypto from 'node:crypto';
 import prisma from '#core/config/prisma.js';
 
+const EVIDENCE_VIEW_PATH = /\/evidencias(\/|$)/;
+
 export function auditMiddleware(req, res, next) {
-  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) return next();
+  const isMutation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
+  const isEvidenceView = req.method === 'GET' && EVIDENCE_VIEW_PATH.test(req.originalUrl.split('?')[0]);
+  if (!isMutation && !isEvidenceView) return next();
   const startedAt = Date.now();
   res.on('finish', () => {
     const clientIp = String(req.ip || '').replace(/^::ffff:/, '').slice(0, 45) || null;

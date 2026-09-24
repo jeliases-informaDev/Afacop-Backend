@@ -193,9 +193,10 @@ model Visita {
   observaciones       String?   @db.Text
   foto_url            String?   @db.VarChar(255) // Primera fotografía en almacenamiento externo
   foto_adicional_url  String?   @db.VarChar(255) // Segunda fotografía en almacenamiento externo
+  firma_url           String?   @db.VarChar(255) // Firma en almacenamiento externo
   video_url           String?   @db.VarChar(255) // Compatibilidad con evidencias antiguas
   foto_evidencia      String?   @db.Text // Imagen JPEG heredada en data URL
-  firma_evidencia     String?   @db.Text // Firma PNG en data URL
+  firma_evidencia     String?   @db.Text // Firma PNG heredada en data URL
   fecha_creacion      DateTime  @default(now())
   fecha_actualizar    DateTime  @updatedAt
 

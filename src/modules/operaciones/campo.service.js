@@ -14,12 +14,6 @@ function requireAdvisor(id) {
 const clientSelect = { id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true, telefono: true, direccion: true, distrito: true, deuda_castigada: true, deuda_vigente: true, otras_deudas: true, ultima_gestion: true, latitud: true, longitud: true };
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
-function validateEvidence(value, type, maxLength) {
-  if (typeof value !== 'string' || !new RegExp(`^data:image/${type};base64,[A-Za-z0-9+/=]+$`).test(value) || value.length > maxLength) {
-    throw Object.assign(new Error(type === 'png' ? 'La firma es obligatoria o no tiene un formato válido.' : 'La fotografía es obligatoria o supera el tamaño permitido.'), { statusCode: 400 });
-  }
-  return value;
-}
 
 async function routeForToday(id_asesor) {
   const advisorId = requireAdvisor(id_asesor); const { start, end } = todayBounds();
@@ -196,30 +190,33 @@ async function registerVisit(id_asesor, payload) {
     const existing = await prisma.visita.findUnique({ where: { client_sync_id: clientSyncId }, include: { cliente: { select: { nombres: true, apellido_paterno: true } } } });
     if (existing) {
       if (existing.id_asesor !== advisorId) throw Object.assign(new Error('El identificador de sincronización ya está en uso.'), { statusCode: 409 });
-      return serialize({ ...existing, _already_synced: true, foto_url: undefined, foto_adicional_url: undefined, video_url: undefined, firma_evidencia: undefined, cliente_nombre: `${existing.cliente.nombres} ${existing.cliente.apellido_paterno}` });
+      return serialize({ ...existing, _already_synced: true, foto_url: undefined, foto_adicional_url: undefined, video_url: undefined, firma_url: undefined, firma_evidencia: undefined, cliente_nombre: `${existing.cliente.nombres} ${existing.cliente.apellido_paterno}` });
     }
   }
   const lat = Number(payload.latitud); const lng = Number(payload.longitud);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) throw Object.assign(new Error('Activa la ubicación para registrar la visita.'), { statusCode: 400 });
   const observaciones = payload.observaciones?.trim();
   if (!observaciones || observaciones.length < 5 || observaciones.length > 2000) throw Object.assign(new Error('Ingresa una descripción de al menos 5 caracteres.'), { statusCode: 400 });
-  const firmaEvidencia = validateEvidence(payload.firma_evidencia, 'png', 700000);
   if (!payload.foto_evidencia_key || payload.foto_evidencia_key === payload.foto_adicional_evidencia_key) {
     throw Object.assign(new Error('Debes registrar dos fotografías diferentes.'), { statusCode: 400 });
   }
-  const [fotoKey, fotoAdicionalKey] = await Promise.all([
+  if (!payload.firma_evidencia_key) {
+    throw Object.assign(new Error('La firma es obligatoria.'), { statusCode: 400 });
+  }
+  const [fotoKey, fotoAdicionalKey, firmaKey] = await Promise.all([
     storageService.verifyObject(payload.foto_evidencia_key, advisorId, clientId, 'foto'),
     storageService.verifyObject(payload.foto_adicional_evidencia_key, advisorId, clientId, 'foto'),
+    storageService.verifyObject(payload.firma_evidencia_key, advisorId, clientId, 'firma'),
   ]);
   return prisma.$transaction(async tx => {
     const link = await tx.rutaCliente.findFirst({ where: { id_ruta: routeId, id_cliente: clientId, ruta: { id_asesor: advisorId, estado: 'EN_PROCESO' } }, include: { cliente: { select: { nombres: true, apellido_paterno: true, deuda_castigada: true, deuda_vigente: true, otras_deudas: true } } } });
     if (!link) throw Object.assign(new Error('El cliente no pertenece a tu ruta activa.'), { statusCode: 403 });
     const deudaTotal = Number(link.cliente.deuda_castigada || 0) + Number(link.cliente.deuda_vigente || 0) + Number(link.cliente.otras_deudas || 0);
     const montoRecuperado = payload.resultado === 'GESTIONADO' ? deudaTotal : null;
-    const visit = await tx.visita.create({ data: { client_sync_id: clientSyncId || null, id_ruta_cliente: link.id_ruta_cliente, id_cliente: clientId, id_asesor: advisorId, tipo_visita: 'PROGRAMADA', fecha_hora_checkin: new Date(), fecha_hora_checkout: new Date(), latitud: lat, longitud: lng, resultado: payload.resultado, es_efectiva: payload.resultado === 'GESTIONADO', monto_recaudado: montoRecuperado, fecha_promesa: payload.fecha_promesa ? new Date(payload.fecha_promesa) : null, observaciones, foto_url: fotoKey, foto_adicional_url: fotoAdicionalKey, firma_evidencia: firmaEvidencia } });
+    const visit = await tx.visita.create({ data: { client_sync_id: clientSyncId || null, id_ruta_cliente: link.id_ruta_cliente, id_cliente: clientId, id_asesor: advisorId, tipo_visita: 'PROGRAMADA', fecha_hora_checkin: new Date(), fecha_hora_checkout: new Date(), latitud: lat, longitud: lng, resultado: payload.resultado, es_efectiva: payload.resultado === 'GESTIONADO', monto_recaudado: montoRecuperado, fecha_promesa: payload.fecha_promesa ? new Date(payload.fecha_promesa) : null, observaciones, foto_url: fotoKey, foto_adicional_url: fotoAdicionalKey, firma_url: firmaKey } });
     await tx.rutaCliente.update({ where: { id_ruta_cliente: link.id_ruta_cliente }, data: { estado_visita: payload.resultado === 'GESTIONADO' ? 'VISITADO' : payload.resultado } });
     await tx.cliente.update({ where: { id_cliente: clientId }, data: { ultima_gestion: new Date() } });
-    return serialize({ ...visit, foto_url: undefined, foto_adicional_url: undefined, video_url: undefined, firma_evidencia: undefined, cliente_nombre: `${link.cliente.nombres} ${link.cliente.apellido_paterno}` });
+    return serialize({ ...visit, foto_url: undefined, foto_adicional_url: undefined, video_url: undefined, firma_url: undefined, firma_evidencia: undefined, cliente_nombre: `${link.cliente.nombres} ${link.cliente.apellido_paterno}` });
   });
 }
 export default { summary, routeForToday, assignedClients, updateLocation, setRouteStatus, createEvidenceUpload, registerVisit };
