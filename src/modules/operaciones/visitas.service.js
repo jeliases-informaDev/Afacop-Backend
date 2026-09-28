@@ -49,7 +49,7 @@ function evidenceWhere({ buscar = "", resultado = "", desde = "", hasta = "" } =
   const and = [];
   const term = String(buscar).trim();
   if (term) and.push({ OR: [
-    { cliente: { dni: { contains: term, mode: "insensitive" } } },
+    { cliente: { numero_documento: { contains: term, mode: "insensitive" } } },
     { cliente: { nombres: { contains: term, mode: "insensitive" } } },
     { cliente: { apellido_paterno: { contains: term, mode: "insensitive" } } },
     { cliente: { apellido_materno: { contains: term, mode: "insensitive" } } },
@@ -78,7 +78,7 @@ async function obtenerEvidencias(filters = {}) {
       select: {
         id_visita: true, resultado: true, es_efectiva: true, monto_recaudado: true,
         observaciones: true, fecha_hora_checkin: true, latitud: true, longitud: true,
-        cliente: { select: { id_cliente: true, dni: true, nombres: true, apellido_paterno: true, apellido_materno: true, distrito: true } },
+        cliente: { select: { id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true, distrito: true } },
         asesor: { select: { id_asesor: true, nombres: true, apellido_paterno: true, apellido_materno: true } },
       },
     }),
@@ -94,7 +94,11 @@ async function obtenerEvidencias(filters = {}) {
   const secondPhotoIds = new Set(withSecondPhoto.map(item => item.id_visita));
   const signatureIds = new Set(withSignature.map(item => item.id_visita));
   return {
-    items: items.map(item => ({ ...item, tiene_foto: photoIds.has(item.id_visita), tiene_foto_adicional: secondPhotoIds.has(item.id_visita), tiene_firma: signatureIds.has(item.id_visita) })),
+    items: items.map(item => ({
+      ...item,
+      cliente: { ...item.cliente, dni: item.cliente.numero_documento },
+      tiene_foto: photoIds.has(item.id_visita), tiene_foto_adicional: secondPhotoIds.has(item.id_visita), tiene_firma: signatureIds.has(item.id_visita),
+    })),
     pagination: { page, limit, total, pages: Math.max(1, Math.ceil(total / limit)) },
   };
 }
@@ -103,7 +107,7 @@ async function obtenerEvidencia(id) {
   const item = await prisma.visita.findFirst({
     where: { id_visita: Number(id), OR: [{ foto_url: { not: null } }, { foto_adicional_url: { not: null } }, { foto_evidencia: { not: null } }, { firma_url: { not: null } }, { firma_evidencia: { not: null } }] },
     include: {
-      cliente: { select: { id_cliente: true, dni: true, nombres: true, apellido_paterno: true, apellido_materno: true, telefono: true, direccion: true, distrito: true } },
+      cliente: { select: { id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true, telefono: true, direccion: true, distrito: true } },
       asesor: { select: { id_asesor: true, dni: true, nombres: true, apellido_paterno: true, apellido_materno: true } },
       ruta_cliente: { select: { id_ruta: true, secuencia: true } },
     },
@@ -116,6 +120,7 @@ async function obtenerEvidencia(id) {
   ]);
   return {
     ...item,
+    cliente: { ...item.cliente, dni: item.cliente.numero_documento },
     foto_url: undefined,
     foto_adicional_url: undefined,
     firma_url: undefined,
@@ -139,31 +144,31 @@ async function obtenerSugerenciasEvidencias(buscar = "") {
       { firma_evidencia: { not: null } },
     ],
   };
-  const personFilter = {
+  const personFilter = (idField) => ({
     OR: [
-      { dni: { contains: term, mode: "insensitive" } },
+      { [idField]: { contains: term, mode: "insensitive" } },
       { nombres: { contains: term, mode: "insensitive" } },
       { apellido_paterno: { contains: term, mode: "insensitive" } },
       { apellido_materno: { contains: term, mode: "insensitive" } },
     ],
-  };
+  });
 
   const [clientes, asesores] = await Promise.all([
     prisma.cliente.findMany({
-      where: { AND: [personFilter, { visitas: { some: evidenceFilter } }] },
+      where: { AND: [personFilter("numero_documento"), { visitas: { some: evidenceFilter } }] },
       orderBy: [{ apellido_paterno: "asc" }, { nombres: "asc" }],
       take: 6,
-      select: { id_cliente: true, dni: true, nombres: true, apellido_paterno: true, apellido_materno: true, distrito: true },
+      select: { id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true, distrito: true },
     }),
     prisma.asesor.findMany({
-      where: { AND: [personFilter, { visitas: { some: evidenceFilter } }] },
+      where: { AND: [personFilter("dni"), { visitas: { some: evidenceFilter } }] },
       orderBy: [{ apellido_paterno: "asc" }, { nombres: "asc" }],
       take: 6,
       select: { id_asesor: true, dni: true, nombres: true, apellido_paterno: true, apellido_materno: true, estado: true },
     }),
   ]);
 
-  return { clientes, asesores };
+  return { clientes: clientes.map(c => ({ ...c, dni: c.numero_documento })), asesores };
 }
 
 export default { obtenerVisitas, crearVisita, obtenerResumen, obtenerEvidencias, obtenerSugerenciasEvidencias, obtenerEvidencia };
