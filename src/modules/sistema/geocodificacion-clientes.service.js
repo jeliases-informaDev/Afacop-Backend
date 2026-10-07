@@ -1,123 +1,15 @@
 import prisma from '#core/config/prisma.js';
-import { env } from '#core/config/env.js';
 import { logger } from '#core/config/logger.js';
+import { estadoSegunConfianza } from './geocodificacion-direcciones.js';
 import {
-  coincideDistrito,
-  estadoSegunConfianza,
-  evaluarResultado,
-  limpiarDireccion,
-  normalizarNumero,
-} from './geocodificacion-direcciones.js';
+  geocodificarDireccion,
+  pausaEntreConsultasMs,
+  proveedorActivo,
+  sleep,
+  tamanoMaximoLote,
+} from './geocodificacion-proveedores.js';
 
 const DEFAULT_BATCH_SIZE = 5;
-const DELAY_MS = 1200;
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-async function consultarProveedor(params) {
-  const url = new URL(`${env.GEOCODING_BASE_URL.replace(/\/$/, '')}/search`);
-  url.searchParams.set('format', 'jsonv2');
-  url.searchParams.set('countrycodes', 'pe');
-  url.searchParams.set('limit', '5');
-  url.searchParams.set('addressdetails', '1');
-  for (const [clave, valor] of Object.entries(params)) {
-    url.searchParams.set(clave, valor);
-  }
-
-  const response = await fetch(url, {
-    headers: {
-      Accept: 'application/json',
-      'Accept-Language': 'es',
-      'User-Agent': process.env.GEOCODING_USER_AGENT || 'Radar360/1.0',
-    },
-    signal: AbortSignal.timeout(15000),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Servicio de geocodificación respondió ${response.status}`);
-  }
-
-  const results = await response.json();
-  return Array.isArray(results) ? results : [];
-}
-
-async function geocodeAddress({
-  direccion,
-  direccion_normalizada: direccionNormalizada,
-  distrito,
-  provincia,
-}) {
-  const limpia = limpiarDireccion(direccion);
-  const numeroSolicitado = limpia.numero
-    ? normalizarNumero(limpia.numero)
-    : null;
-  const ciudad = distrito || provincia || null;
-
-  // La búsqueda estructurada (calle + número + distrito) encuentra muchas
-  // direcciones que la búsqueda de texto libre no resuelve.
-  let results = [];
-  if (limpia.calle && ciudad) {
-    results = await consultarProveedor({
-      street: [limpia.numero, limpia.calle].filter(Boolean).join(' '),
-      city: ciudad,
-    });
-    if (!results.length) await sleep(DELAY_MS);
-  }
-  if (!results.length) {
-    results = await consultarProveedor({ q: direccionNormalizada });
-  }
-  if (!results.length) return null;
-
-  let item;
-  if (numeroSolicitado) {
-    // Solo se acepta un resultado cuyo número coincida realmente.
-    const conNumero = results.filter(
-      candidato => normalizarNumero(candidato.address?.house_number) === numeroSolicitado,
-    );
-    item = conNumero.find(
-      candidato => coincideDistrito(distrito, candidato.address) !== false,
-    ) ?? conNumero[0];
-
-    if (!item) {
-      logger.warn(
-        {
-          direccion: direccionNormalizada,
-          numeroSolicitado,
-          resultados: results.map(candidato => ({
-            display_name: candidato.display_name,
-            house_number: candidato.address?.house_number || null,
-            addresstype: candidato.addresstype || null,
-          })),
-        },
-        'client_geocoding_house_number_not_found',
-      );
-      return null;
-    }
-  } else {
-    item = results.find(
-      candidato => coincideDistrito(distrito, candidato.address) !== false,
-    ) ?? results[0];
-  }
-
-  const latitud = Number(item.lat);
-  const longitud = Number(item.lon);
-  if (!Number.isFinite(latitud) || !Number.isFinite(longitud)) return null;
-
-  const evaluacion = evaluarResultado({
-    item,
-    numeroSolicitado,
-    distritoEsperado: distrito,
-    esManzanaLote: limpia.esManzanaLote,
-  });
-
-  return {
-    latitud,
-    longitud,
-    precision: evaluacion.precision,
-    confianza: evaluacion.confianza,
-    direccionEncontrada: item.display_name?.slice(0, 400) || null,
-  };
-}
 
 // Muchos clientes comparten el mismo domicilio: se reutiliza una ubicación ya
 // confiable en vez de volver a consultar al proveedor externo.
@@ -151,9 +43,10 @@ const SIN_VERIFICACION = {
 export async function geocodePendingClients({
   limit = DEFAULT_BATCH_SIZE,
 } = {}) {
+  const proveedor = proveedorActivo();
   const safeLimit = Math.min(
     Math.max(Number(limit) || DEFAULT_BATCH_SIZE, 1),
-    20,
+    tamanoMaximoLote(proveedor),
   );
 
   const clients = await prisma.cliente.findMany({
@@ -180,6 +73,7 @@ export async function geocodePendingClients({
   let noEncontrados = 0;
   let reutilizados = 0;
   let errores = 0;
+  let detenido = null;
 
   for (const client of clients) {
     let consultoProveedor = false;
@@ -206,7 +100,7 @@ export async function geocodePendingClients({
       }
 
       consultoProveedor = true;
-      const result = await geocodeAddress(client);
+      const result = await geocodificarDireccion(client, { proveedor });
 
       if (!result) {
         await prisma.cliente.update({
@@ -242,6 +136,14 @@ export async function geocodePendingClients({
         else revisar++;
       }
     } catch (error) {
+      if (error.detenerLote) {
+        // Clave inválida, límite excedido o proveedor caído: los clientes
+        // quedan PENDIENTE y se reintentan en el siguiente ciclo.
+        detenido = error.message;
+        logger.warn({ err: error, proveedor }, 'client_geocoding_batch_stopped');
+        break;
+      }
+
       errores++;
 
       await prisma.cliente.update({
@@ -266,15 +168,17 @@ export async function geocodePendingClients({
     }
 
     // Solo se espera cuando se consultó al proveedor externo.
-    if (consultoProveedor) await sleep(DELAY_MS);
+    if (consultoProveedor) await sleep(pausaEntreConsultasMs(proveedor));
   }
 
   return {
-    procesados: clients.length,
+    proveedor,
+    procesados: localizados + revisar + noEncontrados + reutilizados + errores,
     localizados,
     revisar,
     no_encontrados: noEncontrados,
     reutilizados,
     errores,
+    detenido,
   };
 }

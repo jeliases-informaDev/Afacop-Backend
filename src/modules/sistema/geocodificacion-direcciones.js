@@ -96,6 +96,47 @@ export function evaluarResultado({ item, numeroSolicitado = null, distritoEspera
   return { precision, confianza, distritoCoincide };
 }
 
+// Traduce un resultado de Mapbox (API v6) al formato interno, de modo que
+// evaluarResultado() aplique las mismas reglas de confianza a cualquier proveedor.
+// Solo un punto de techo/parcela/puerta con el número coincidente cuenta como
+// edificio; una interpolación o aproximación queda como "place" (dato dudoso).
+export function mapearFeatureMapbox(feature) {
+  const props = feature?.properties ?? {};
+  const contexto = props.context ?? {};
+  const [longitud, latitud] = feature?.geometry?.coordinates
+    ?? [props.coordinates?.longitude, props.coordinates?.latitude];
+  const puntoExacto = ['rooftop', 'parcel', 'point'].includes(props.coordinates?.accuracy);
+
+  let addresstype;
+  switch (props.feature_type) {
+    case 'address':
+      addresstype = puntoExacto && props.match_code?.address_number === 'matched' ? 'building' : 'place';
+      break;
+    case 'street': addresstype = 'road'; break;
+    case 'neighborhood': addresstype = 'neighbourhood'; break;
+    case 'locality':
+    case 'district': addresstype = 'suburb'; break;
+    default: addresstype = 'city';
+  }
+
+  return {
+    lat: String(latitud),
+    lon: String(longitud),
+    display_name: props.full_address
+      || [props.name, props.place_formatted].filter(Boolean).join(', ')
+      || null,
+    addresstype,
+    type: addresstype,
+    address: {
+      house_number: contexto.address?.address_number ?? null,
+      road: contexto.street?.name ?? contexto.address?.street_name ?? null,
+      suburb: contexto.neighborhood?.name ?? null,
+      city_district: contexto.locality?.name ?? null,
+      city: contexto.place?.name ?? null,
+    },
+  };
+}
+
 export function estadoSegunConfianza(confianza) {
   return confianza === 'ALTA' ? 'LOCALIZADO' : 'REVISAR';
 }

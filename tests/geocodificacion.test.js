@@ -5,6 +5,7 @@ import {
   estadoSegunConfianza,
   evaluarResultado,
   limpiarDireccion,
+  mapearFeatureMapbox,
 } from '../src/modules/sistema/geocodificacion-direcciones.js';
 
 test('limpiarDireccion separa calle y número y expande abreviaturas', () => {
@@ -81,4 +82,62 @@ test('direcciones con manzana y lote nunca se aceptan automáticamente', () => {
 test('un resultado solo de zona o ciudad es de confianza BAJA', () => {
   assert.equal(evaluarResultado({ item: { addresstype: 'suburb', address: {} }, numeroSolicitado: '10' }).confianza, 'BAJA');
   assert.equal(evaluarResultado({ item: { addresstype: 'city', address: {} } }).confianza, 'BAJA');
+});
+
+const featureMapbox = propiedades => ({
+  geometry: { coordinates: [-77.0345, -12.0756] },
+  properties: propiedades,
+});
+
+test('Mapbox: punto de techo con número coincidente se trata como edificio y es de confianza ALTA', () => {
+  const item = mapearFeatureMapbox(featureMapbox({
+    feature_type: 'address',
+    full_address: 'Avenida Petit Thouars 1113, Lima, Perú',
+    coordinates: { accuracy: 'rooftop' },
+    match_code: { address_number: 'matched', confidence: 'exact' },
+    context: {
+      address: { address_number: '1113', street_name: 'Avenida Petit Thouars' },
+      neighborhood: { name: 'Santa Beatriz' },
+      place: { name: 'Lima' },
+    },
+  }));
+  assert.equal(item.addresstype, 'building');
+  assert.equal(item.lat, '-12.0756');
+  assert.equal(item.lon, '-77.0345');
+  assert.equal(item.address.house_number, '1113');
+  const r = evaluarResultado({ item, numeroSolicitado: '1113', distritoEsperado: 'Lima' });
+  assert.equal(r.precision, 'EXACTA');
+  assert.equal(r.confianza, 'ALTA');
+});
+
+test('Mapbox: una dirección interpolada o aproximada queda por revisar', () => {
+  for (const accuracy of ['interpolated', 'approximate']) {
+    const item = mapearFeatureMapbox(featureMapbox({
+      feature_type: 'address',
+      coordinates: { accuracy },
+      match_code: { address_number: 'matched' },
+      context: { address: { address_number: '1113' }, place: { name: 'Lima' } },
+    }));
+    assert.equal(item.addresstype, 'place');
+    const r = evaluarResultado({ item, numeroSolicitado: '1113', distritoEsperado: 'Lima' });
+    assert.equal(estadoSegunConfianza(r.confianza), 'REVISAR');
+  }
+});
+
+test('Mapbox: el número solo cuenta si el proveedor confirma que coincide', () => {
+  const item = mapearFeatureMapbox(featureMapbox({
+    feature_type: 'address',
+    coordinates: { accuracy: 'rooftop' },
+    match_code: { address_number: 'plausible' },
+    context: { address: { address_number: '1113' } },
+  }));
+  assert.equal(item.addresstype, 'place');
+});
+
+test('Mapbox: calle, barrio y localidad se traducen a tipos de baja precisión', () => {
+  const tipoDe = feature_type => mapearFeatureMapbox(featureMapbox({ feature_type })).addresstype;
+  assert.equal(tipoDe('street'), 'road');
+  assert.equal(tipoDe('neighborhood'), 'neighbourhood');
+  assert.equal(tipoDe('locality'), 'suburb');
+  assert.equal(tipoDe('place'), 'city');
 });
