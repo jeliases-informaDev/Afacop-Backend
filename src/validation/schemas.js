@@ -109,3 +109,23 @@ export const userCreateBody = z.object({
   id_asesor: z.coerce.number().int().positive().nullable().optional(),
 }).strict();
 export const userUpdateBody = userCreateBody.partial().refine(data => Object.keys(data).length > 0, 'Debe enviar al menos un campo');
+
+// Perú continental: latitud -18.5 a 0.1, longitud -81.5 a -68.5.
+const peruLatitud = z.coerce.number().min(-18.5).max(0.1);
+const peruLongitud = z.coerce.number().min(-81.5).max(-68.5);
+export const clientLocationBody = z.object({
+  latitud: peruLatitud,
+  longitud: peruLongitud,
+  aplicar_misma_direccion: z.boolean().optional(),
+}).strict();
+export const clientLocationFieldBody = z.object({
+  latitud: peruLatitud,
+  longitud: peruLongitud,
+  precision: z.coerce.number().min(0).max(5000).optional(),
+}).strict();
+export const locationReviewQuery = z.object({
+  estado: z.enum(['REVISAR', 'NO_ENCONTRADO', 'ERROR', 'PENDIENTE', 'LOCALIZADO', 'VERIFICADO']).optional(),
+  buscar: z.string().trim().max(100).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(5).max(50).default(20),
+}).strict();

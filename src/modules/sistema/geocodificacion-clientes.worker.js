@@ -3,6 +3,7 @@ import { logger } from '#core/config/logger.js';
 import {
   geocodePendingClients,
 } from './geocodificacion-clientes.service.js';
+import { tamanoMaximoLote } from './geocodificacion-proveedores.js';
 
 const WORKER_ENABLED =
   String(
@@ -14,8 +15,12 @@ const BATCH_SIZE = Math.min(
     Number(process.env.GEOCODING_BATCH_SIZE) || 5,
     1
   ),
-  20
+  tamanoMaximoLote()
 );
+
+// Si el lote salió completo hay más clientes en cola: se continúa casi de
+// inmediato en vez de esperar todo el intervalo.
+const CONTINUAR_MS = 2000;
 
 const INTERVAL_MS = Math.max(
   Number(process.env.GEOCODING_INTERVAL_MS) || 30000,
@@ -39,17 +44,30 @@ async function executeCycle() {
   }
 
   processing = true;
+  let siguienteMs = INTERVAL_MS;
 
   try {
     const result = await geocodePendingClients({
       limit: BATCH_SIZE,
     });
 
+    // Con el servidor público de OpenStreetMap se mantiene siempre el ritmo
+    // lento; solo un proveedor con clave (o servidor propio) avanza rápido.
+    if (
+      tamanoMaximoLote() > 20
+      && !result.detenido
+      && result.procesados >= BATCH_SIZE
+    ) {
+      siguienteMs = CONTINUAR_MS;
+    }
+
     if (result.procesados > 0) {
       logger.info(
         {
           procesados: result.procesados,
           localizados: result.localizados,
+          revisar: result.revisar,
+          reutilizados: result.reutilizados,
           no_encontrados: result.no_encontrados,
           errores: result.errores,
         },
@@ -66,18 +84,18 @@ async function executeCycle() {
   } finally {
     processing = false;
 
-    scheduleNext();
+    scheduleNext(siguienteMs);
   }
 }
 
-function scheduleNext() {
+function scheduleNext(delayMs = INTERVAL_MS) {
   if (!started) {
     return;
   }
 
   timer = setTimeout(
     executeCycle,
-    INTERVAL_MS
+    delayMs
   );
 }
 

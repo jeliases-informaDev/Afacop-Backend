@@ -145,6 +145,11 @@ exports.Prisma.ClienteScalarFieldEnum = {
   estado_geocodificacion: 'estado_geocodificacion',
   precision_geocodificacion: 'precision_geocodificacion',
   fecha_geocodificacion: 'fecha_geocodificacion',
+  confianza_geocodificacion: 'confianza_geocodificacion',
+  direccion_geocodificada: 'direccion_geocodificada',
+  ubicacion_verificada_en: 'ubicacion_verificada_en',
+  ubicacion_verificada_origen: 'ubicacion_verificada_origen',
+  ubicacion_verificada_por: 'ubicacion_verificada_por',
   datos_adicionales: 'datos_adicionales'
 };
 

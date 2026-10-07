@@ -1,4 +1,5 @@
 import campoService from './campo.service.js';
+import ubicacionesService from '#modules/clientes/ubicaciones.service.js';
 
 function emit(req, event, data) { const io = req.app.get('io'); if (!io) return; ['ADMINISTRADOR', 'GERENTE', 'SUPERVISOR'].forEach(role => io.to(`role:${role}`).emit(event, data)); if (req.user.id_asesor) io.to(`advisor:${req.user.id_asesor}`).emit(event, data); }
 function handle(res, next, error) { if (error.statusCode) return res.status(error.statusCode).json({ error: error.message, code: error.code }); next(error); }
@@ -9,4 +10,5 @@ async function ubicacion(req, res, next) { try { const data = await campoService
 async function estadoRuta(req, res, next) { try { const data = await campoService.setRouteStatus(req.user.id_asesor, req.params.id, req.body.estado); if (!data) return res.status(404).json({ error: 'Ruta no encontrada.' }); emit(req, req.body.estado === 'EN_PROCESO' ? 'journey_started' : 'journey_finished', { id_ruta: data.id_ruta, id_asesor: req.user.id_asesor, estado: data.estado }); res.json({ data }); } catch (e) { handle(res, next, e); } }
 async function presignEvidence(req, res, next) { try { res.json({ data: await campoService.createEvidenceUpload(req.user.id_asesor, req.body) }); } catch (e) { handle(res, next, e); } }
 async function visita(req, res, next) { try { const data = await campoService.registerVisit(req.user.id_asesor, req.body); const realtimeData = { id_visita: data.id_visita, cliente_id: data.id_cliente, asesor_id: req.user.id_asesor, tipificacion: data.resultado, tiene_foto: true, tiene_foto_adicional: true, tiene_firma: true }; if (!data._already_synced) { emit(req, 'ficha_completed', realtimeData); emit(req, 'evidence_created', realtimeData); } res.status(data._already_synced ? 200 : 201).json({ mensaje: data._already_synced ? 'La gestión ya estaba sincronizada.' : 'Gestión y evidencias sincronizadas correctamente.', data }); } catch (e) { handle(res, next, e); } }
-export default { resumen, rutaHoy, clientes, ubicacion, estadoRuta, presignEvidence, visita };
+async function confirmarUbicacionCliente(req, res, next) { try { const data = await ubicacionesService.confirmarUbicacionCampo({ idAsesor: req.user.id_asesor, idCliente: req.validated.params.id, latitud: req.body.latitud, longitud: req.body.longitud, precision: req.body.precision, actorId: req.user.id }); res.json({ data }); } catch (e) { handle(res, next, e); } }
+export default { resumen, rutaHoy, clientes, ubicacion, estadoRuta, presignEvidence, visita, confirmarUbicacionCliente };

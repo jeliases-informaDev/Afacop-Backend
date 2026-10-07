@@ -51,6 +51,13 @@ model Cliente {
   estado_geocodificacion    String?   @db.VarChar(30)
   precision_geocodificacion String?   @db.VarChar(30)
   fecha_geocodificacion     DateTime? @db.Timestamptz
+  confianza_geocodificacion String?   @db.VarChar(10)
+  direccion_geocodificada   String?   @db.VarChar(400)
+
+  // Verificación humana (panel web) o de campo (asesor) de la ubicación
+  ubicacion_verificada_en     DateTime? @db.Timestamptz
+  ubicacion_verificada_origen String?   @db.VarChar(10)
+  ubicacion_verificada_por    String?   @db.Uuid
 
   // Cualquier campo extra proveniente del Excel
   datos_adicionales Json?
@@ -68,6 +75,7 @@ model Cliente {
   @@index([latitud, longitud])
   @@index([estado_geocodificacion])
   @@index([ubigeo])
+  @@index([direccion_normalizada], map: "clientes_direccion_normalizada_idx")
   @@map("clientes")
 }
 
