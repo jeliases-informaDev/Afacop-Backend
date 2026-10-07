@@ -37,22 +37,55 @@ function mapearCliente(cliente, centros) {
   };
 }
 
+// "Precisas" = ubicadas con confianza alta (o con coordenadas que trajo el Excel).
+// "Aproximadas" = ubicadas, pero solo a nivel de calle o zona: sirven para ver la
+// zona en el mapa y no necesitan revisión; la navegación usa la dirección escrita.
+const ES_PRECISA = {
+  OR: [{ confianza_geocodificacion: 'ALTA' }, { precision_geocodificacion: 'IMPORTADA' }],
+};
+
+function filtroEstado(estado) {
+  if (estado === 'PRECISAS') {
+    return { AND: [{ estado_geocodificacion: 'LOCALIZADO' }, ES_PRECISA] };
+  }
+  if (estado === 'APROXIMADAS') {
+    return {
+      AND: [
+        { estado_geocodificacion: 'LOCALIZADO' },
+        {
+          OR: [
+            { confianza_geocodificacion: { in: ['MEDIA', 'BAJA'] } },
+            {
+              AND: [
+                { confianza_geocodificacion: null },
+                { OR: [{ precision_geocodificacion: null }, { precision_geocodificacion: { not: 'IMPORTADA' } }] },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+  }
+  return { estado_geocodificacion: estado ? estado : { in: ESTADOS_REVISION } };
+}
+
 async function listarRevision({ estado, buscar, page, limit }) {
-  const where = {
-    estado_geocodificacion: estado ? estado : { in: ESTADOS_REVISION },
-  };
+  const condiciones = [filtroEstado(estado)];
   const termino = String(buscar ?? '').trim();
   if (termino) {
-    where.OR = [
-      { numero_documento: { contains: termino, mode: 'insensitive' } },
-      { nombres: { contains: termino, mode: 'insensitive' } },
-      { apellido_paterno: { contains: termino, mode: 'insensitive' } },
-      { apellido_materno: { contains: termino, mode: 'insensitive' } },
-      { direccion: { contains: termino, mode: 'insensitive' } },
-    ];
+    condiciones.push({
+      OR: [
+        { numero_documento: { contains: termino, mode: 'insensitive' } },
+        { nombres: { contains: termino, mode: 'insensitive' } },
+        { apellido_paterno: { contains: termino, mode: 'insensitive' } },
+        { apellido_materno: { contains: termino, mode: 'insensitive' } },
+        { direccion: { contains: termino, mode: 'insensitive' } },
+      ],
+    });
   }
+  const where = { AND: condiciones };
 
-  const [total, clientes, resumenBruto] = await Promise.all([
+  const [total, clientes, resumenBruto, precisas, aproximadas] = await Promise.all([
     prisma.cliente.count({ where }),
     prisma.cliente.findMany({
       where,
@@ -83,6 +116,8 @@ async function listarRevision({ estado, buscar, page, limit }) {
       by: ['estado_geocodificacion'],
       _count: { _all: true },
     }),
+    prisma.cliente.count({ where: filtroEstado('PRECISAS') }),
+    prisma.cliente.count({ where: filtroEstado('APROXIMADAS') }),
   ]);
 
   // Centro aproximado de cada distrito (promedio de clientes ya ubicados),
@@ -116,6 +151,8 @@ async function listarRevision({ estado, buscar, page, limit }) {
   for (const fila of resumenBruto) {
     resumen[fila.estado_geocodificacion ?? 'SIN_ESTADO'] = fila._count._all;
   }
+  resumen.PRECISAS = precisas;
+  resumen.APROXIMADAS = aproximadas;
 
   return {
     items: clientes.map(cliente => mapearCliente(cliente, centros)),
@@ -250,8 +287,10 @@ async function confirmarUbicacionCampo({ idAsesor, idCliente, latitud, longitud,
     throw errorOperativo('El cliente no está asignado a tu cartera ni a tu ruta.', 403, 'CLIENT_NOT_ASSIGNED');
   }
 
+  // Los clientes con exactamente la misma dirección comparten domicilio: lo que
+  // el asesor confirma en la puerta les sirve a todos.
   return guardarUbicacion({
-    idCliente, latitud, longitud, actorId, origen: 'CAMPO', aplicarMismaDireccion: false,
+    idCliente, latitud, longitud, actorId, origen: 'CAMPO', aplicarMismaDireccion: true,
   });
 }
 

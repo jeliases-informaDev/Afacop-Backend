@@ -1,6 +1,6 @@
 import prisma from '#core/config/prisma.js';
 import { logger } from '#core/config/logger.js';
-import { estadoSegunConfianza } from './geocodificacion-direcciones.js';
+import { estadoSegunResultado } from './geocodificacion-direcciones.js';
 import {
   geocodificarDireccion,
   pausaEntreConsultasMs,
@@ -69,6 +69,7 @@ export async function geocodePendingClients({
   });
 
   let localizados = 0;
+  let aproximados = 0;
   let revisar = 0;
   let noEncontrados = 0;
   let reutilizados = 0;
@@ -116,7 +117,7 @@ export async function geocodePendingClients({
         });
         noEncontrados++;
       } else {
-        const estado = estadoSegunConfianza(result.confianza);
+        const estado = estadoSegunResultado(result);
 
         await prisma.cliente.update({
           where: { id_cliente: client.id_cliente },
@@ -132,8 +133,9 @@ export async function geocodePendingClients({
           },
         });
 
-        if (estado === 'LOCALIZADO') localizados++;
-        else revisar++;
+        if (estado === 'REVISAR') revisar++;
+        else if (result.confianza === 'ALTA') localizados++;
+        else aproximados++;
       }
     } catch (error) {
       if (error.detenerLote) {
@@ -173,8 +175,9 @@ export async function geocodePendingClients({
 
   return {
     proveedor,
-    procesados: localizados + revisar + noEncontrados + reutilizados + errores,
+    procesados: localizados + aproximados + revisar + noEncontrados + reutilizados + errores,
     localizados,
+    aproximados,
     revisar,
     no_encontrados: noEncontrados,
     reutilizados,

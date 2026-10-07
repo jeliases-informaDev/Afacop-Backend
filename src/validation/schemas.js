@@ -124,7 +124,7 @@ export const clientLocationFieldBody = z.object({
   precision: z.coerce.number().min(0).max(5000).optional(),
 }).strict();
 export const locationReviewQuery = z.object({
-  estado: z.enum(['REVISAR', 'NO_ENCONTRADO', 'ERROR', 'PENDIENTE', 'LOCALIZADO', 'VERIFICADO']).optional(),
+  estado: z.enum(['REVISAR', 'NO_ENCONTRADO', 'ERROR', 'PENDIENTE', 'LOCALIZADO', 'VERIFICADO', 'PRECISAS', 'APROXIMADAS']).optional(),
   buscar: z.string().trim().max(100).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(5).max(50).default(20),

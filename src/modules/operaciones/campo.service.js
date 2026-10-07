@@ -11,7 +11,7 @@ function requireAdvisor(id) {
 }
 
 //Se agregan campos correctos de la tabla clientes 
-const clientSelect = { id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true, telefono: true, direccion: true, distrito: true, deuda_castigada: true, deuda_vigente: true, otras_deudas: true, ultima_gestion: true, latitud: true, longitud: true };
+const clientSelect = { id_cliente: true, tipo_documento: true, numero_documento: true, nombres: true, apellido_paterno: true, apellido_materno: true, telefono: true, direccion: true, distrito: true, deuda_castigada: true, deuda_vigente: true, otras_deudas: true, ultima_gestion: true, latitud: true, longitud: true, provincia: true, departamento: true, estado_geocodificacion: true, confianza_geocodificacion: true, precision_geocodificacion: true };
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 // Compatibilidad temporal: versiones de la app instaladas antes de este cambio

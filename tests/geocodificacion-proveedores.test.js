@@ -123,3 +123,18 @@ test('La pausa y el tamaño de lote dependen del proveedor y de la configuració
   assert.equal(tamanoMaximoLote('mapbox'), 500);
   assert.equal(tamanoMaximoLote('nominatim'), 500);
 });
+
+test('Un resultado a nivel de ciudad no se guarda como ubicación', async () => {
+  simularRed([{ status: 200, body: [{ lat: '-12.04', lon: '-77.04', addresstype: 'city', display_name: 'Lima', address: { city: 'Lima' } }] }]);
+  const resultado = await geocodificarDireccion(
+    { direccion: 'Lima', direccion_normalizada: 'Lima, Perú', distrito: 'Lima', provincia: 'Lima' },
+    { proveedor: 'nominatim' },
+  );
+  assert.equal(resultado, null);
+});
+
+test('El resultado indica si coincide con el distrito declarado', async () => {
+  simularRed([{ status: 200, body: { features: [featureTecho] } }]);
+  const resultado = await geocodificarDireccion(cliente, { proveedor: 'mapbox' });
+  assert.equal(resultado.distritoCoincide, true);
+});
