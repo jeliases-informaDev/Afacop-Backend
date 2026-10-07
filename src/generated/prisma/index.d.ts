@@ -2292,6 +2292,11 @@ export namespace Prisma {
     estado_geocodificacion: string | null
     precision_geocodificacion: string | null
     fecha_geocodificacion: Date | null
+    confianza_geocodificacion: string | null
+    direccion_geocodificada: string | null
+    ubicacion_verificada_en: Date | null
+    ubicacion_verificada_origen: string | null
+    ubicacion_verificada_por: string | null
   }
 
   export type ClienteMaxAggregateOutputType = {
@@ -2319,6 +2324,11 @@ export namespace Prisma {
     estado_geocodificacion: string | null
     precision_geocodificacion: string | null
     fecha_geocodificacion: Date | null
+    confianza_geocodificacion: string | null
+    direccion_geocodificada: string | null
+    ubicacion_verificada_en: Date | null
+    ubicacion_verificada_origen: string | null
+    ubicacion_verificada_por: string | null
   }
 
   export type ClienteCountAggregateOutputType = {
@@ -2346,6 +2356,11 @@ export namespace Prisma {
     estado_geocodificacion: number
     precision_geocodificacion: number
     fecha_geocodificacion: number
+    confianza_geocodificacion: number
+    direccion_geocodificada: number
+    ubicacion_verificada_en: number
+    ubicacion_verificada_origen: number
+    ubicacion_verificada_por: number
     datos_adicionales: number
     _all: number
   }
@@ -2396,6 +2411,11 @@ export namespace Prisma {
     estado_geocodificacion?: true
     precision_geocodificacion?: true
     fecha_geocodificacion?: true
+    confianza_geocodificacion?: true
+    direccion_geocodificada?: true
+    ubicacion_verificada_en?: true
+    ubicacion_verificada_origen?: true
+    ubicacion_verificada_por?: true
   }
 
   export type ClienteMaxAggregateInputType = {
@@ -2423,6 +2443,11 @@ export namespace Prisma {
     estado_geocodificacion?: true
     precision_geocodificacion?: true
     fecha_geocodificacion?: true
+    confianza_geocodificacion?: true
+    direccion_geocodificada?: true
+    ubicacion_verificada_en?: true
+    ubicacion_verificada_origen?: true
+    ubicacion_verificada_por?: true
   }
 
   export type ClienteCountAggregateInputType = {
@@ -2450,6 +2475,11 @@ export namespace Prisma {
     estado_geocodificacion?: true
     precision_geocodificacion?: true
     fecha_geocodificacion?: true
+    confianza_geocodificacion?: true
+    direccion_geocodificada?: true
+    ubicacion_verificada_en?: true
+    ubicacion_verificada_origen?: true
+    ubicacion_verificada_por?: true
     datos_adicionales?: true
     _all?: true
   }
@@ -2565,6 +2595,11 @@ export namespace Prisma {
     estado_geocodificacion: string | null
     precision_geocodificacion: string | null
     fecha_geocodificacion: Date | null
+    confianza_geocodificacion: string | null
+    direccion_geocodificada: string | null
+    ubicacion_verificada_en: Date | null
+    ubicacion_verificada_origen: string | null
+    ubicacion_verificada_por: string | null
     datos_adicionales: JsonValue | null
     _count: ClienteCountAggregateOutputType | null
     _avg: ClienteAvgAggregateOutputType | null
@@ -2612,6 +2647,11 @@ export namespace Prisma {
     estado_geocodificacion?: boolean
     precision_geocodificacion?: boolean
     fecha_geocodificacion?: boolean
+    confianza_geocodificacion?: boolean
+    direccion_geocodificada?: boolean
+    ubicacion_verificada_en?: boolean
+    ubicacion_verificada_origen?: boolean
+    ubicacion_verificada_por?: boolean
     datos_adicionales?: boolean
     admisiones?: boolean | Cliente$admisionesArgs<ExtArgs>
     asignaciones?: boolean | Cliente$asignacionesArgs<ExtArgs>
@@ -2645,6 +2685,11 @@ export namespace Prisma {
     estado_geocodificacion?: boolean
     precision_geocodificacion?: boolean
     fecha_geocodificacion?: boolean
+    confianza_geocodificacion?: boolean
+    direccion_geocodificada?: boolean
+    ubicacion_verificada_en?: boolean
+    ubicacion_verificada_origen?: boolean
+    ubicacion_verificada_por?: boolean
     datos_adicionales?: boolean
   }, ExtArgs["result"]["cliente"]>
 
@@ -2673,6 +2718,11 @@ export namespace Prisma {
     estado_geocodificacion?: boolean
     precision_geocodificacion?: boolean
     fecha_geocodificacion?: boolean
+    confianza_geocodificacion?: boolean
+    direccion_geocodificada?: boolean
+    ubicacion_verificada_en?: boolean
+    ubicacion_verificada_origen?: boolean
+    ubicacion_verificada_por?: boolean
     datos_adicionales?: boolean
   }, ExtArgs["result"]["cliente"]>
 
@@ -2701,10 +2751,15 @@ export namespace Prisma {
     estado_geocodificacion?: boolean
     precision_geocodificacion?: boolean
     fecha_geocodificacion?: boolean
+    confianza_geocodificacion?: boolean
+    direccion_geocodificada?: boolean
+    ubicacion_verificada_en?: boolean
+    ubicacion_verificada_origen?: boolean
+    ubicacion_verificada_por?: boolean
     datos_adicionales?: boolean
   }
 
-  export type ClienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_cliente" | "tipo_documento" | "numero_documento" | "telefono" | "nombres" | "apellido_paterno" | "apellido_materno" | "direccion" | "direccion_normalizada" | "provincia" | "departamento" | "ubigeo" | "distrito" | "deuda_castigada" | "deuda_cliente" | "deuda_vigente" | "otras_deudas" | "estado" | "ultima_gestion" | "latitud" | "longitud" | "estado_geocodificacion" | "precision_geocodificacion" | "fecha_geocodificacion" | "datos_adicionales", ExtArgs["result"]["cliente"]>
+  export type ClienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_cliente" | "tipo_documento" | "numero_documento" | "telefono" | "nombres" | "apellido_paterno" | "apellido_materno" | "direccion" | "direccion_normalizada" | "provincia" | "departamento" | "ubigeo" | "distrito" | "deuda_castigada" | "deuda_cliente" | "deuda_vigente" | "otras_deudas" | "estado" | "ultima_gestion" | "latitud" | "longitud" | "estado_geocodificacion" | "precision_geocodificacion" | "fecha_geocodificacion" | "confianza_geocodificacion" | "direccion_geocodificada" | "ubicacion_verificada_en" | "ubicacion_verificada_origen" | "ubicacion_verificada_por" | "datos_adicionales", ExtArgs["result"]["cliente"]>
   export type ClienteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     admisiones?: boolean | Cliente$admisionesArgs<ExtArgs>
     asignaciones?: boolean | Cliente$asignacionesArgs<ExtArgs>
@@ -2748,6 +2803,11 @@ export namespace Prisma {
       estado_geocodificacion: string | null
       precision_geocodificacion: string | null
       fecha_geocodificacion: Date | null
+      confianza_geocodificacion: string | null
+      direccion_geocodificada: string | null
+      ubicacion_verificada_en: Date | null
+      ubicacion_verificada_origen: string | null
+      ubicacion_verificada_por: string | null
       datos_adicionales: Prisma.JsonValue | null
     }, ExtArgs["result"]["cliente"]>
     composites: {}
@@ -3200,6 +3260,11 @@ export namespace Prisma {
     readonly estado_geocodificacion: FieldRef<"Cliente", 'String'>
     readonly precision_geocodificacion: FieldRef<"Cliente", 'String'>
     readonly fecha_geocodificacion: FieldRef<"Cliente", 'DateTime'>
+    readonly confianza_geocodificacion: FieldRef<"Cliente", 'String'>
+    readonly direccion_geocodificada: FieldRef<"Cliente", 'String'>
+    readonly ubicacion_verificada_en: FieldRef<"Cliente", 'DateTime'>
+    readonly ubicacion_verificada_origen: FieldRef<"Cliente", 'String'>
+    readonly ubicacion_verificada_por: FieldRef<"Cliente", 'String'>
     readonly datos_adicionales: FieldRef<"Cliente", 'Json'>
   }
     
@@ -18307,6 +18372,11 @@ export namespace Prisma {
     estado_geocodificacion: 'estado_geocodificacion',
     precision_geocodificacion: 'precision_geocodificacion',
     fecha_geocodificacion: 'fecha_geocodificacion',
+    confianza_geocodificacion: 'confianza_geocodificacion',
+    direccion_geocodificada: 'direccion_geocodificada',
+    ubicacion_verificada_en: 'ubicacion_verificada_en',
+    ubicacion_verificada_origen: 'ubicacion_verificada_origen',
+    ubicacion_verificada_por: 'ubicacion_verificada_por',
     datos_adicionales: 'datos_adicionales'
   };
 
@@ -18720,6 +18790,11 @@ export namespace Prisma {
     estado_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
     precision_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
     fecha_geocodificacion?: DateTimeNullableFilter<"Cliente"> | Date | string | null
+    confianza_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
+    direccion_geocodificada?: StringNullableFilter<"Cliente"> | string | null
+    ubicacion_verificada_en?: DateTimeNullableFilter<"Cliente"> | Date | string | null
+    ubicacion_verificada_origen?: StringNullableFilter<"Cliente"> | string | null
+    ubicacion_verificada_por?: UuidNullableFilter<"Cliente"> | string | null
     datos_adicionales?: JsonNullableFilter<"Cliente">
     admisiones?: AdmisionListRelationFilter
     asignaciones?: AsignacionClienteListRelationFilter
@@ -18752,6 +18827,11 @@ export namespace Prisma {
     estado_geocodificacion?: SortOrderInput | SortOrder
     precision_geocodificacion?: SortOrderInput | SortOrder
     fecha_geocodificacion?: SortOrderInput | SortOrder
+    confianza_geocodificacion?: SortOrderInput | SortOrder
+    direccion_geocodificada?: SortOrderInput | SortOrder
+    ubicacion_verificada_en?: SortOrderInput | SortOrder
+    ubicacion_verificada_origen?: SortOrderInput | SortOrder
+    ubicacion_verificada_por?: SortOrderInput | SortOrder
     datos_adicionales?: SortOrderInput | SortOrder
     admisiones?: AdmisionOrderByRelationAggregateInput
     asignaciones?: AsignacionClienteOrderByRelationAggregateInput
@@ -18788,6 +18868,11 @@ export namespace Prisma {
     estado_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
     precision_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
     fecha_geocodificacion?: DateTimeNullableFilter<"Cliente"> | Date | string | null
+    confianza_geocodificacion?: StringNullableFilter<"Cliente"> | string | null
+    direccion_geocodificada?: StringNullableFilter<"Cliente"> | string | null
+    ubicacion_verificada_en?: DateTimeNullableFilter<"Cliente"> | Date | string | null
+    ubicacion_verificada_origen?: StringNullableFilter<"Cliente"> | string | null
+    ubicacion_verificada_por?: UuidNullableFilter<"Cliente"> | string | null
     datos_adicionales?: JsonNullableFilter<"Cliente">
     admisiones?: AdmisionListRelationFilter
     asignaciones?: AsignacionClienteListRelationFilter
@@ -18820,6 +18905,11 @@ export namespace Prisma {
     estado_geocodificacion?: SortOrderInput | SortOrder
     precision_geocodificacion?: SortOrderInput | SortOrder
     fecha_geocodificacion?: SortOrderInput | SortOrder
+    confianza_geocodificacion?: SortOrderInput | SortOrder
+    direccion_geocodificada?: SortOrderInput | SortOrder
+    ubicacion_verificada_en?: SortOrderInput | SortOrder
+    ubicacion_verificada_origen?: SortOrderInput | SortOrder
+    ubicacion_verificada_por?: SortOrderInput | SortOrder
     datos_adicionales?: SortOrderInput | SortOrder
     _count?: ClienteCountOrderByAggregateInput
     _avg?: ClienteAvgOrderByAggregateInput
@@ -18856,6 +18946,11 @@ export namespace Prisma {
     estado_geocodificacion?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
     precision_geocodificacion?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
     fecha_geocodificacion?: DateTimeNullableWithAggregatesFilter<"Cliente"> | Date | string | null
+    confianza_geocodificacion?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
+    direccion_geocodificada?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
+    ubicacion_verificada_en?: DateTimeNullableWithAggregatesFilter<"Cliente"> | Date | string | null
+    ubicacion_verificada_origen?: StringNullableWithAggregatesFilter<"Cliente"> | string | null
+    ubicacion_verificada_por?: UuidNullableWithAggregatesFilter<"Cliente"> | string | null
     datos_adicionales?: JsonNullableWithAggregatesFilter<"Cliente">
   }
 
@@ -20055,6 +20150,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteCreateNestedManyWithoutClienteInput
@@ -20087,6 +20187,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteUncheckedCreateNestedManyWithoutClienteInput
@@ -20118,6 +20223,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUpdateManyWithoutClienteNestedInput
@@ -20150,6 +20260,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUncheckedUpdateManyWithoutClienteNestedInput
@@ -20182,6 +20297,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -20209,6 +20329,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -20237,6 +20362,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -21645,6 +21775,18 @@ export namespace Prisma {
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
   }
+
+  export type UuidNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
+  }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -21744,6 +21886,11 @@ export namespace Prisma {
     estado_geocodificacion?: SortOrder
     precision_geocodificacion?: SortOrder
     fecha_geocodificacion?: SortOrder
+    confianza_geocodificacion?: SortOrder
+    direccion_geocodificada?: SortOrder
+    ubicacion_verificada_en?: SortOrder
+    ubicacion_verificada_origen?: SortOrder
+    ubicacion_verificada_por?: SortOrder
     datos_adicionales?: SortOrder
   }
 
@@ -21782,6 +21929,11 @@ export namespace Prisma {
     estado_geocodificacion?: SortOrder
     precision_geocodificacion?: SortOrder
     fecha_geocodificacion?: SortOrder
+    confianza_geocodificacion?: SortOrder
+    direccion_geocodificada?: SortOrder
+    ubicacion_verificada_en?: SortOrder
+    ubicacion_verificada_origen?: SortOrder
+    ubicacion_verificada_por?: SortOrder
   }
 
   export type ClienteMinOrderByAggregateInput = {
@@ -21809,6 +21961,11 @@ export namespace Prisma {
     estado_geocodificacion?: SortOrder
     precision_geocodificacion?: SortOrder
     fecha_geocodificacion?: SortOrder
+    confianza_geocodificacion?: SortOrder
+    direccion_geocodificada?: SortOrder
+    ubicacion_verificada_en?: SortOrder
+    ubicacion_verificada_origen?: SortOrder
+    ubicacion_verificada_por?: SortOrder
   }
 
   export type ClienteSumOrderByAggregateInput = {
@@ -21927,6 +22084,21 @@ export namespace Prisma {
     _sum?: NestedDecimalNullableFilter<$PrismaModel>
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -22512,18 +22684,6 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type UuidNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
-  }
-
   export type AuditoriaSeguridadCountOrderByAggregateInput = {
     id_auditoria?: SortOrder
     fecha?: SortOrder
@@ -22575,21 +22735,6 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadSumOrderByAggregateInput = {
     estado_http?: SortOrder
-  }
-
-  export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type ImportacionMasivaCountOrderByAggregateInput = {
@@ -23647,6 +23792,17 @@ export namespace Prisma {
     not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
   }
 
+  export type NestedUuidNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -23774,6 +23930,20 @@ export namespace Prisma {
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
+
+  export type NestedUuidNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -23886,31 +24056,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type NestedUuidNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedUuidNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type AdmisionCreateWithoutClienteInput = {
@@ -24208,6 +24353,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     asignaciones?: AsignacionClienteCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteCreateNestedManyWithoutClienteInput
@@ -24239,6 +24389,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     asignaciones?: AsignacionClienteUncheckedCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteUncheckedCreateNestedManyWithoutClienteInput
@@ -24285,6 +24440,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     asignaciones?: AsignacionClienteUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUpdateManyWithoutClienteNestedInput
@@ -24316,6 +24476,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     asignaciones?: AsignacionClienteUncheckedUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUncheckedUpdateManyWithoutClienteNestedInput
@@ -24635,6 +24800,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteCreateNestedManyWithoutClienteInput
@@ -24666,6 +24836,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedCreateNestedManyWithoutClienteInput
     rutas_clientes?: RutaClienteUncheckedCreateNestedManyWithoutClienteInput
@@ -24754,6 +24929,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUpdateManyWithoutClienteNestedInput
@@ -24785,6 +24965,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedUpdateManyWithoutClienteNestedInput
     rutas_clientes?: RutaClienteUncheckedUpdateManyWithoutClienteNestedInput
@@ -25026,6 +25211,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteCreateNestedManyWithoutClienteInput
@@ -25057,6 +25247,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteUncheckedCreateNestedManyWithoutClienteInput
@@ -25194,6 +25389,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUpdateManyWithoutClienteNestedInput
@@ -25225,6 +25425,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUncheckedUpdateManyWithoutClienteNestedInput
@@ -25297,6 +25502,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteCreateNestedManyWithoutClienteInput
@@ -25328,6 +25538,11 @@ export namespace Prisma {
     estado_geocodificacion?: string | null
     precision_geocodificacion?: string | null
     fecha_geocodificacion?: Date | string | null
+    confianza_geocodificacion?: string | null
+    direccion_geocodificada?: string | null
+    ubicacion_verificada_en?: Date | string | null
+    ubicacion_verificada_origen?: string | null
+    ubicacion_verificada_por?: string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedCreateNestedManyWithoutClienteInput
     asignaciones?: AsignacionClienteUncheckedCreateNestedManyWithoutClienteInput
@@ -25448,6 +25663,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUpdateManyWithoutClienteNestedInput
@@ -25479,6 +25699,11 @@ export namespace Prisma {
     estado_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     precision_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
     fecha_geocodificacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confianza_geocodificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_geocodificada?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_verificada_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    ubicacion_verificada_por?: NullableStringFieldUpdateOperationsInput | string | null
     datos_adicionales?: NullableJsonNullValueInput | InputJsonValue
     admisiones?: AdmisionUncheckedUpdateManyWithoutClienteNestedInput
     asignaciones?: AsignacionClienteUncheckedUpdateManyWithoutClienteNestedInput

@@ -50,6 +50,8 @@ async function executeCycle() {
         {
           procesados: result.procesados,
           localizados: result.localizados,
+          revisar: result.revisar,
+          reutilizados: result.reutilizados,
           no_encontrados: result.no_encontrados,
           errores: result.errores,
         },
