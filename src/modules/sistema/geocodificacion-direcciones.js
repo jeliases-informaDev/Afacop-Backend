@@ -3,13 +3,15 @@ const TIPOS_CALLE = ['road', 'street', 'pedestrian', 'residential'];
 const TIPOS_ZONA = ['suburb', 'neighbourhood', 'quarter', 'city_district'];
 const TIPOS_CIUDAD = ['city', 'town', 'municipality', 'province'];
 
+// Cada abreviatura se reconoce con punto (aunque venga pegada: "Av.Petit Thouars")
+// o sin punto seguida de espacio. El reemplazo lleva un espacio al final.
 const ABREVIATURAS = [
-  [/\bAV(?:DA?)?\.?(?=\s|$)/gi, 'Avenida'],
-  [/\bJR\.?(?=\s|$)/gi, 'Jirón'],
-  [/\bCA(?:L)?\.?(?=\s|$)/gi, 'Calle'],
-  [/\bPSJE?\.?(?=\s|$)/gi, 'Pasaje'],
-  [/\bURB\.?(?=\s|$)/gi, 'Urbanización'],
-  [/\bPROL\.?(?=\s|$)/gi, 'Prolongación'],
+  [/\bAV(?:DA?)?(?:\.\s*|(?=\s))/gi, 'Avenida '],
+  [/\bJR(?:\.\s*|(?=\s))/gi, 'Jirón '],
+  [/\bCAL?(?:\.\s*|(?=\s))/gi, 'Calle '],
+  [/\bPSJE?(?:\.\s*|(?=\s))/gi, 'Pasaje '],
+  [/\bURB(?:\.\s*|(?=\s))/gi, 'Urbanización '],
+  [/\bPROL(?:\.\s*|(?=\s))/gi, 'Prolongación '],
 ];
 const REFERENCIAS = /\b(?:REF|REFERENCIA|FRENTE A|CERCA A|CERCA DE|ALTURA DE|ESQ|ESQUINA|CRUCE)\b\.?:?.*$/i;
 const INTERIOR = /\b(?:DEPARTAMENTO|INTERIOR|DEPTO|DPTO|OFICINA|EDIFICIO|TIENDA|BLOCK|STAND|PUESTO|OFIC|PISO|EDIF|INT|DEP|BLQ|TDA|OF)\b/i;
@@ -137,6 +139,10 @@ export function mapearFeatureMapbox(feature) {
   };
 }
 
-export function estadoSegunConfianza(confianza) {
-  return confianza === 'ALTA' ? 'LOCALIZADO' : 'REVISAR';
+// Una ubicación aproximada es utilizable (sirve para ver la zona; la navegación usa
+// la dirección escrita) y NO requiere revisión: con miles de clientes por carga, la
+// revisión manual no puede ser el camino normal. Solo se marca "por revisar" lo
+// sospechoso: un punto que cae fuera del distrito declarado.
+export function estadoSegunResultado({ distritoCoincide }) {
+  return distritoCoincide === false ? 'REVISAR' : 'LOCALIZADO';
 }

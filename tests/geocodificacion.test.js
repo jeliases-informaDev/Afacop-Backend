@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   coincideDistrito,
-  estadoSegunConfianza,
+  estadoSegunResultado,
   evaluarResultado,
   limpiarDireccion,
   mapearFeatureMapbox,
@@ -56,15 +56,15 @@ test('un edificio con el número exacto y el distrito correcto es de confianza A
   const r = evaluarResultado({ item, numeroSolicitado: '1113', distritoEsperado: 'Lima' });
   assert.equal(r.precision, 'EXACTA');
   assert.equal(r.confianza, 'ALTA');
-  assert.equal(estadoSegunConfianza(r.confianza), 'LOCALIZADO');
+  assert.equal(estadoSegunResultado(r), 'LOCALIZADO');
 });
 
-test('mismo número pero dato dudoso (addresstype place, caso Petit Thouars) queda por revisar', () => {
+test('mismo número pero dato dudoso (addresstype place, caso Petit Thouars) queda como aproximado, sin pasar a revisión', () => {
   const item = { addresstype: 'place', address: { house_number: '1113', suburb: 'Santa Beatriz', city: 'Lima' } };
   const r = evaluarResultado({ item, numeroSolicitado: '1113', distritoEsperado: 'Lima' });
   assert.equal(r.precision, 'APROXIMADA');
   assert.equal(r.confianza, 'MEDIA');
-  assert.equal(estadoSegunConfianza(r.confianza), 'REVISAR');
+  assert.equal(estadoSegunResultado(r), 'LOCALIZADO');
 });
 
 test('un resultado en otro distrito baja la confianza a BAJA', () => {
@@ -110,7 +110,7 @@ test('Mapbox: punto de techo con número coincidente se trata como edificio y es
   assert.equal(r.confianza, 'ALTA');
 });
 
-test('Mapbox: una dirección interpolada o aproximada queda por revisar', () => {
+test('Mapbox: una dirección interpolada o aproximada queda como aproximada', () => {
   for (const accuracy of ['interpolated', 'approximate']) {
     const item = mapearFeatureMapbox(featureMapbox({
       feature_type: 'address',
@@ -120,7 +120,8 @@ test('Mapbox: una dirección interpolada o aproximada queda por revisar', () => 
     }));
     assert.equal(item.addresstype, 'place');
     const r = evaluarResultado({ item, numeroSolicitado: '1113', distritoEsperado: 'Lima' });
-    assert.equal(estadoSegunConfianza(r.confianza), 'REVISAR');
+    assert.equal(r.confianza, 'MEDIA');
+    assert.equal(estadoSegunResultado(r), 'LOCALIZADO');
   }
 });
 
@@ -140,4 +141,19 @@ test('Mapbox: calle, barrio y localidad se traducen a tipos de baja precisión',
   assert.equal(tipoDe('neighborhood'), 'neighbourhood');
   assert.equal(tipoDe('locality'), 'suburb');
   assert.equal(tipoDe('place'), 'city');
+});
+
+test('una ubicación fuera del distrito declarado es sospechosa y pasa a revisión', () => {
+  const item = { addresstype: 'building', address: { house_number: '1113', suburb: 'Lince', city: 'Lima' } };
+  const r = evaluarResultado({ item, numeroSolicitado: '1113', distritoEsperado: 'Miraflores' });
+  assert.equal(estadoSegunResultado(r), 'REVISAR');
+});
+
+test('limpiarDireccion expande abreviaturas aunque vengan pegadas al nombre (Av.Petit Thouars)', () => {
+  const a = limpiarDireccion('Av.Petit Thouars 1113');
+  assert.equal(a.calle, 'Avenida Petit Thouars');
+  assert.equal(a.numero, '1113');
+  const b = limpiarDireccion('Jr.28 de Julio 1250');
+  assert.equal(b.calle, 'Jirón 28 de Julio');
+  assert.equal(b.numero, '1250');
 });

@@ -200,11 +200,15 @@ export async function geocodificarDireccion(
     esManzanaLote: limpia.esManzanaLote,
   });
 
+  // Un punto a nivel de ciudad o provincia no sirve ni como aproximación.
+  if (evaluacion.precision === 'PROVINCIA') return null;
+
   return {
     latitud,
     longitud,
     precision: evaluacion.precision,
     confianza: evaluacion.confianza,
+    distritoCoincide: evaluacion.distritoCoincide,
     direccionEncontrada: item.display_name?.slice(0, 400) || null,
   };
 }

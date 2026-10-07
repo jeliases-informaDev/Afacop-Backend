@@ -1,14 +1,29 @@
 # Geocodificación de clientes
 
 Al importar clientes, cada dirección se ubica en el mapa en segundo plano. El resultado
-nunca se da por bueno solo porque exista: cada ubicación recibe un nivel de confianza.
+nunca se da por exacto solo porque exista: cada ubicación recibe un nivel de confianza.
 
-| Estado | Significado |
-|---|---|
-| `LOCALIZADO` | Confianza alta (número de casa y distrito coinciden con un punto exacto). |
-| `REVISAR` | Se encontró un punto, pero es dudoso. Se corrige en **Clientes → Revisar ubicaciones**. |
-| `NO_ENCONTRADO` / `ERROR` | Sin punto. Se coloca a mano en la misma pantalla. |
-| `VERIFICADO` | Lo confirmó una persona en el panel o el asesor en campo. No se vuelve a mover solo. |
+Las cargas son de miles de clientes, así que **la revisión manual no es el camino normal**.
+Lo aproximado se usa tal cual, y la corrección ocurre solo donde hace falta (al visitar).
+
+| Estado | Significado | ¿Hay que revisarla? |
+|---|---|---|
+| `LOCALIZADO`, confianza alta | Punto exacto (número de casa y distrito coinciden). | No. Pestaña "Precisas". |
+| `LOCALIZADO`, confianza media o baja | **Aproximada**: a nivel de calle o zona. Sirve para ver la zona en el mapa. | No. Pestaña "Aproximadas": se afina solo si hace falta. |
+| `REVISAR` | Sospechosa: el punto cae fuera del distrito declarado. | Sí, si se va a visitar pronto. |
+| `NO_ENCONTRADO` / `ERROR` | Sin punto. | Solo al visitar: el asesor navega por la dirección escrita y confirma al llegar. |
+| `VERIFICADO` | Lo confirmó una persona en el panel o el asesor en campo. No se vuelve a mover solo. | No. |
+
+## Cómo se evita la revisión masiva
+
+- **El celular navega por la dirección escrita** cuando el punto no es confiable
+  (aproximado, por revisar o sin punto). Google entiende las direcciones de Lima mucho mejor
+  que el mapa abierto, así que el asesor no depende de un pin dudoso.
+- **El asesor confirma al llegar** ("Estoy en el domicilio"). Eso verifica el punto y lo
+  aplica a todos los clientes con exactamente la misma dirección.
+- **Lo verificado se conserva** en las cargas mensuales siguientes: solo se reinicia si
+  cambia la dirección. Cada mes quedan menos clientes por resolver.
+- Un resultado a nivel de ciudad o provincia no se guarda como ubicación.
 
 ## Proveedor
 

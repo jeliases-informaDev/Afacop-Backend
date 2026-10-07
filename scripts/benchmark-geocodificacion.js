@@ -9,7 +9,7 @@
 // modo temporal (gratis, sin tarjeta); --permanente usa el mismo modo que producción.
 import fs from 'node:fs';
 import 'dotenv/config';
-import { estadoSegunConfianza } from '../src/modules/sistema/geocodificacion-direcciones.js';
+import { estadoSegunResultado } from '../src/modules/sistema/geocodificacion-direcciones.js';
 import {
   geocodificarDireccion,
   pausaEntreConsultasMs,
@@ -100,7 +100,7 @@ for (const fila of filas) {
       } else {
         encontrados[proveedor] = resultado;
         cuenta[resultado.confianza]++;
-        linea = `${estadoSegunConfianza(resultado.confianza)} / confianza ${resultado.confianza} / ${resultado.precision}`
+        linea = `${estadoSegunResultado(resultado)} / confianza ${resultado.confianza} / ${resultado.precision}`
           + `  (${resultado.latitud.toFixed(5)}, ${resultado.longitud.toFixed(5)})`;
         if (real) {
           const error = metros(resultado, real);

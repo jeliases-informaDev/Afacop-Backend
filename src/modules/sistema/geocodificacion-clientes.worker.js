@@ -66,6 +66,7 @@ async function executeCycle() {
         {
           procesados: result.procesados,
           localizados: result.localizados,
+          aproximados: result.aproximados,
           revisar: result.revisar,
           reutilizados: result.reutilizados,
           no_encontrados: result.no_encontrados,
