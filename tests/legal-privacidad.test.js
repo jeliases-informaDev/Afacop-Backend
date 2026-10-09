@@ -1,16 +1,28 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { access, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import express from 'express';
+import helmet from 'helmet';
 import { createLegalRouter, tieneMarcadoresPendientes } from '../src/modules/sistema/legal.routes.js';
 
-async function conPolitica(contenido, prueba) {
+async function conPolitica(contenido, prueba, { conHelmet = false } = {}) {
   const carpeta = await mkdtemp(path.join(os.tmpdir(), 'politica-'));
   const archivo = path.join(carpeta, 'politica.html');
   if (contenido !== null) await writeFile(archivo, contenido, 'utf8');
   const app = express();
+  // Misma CSP global que src/server.js: la ruta debe poder reemplazarla para mostrar sus estilos.
+  if (conHelmet) {
+    app.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'none'"], frameAncestors: ["'none'"], baseUri: ["'none'"], formAction: ["'none'"],
+        },
+      },
+      crossOriginResourcePolicy: { policy: 'same-site' },
+    }));
+  }
   app.use('/privacidad', createLegalRouter({ archivoPolitica: archivo }));
   const servidor = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   try {
@@ -33,6 +45,18 @@ test('sirve la política completa como HTML público con una CSP que permite sus
     assert.match(respuesta.headers.get('cache-control'), /public/);
     assert.match(await respuesta.text(), /Política de Privacidad de Radar 360°/);
   });
+});
+
+test('con la CSP global de helmet por delante, la ruta deja ver los estilos y sigue sin permitir scripts ni marcos', async () => {
+  await conPolitica('<html><body>ok</body></html>', async base => {
+    const respuesta = await fetch(`${base}/privacidad/radar360`);
+    assert.equal(respuesta.status, 200);
+    const csp = respuesta.headers.get('content-security-policy');
+    assert.match(csp, /style-src 'unsafe-inline'/);
+    assert.match(csp, /frame-ancestors 'none'/);
+    assert.doesNotMatch(csp, /script-src/);
+    assert.equal(csp.split(';').filter(d => d.trim().startsWith('default-src')).length, 1);
+  }, { conHelmet: true });
 });
 
 test('no publica una política con datos por completar', async () => {
@@ -60,10 +84,13 @@ test('solo existe la ruta de la política de Radar 360°', async () => {
 
 test('detecta los marcadores pendientes', () => {
   assert.equal(tieneMarcadoresPendientes('<p><mark>[RUC]</mark></p>'), true);
-  assert.equal(tieneMarcadoresPendientes('<p>RUC 20123456789</p>'), false);
+  assert.equal(tieneMarcadoresPendientes('<p>RUC 20604919321</p>'), false);
 });
 
-test('el HTML de la política viene incluido en el repositorio', async () => {
-  const archivo = new URL('../src/assets/legal/politica-privacidad-radar360.html', import.meta.url);
-  await access(archivo);
+test('la política incluida en el repositorio está completa y lista para publicarse', async () => {
+  const html = await readFile(new URL('../src/assets/legal/politica-privacidad-radar360.html', import.meta.url), 'utf8');
+  assert.equal(tieneMarcadoresPendientes(html), false);
+  assert.match(html, /Política de Privacidad de Radar 360°/);
+  assert.match(html, /20604919321/);
+  assert.match(html, /serviciosdigitales@informaperu\.com/);
 });
