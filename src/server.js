@@ -43,6 +43,7 @@ import campoRoutes from '#modules/operaciones/campo.routes.js';
 import dashboardRoutes from '#modules/sistema/dashboard.routes.js';
 import importacionesRoutes from '#modules/sistema/importaciones.routes.js';
 import seguridadRoutes from '#modules/sistema/seguridad.routes.js';
+import legalRoutes from '#modules/sistema/legal.routes.js';
 import { resumePendingJobs } from '#modules/sistema/importaciones.service.js';
 
 //worker de geocodificacion
@@ -156,6 +157,9 @@ app.get('/health/live', (_req, res) => res.json({ status: 'ok' }));
 app.get('/health/ready', async (req, res, next) => {
   try { await prisma.$queryRaw`SELECT 1`; res.json({ status: 'ready' }); } catch (error) { error.statusCode = 503; next(error); }
 });
+
+// Páginas públicas (sin sesión): política de privacidad de la app móvil.
+app.use('/privacidad', legalRoutes);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/clientes', clientesRoutes);
