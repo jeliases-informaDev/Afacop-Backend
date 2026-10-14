@@ -11,7 +11,9 @@ let client;
 function configured() { return Boolean(env.B2_ENDPOINT && env.B2_REGION && env.B2_BUCKET && env.B2_KEY_ID && env.B2_APPLICATION_KEY); }
 function getClient() {
   if (!configured()) throw Object.assign(new Error('El almacenamiento de evidencias no está configurado.'), { statusCode: 503, code: 'EVIDENCE_STORAGE_NOT_CONFIGURED' });
-  if (!client) client = new S3Client({ endpoint: env.B2_ENDPOINT, region: env.B2_REGION, credentials: { accessKeyId: env.B2_KEY_ID, secretAccessKey: env.B2_APPLICATION_KEY }, forcePathStyle: true });
+  if (!client) client = new S3Client({ endpoint: env.B2_ENDPOINT, region: env.B2_REGION, credentials: { accessKeyId: env.B2_KEY_ID, secretAccessKey: env.B2_APPLICATION_KEY }, forcePathStyle: true,
+      // Compatibilidad con servidores S3 que no entienden los checksums por defecto del SDK nuevo (Oracle Object Storage, B2)
+      requestChecksumCalculation: 'WHEN_REQUIRED', responseChecksumValidation: 'WHEN_REQUIRED' });
   return client;
 }
 function expectedPrefix() { return 'evidencias/'; }
