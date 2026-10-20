@@ -1281,6 +1281,11 @@ export async function generarPdfEvaluacion(
     browser = await puppeteer.launch({
       headless: true,
 
+      // En el contenedor de produccion (Linux arm64) no existe el Chrome que descarga Puppeteer:
+      // la imagen instala el Chromium de Debian y lo indica con PUPPETEER_EXECUTABLE_PATH.
+      // En desarrollo la variable no existe y se usa el navegador descargado por Puppeteer.
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
