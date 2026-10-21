@@ -11,7 +11,6 @@ const router = Router();
 router.use(authMiddleware, roleMiddleware(OPERATIONAL_MANAGERS));
 router.get('/plantillas/clientes', downloadClientTemplate);
 router.post('/clientes', upload.single('file'), uploadType('CLIENTES'));
-router.post('/asesores', upload.single('file'), uploadType('ASESORES'));
 router.get('/:id', validate({ params: uuidParams }), getJob);
 
 router.post(

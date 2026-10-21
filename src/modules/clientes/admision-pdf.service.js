@@ -178,6 +178,7 @@ function formatEntidad(texto) {
     "bcp",
     "bbva",
     "oh",
+    "ibk",
   ]);
 
   return String(texto)
@@ -185,7 +186,8 @@ function formatEntidad(texto) {
     .toLowerCase()
     .split(/\s+/)
     .map((palabra, index) => {
-      if (siglas.has(palabra)) {
+      const limpia = palabra.replaceAll(".", "");
+      if (siglas.has(limpia)) {
         return palabra.toUpperCase();
       }
 
@@ -226,17 +228,17 @@ function colorCalificacion(calificacion) {
    CREACIÓN DEL HTML
 ========================================================= */
 
-function crearHtml(evaluacion) {
+function crearHtml(evaluacion = {}) {
   const rating =
-    evaluacion.rating ?? {};
+    evaluacion?.rating ?? {};
 
   const deudas =
-    Array.isArray(evaluacion.deudas)
+    Array.isArray(evaluacion?.deudas)
       ? evaluacion.deudas
       : [];
 
   const lineas =
-    Array.isArray(evaluacion.lineas)
+    Array.isArray(evaluacion?.lineas)
       ? evaluacion.lineas
       : [];
 
@@ -555,7 +557,7 @@ function crearHtml(evaluacion) {
 
     /* =====================================================
        CABECERA
-    ===================================================== */
+    ==================================================== */
 
     .document-header {
       position: relative;
@@ -773,7 +775,7 @@ function crearHtml(evaluacion) {
     }
 
     thead {
-      display: table-row-group;
+      display: table-header-group;
 
       break-after: avoid;
       page-break-after: avoid;

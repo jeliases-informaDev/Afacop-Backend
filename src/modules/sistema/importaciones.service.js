@@ -940,42 +940,6 @@ const existingKeys = new Set(
   )
 );
 
-    // --------------------------------------------------
-    // MODO ACTUALIZACION
-    // Solo permite modificar clientes existentes.
-    // Los documentos inexistentes se omiten.
-    // --------------------------------------------------
-
-    if (job.modo === 'ACTUALIZACION') {
-      const validBatch = [];
-      const missingClients = [];
-
-      for (const item of batch) {
-        const key =
-          `${item.tipo_documento}-${item.numero_documento}`;
-
-        if (existingKeys.has(key)) {
-          validBatch.push(item);
-        } else {
-          missingClients.push(item);
-        }
-      }
-
-      omitted += missingClients.length;
-
-      for (const item of missingClients) {
-        if (details.length >= MAX_ERRORS) break;
-
-        details.push({
-          tipo: 'OMITIDO',
-          documento: item.numero_documento,
-          mensaje:
-            'El cliente no existe y no puede ser creado mediante una ACTUALIZACION.',
-        });
-      }
-
-      batch = validBatch;
-    }
 
     const existing = batch.filter(item =>
       existingKeys.has(
@@ -1521,11 +1485,7 @@ const existingKeys = new Set(
             AND c."numero_documento" = x.numero_documento
 
           ON CONFLICT ("id_cliente")
-          DO UPDATE SET
-            "producto" = EXCLUDED."producto",
-            "linea_credito" = EXCLUDED."linea_credito",
-            "estado" = EXCLUDED."estado",
-            "fecha" = EXCLUDED."fecha"
+          DO NOTHING
         `;
 
       } else {

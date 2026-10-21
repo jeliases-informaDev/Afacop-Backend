@@ -107,12 +107,9 @@ async function crearAsesor(req, res) {
     const documentoEntrante = datos.dni || datos.numero_documento || datos.DNI || datos.documento;
 
     if (!documentoEntrante || !String(documentoEntrante).trim()) {
-      return res.status(400).json({ mensaje: "El DNI es obligatorio" });
+      return res.status(400).json({ mensaje: "El documento es obligatorio" });
     }
     const dniStr = String(documentoEntrante).trim();
-    if (!DNI_REGEX.test(dniStr)) {
-      return res.status(400).json({ mensaje: "El DNI debe tener exactamente 8 dígitos numéricos" });
-    }
 
     if (!datos.nombres || !String(datos.nombres).trim()) {
       return res.status(400).json({ mensaje: "Los nombres son obligatorios" });
@@ -136,7 +133,7 @@ async function crearAsesor(req, res) {
 
     const dniDuplicado = await asesoresService.obtenerAsesorPorDni(dniStr);
     if (dniDuplicado) {
-      return res.status(400).json({ mensaje: "El DNI ya se encuentra registrado" });
+      return res.status(400).json({ mensaje: "El Documento ya se encuentra registrado" });
     }
 
     if (datos.latitud !== undefined && datos.latitud !== null && datos.latitud !== "") {
@@ -191,7 +188,7 @@ async function crearAsesor(req, res) {
 async function actualizarAsesor(req, res) {
   try {
     const { id } = req.params;
-    
+
     const datos = { ...req.body };
 
     if (datos.email !== undefined && datos.correo === undefined) {
@@ -212,19 +209,16 @@ async function actualizarAsesor(req, res) {
       });
     }
 
-    if (datos.numero_documento !== undefined) {
-      const dniStr = String(datos.numero_documento).trim();
-      if (!dniStr) {
-        return res.status(400).json({ mensaje: "El DNI no puede ser vacío" });
+    if (datos.numero_documento !== undefined || datos.dni !== undefined) {
+      const docStr = String(datos.numero_documento || datos.dni).trim();
+      if (!docStr) {
+        return res.status(400).json({ mensaje: "El Documento no puede ser vacío" });
       }
-      if (!DNI_REGEX.test(dniStr)) {
-        return res.status(400).json({ mensaje: "El DNI debe tener exactamente 8 dígitos numéricos" });
-      }
-      const dniDuplicado = await asesoresService.obtenerAsesorPorDni(dniStr);
+      const dniDuplicado = await asesoresService.obtenerAsesorPorDni(docStr);
       if (dniDuplicado && dniDuplicado.id_asesor !== parsedId) {
-        return res.status(400).json({ mensaje: "El DNI ya pertenece a otro asesor" });
+        return res.status(400).json({ mensaje: "El Documento ya pertenece a otro asesor" });
       }
-      datos.numero_documento = dniStr;
+      datos.dni = docStr;
     }
 
     if (datos.nombres !== undefined) {
@@ -429,8 +423,8 @@ async function importarAsesores(req, res) {
 async function geocodificarUbicacion(req, res, next) {
   try {
     const data = req.body.url
-      ? await asesoresService.geocodificarEnlace(req.body.url)
-      : await asesoresService.geocodificarUbicacion(req.body.latitud, req.body.longitud);
+        ? await asesoresService.geocodificarEnlace(req.body.url)
+        : await asesoresService.geocodificarUbicacion(req.body.latitud, req.body.longitud);
     return res.json({ data });
   } catch (error) {
     next(error);
@@ -445,5 +439,4 @@ export default {
   actualizarAsesor,
   actualizarEstado,
   eliminarAsesor,
-  importarAsesores,
 };

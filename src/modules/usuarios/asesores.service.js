@@ -1,6 +1,5 @@
 import prisma from '#core/config/prisma.js';
 import { env } from '#core/config/env.js';
-import * as xlsx from 'xlsx';
 
 const geocodeCache = new Map();
 let lastGeocodeRequest = 0;
@@ -148,7 +147,7 @@ async function obtenerAsesores({ page = 1, limit = 12, search = "", estado } = {
   if (search && search.trim() !== "") {
     const trimmedSearch = search.trim();
     where.OR = [
-      { dni: { contains: trimmedSearch, mode: "insensitive" } }, // <-- Corregido a 'dni'
+      { dni: { contains: trimmedSearch, mode: "insensitive" } },
       { nombres: { contains: trimmedSearch, mode: "insensitive" } },
       { apellido_paterno: { contains: trimmedSearch, mode: "insensitive" } },
       { apellido_materno: { contains: trimmedSearch, mode: "insensitive" } },
@@ -215,7 +214,7 @@ async function obtenerAsesorPorId(id) {
 async function obtenerAsesorPorDni(dni) {
   return prisma.asesor.findUnique({
     where: {
-      dni: dni, // <-- Corregido a 'dni'
+      dni: dni,
     },
   });
 }
@@ -246,7 +245,7 @@ async function crearAsesor(datos) {
 
 async function actualizarAsesor(id, datos) {
   const updateData = {};
-  if (datos.dni !== undefined) updateData.dni = datos.dni; // <-- Corregido a 'dni'
+  if (datos.dni !== undefined) updateData.dni = datos.dni;
   if (datos.nombres !== undefined) updateData.nombres = datos.nombres;
   if (datos.apellido_paterno !== undefined) updateData.apellido_paterno = datos.apellido_paterno;
   if (datos.apellido_materno !== undefined) updateData.apellido_materno = datos.apellido_materno;
@@ -303,234 +302,6 @@ async function eliminarAsesor(id) {
   return actualizarEstado(id, 'INACTIVO');
 }
 
-function normalizarHeaderKey(header) {
-  if (!header || typeof header !== "string") return "";
-  return header
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9,\s_]/g, "")
-    .replace(/\s+/g, " ");
-}
-
-function separarNombreCompleto(nombreCadena) {
-  if (!nombreCadena || typeof nombreCadena !== "string") {
-    return { apellido_paterno: "", apellido_materno: "", nombres: "" };
-  }
-
-  const str = nombreCadena.trim();
-  if (!str) {
-    return { apellido_paterno: "", apellido_materno: "", nombres: "" };
-  }
-
-  if (str.includes(",")) {
-    const partes = str.split(",");
-    const rawApellidos = partes[0] ? partes[0].trim() : "";
-    const rawNombres = partes.slice(1).join(",").trim();
-
-    const palabrasApellidos = rawApellidos ? rawApellidos.split(/\s+/).filter(Boolean) : [];
-
-    let apellido_paterno = "";
-    let apellido_materno = "";
-
-    if (palabrasApellidos.length >= 2) {
-      apellido_paterno = palabrasApellidos[0];
-      apellido_materno = palabrasApellidos.slice(1).join(" ");
-    } else if (palabrasApellidos.length === 1) {
-      apellido_paterno = palabrasApellidos[0];
-      apellido_materno = "";
-    }
-
-    const nombresFinal = rawNombres || rawApellidos;
-
-    return {
-      apellido_paterno,
-      apellido_materno,
-      nombres: nombresFinal
-    };
-  }
-
-  const palabras = str.split(/\s+/).filter(Boolean);
-
-  if (palabras.length >= 3) {
-    return {
-      apellido_paterno: palabras[0],
-      apellido_materno: palabras[1],
-      nombres: palabras.slice(2).join(" ")
-    };
-  } else if (palabras.length === 2) {
-    return {
-      apellido_paterno: palabras[0],
-      apellido_materno: palabras[1],
-      nombres: str
-    };
-  } else if (palabras.length === 1) {
-    return {
-      apellido_paterno: palabras[0],
-      apellido_materno: "",
-      nombres: palabras[0]
-    };
-  }
-
-  return { apellido_paterno: "", apellido_materno: "", nombres: str };
-}
-
-function extraerCoordenadas(rowObj) {
-  let valCombinado = null;
-  for (const key of Object.keys(rowObj)) {
-    if (key.includes("latitud") && key.includes("longitud")) {
-      valCombinado = rowObj[key];
-      break;
-    }
-  }
-
-  if (valCombinado !== null && valCombinado !== undefined && String(valCombinado).trim() !== "") {
-    const str = String(valCombinado).trim();
-    const partes = str.split(/[,;\s]+/).filter(Boolean);
-    if (partes.length >= 2) {
-      const lat = parseFloat(partes[0]);
-      const lng = parseFloat(partes[1]);
-      return {
-        latitud: isNaN(lat) ? null : lat,
-        longitud: isNaN(lng) ? null : lng
-      };
-    }
-  }
-
-  let latVal = null;
-  let lngVal = null;
-
-  for (const key of Object.keys(rowObj)) {
-    if (key === "latitud" || key === "lat") latVal = rowObj[key];
-    if (key === "longitud" || key === "lng" || key === "long") lngVal = rowObj[key];
-  }
-
-  const lat = latVal !== null && latVal !== undefined && latVal !== "" ? parseFloat(latVal) : null;
-  const lng = lngVal !== null && lngVal !== undefined && lngVal !== "" ? parseFloat(lngVal) : null;
-
-  return {
-    latitud: lat !== null && !isNaN(lat) ? lat : null,
-    longitud: lng !== null && !isNaN(lng) ? lng : null
-  };
-}
-
-async function importarAsesores(fileBuffer) {
-  const workbook = xlsx.read(fileBuffer, { type: "buffer", cellDates: true });
-  const sheetName = workbook.SheetNames[0];
-  const sheet = workbook.Sheets[sheetName];
-  const rows = xlsx.utils.sheet_to_json(sheet);
-
-  let insertados = 0;
-  let errores = 0;
-  const detalleErrores = [];
-
-  for (let i = 0; i < rows.length; i++) {
-    const rawRow = rows[i];
-    
-    const rowObj = {};
-    for (const key of Object.keys(rawRow)) {
-      const normKey = normalizarHeaderKey(key);
-      if (normKey) {
-        rowObj[normKey] = rawRow[key];
-      }
-    }
-
-    const rawDni = rowObj.dni ?? rowObj.numero_documento ?? rowObj.documento ?? rowObj.doc_identidad ?? rowObj.num_doc ?? rowObj.codigo;
-    const rawNombres = rowObj.nombres ?? rowObj.nombre ?? rowObj.colaborador ?? rowObj.asesor ?? rowObj.nombre_completo;
-    const rawApPaterno = rowObj.apellido_paterno ?? rowObj.paterno ?? rowObj.ap_paterno;
-    const rawApMaterno = rowObj.apellido_materno ?? rowObj.materno ?? rowObj.ap_materno;
-    const rawTelefono = rowObj.telefono ?? rowObj.telef ?? rowObj.celular;
-    const rawCorreo = rowObj.correo ?? rowObj.email ?? rowObj.mail;
-    const rawDistrito = rowObj.distrito ?? rowObj["distrito base"] ?? rowObj.distrito_base ?? rowObj.distritobase ?? rowObj.dist;
-    const rawEstado = rowObj.estado;
-
-    const dni = rawDni !== null && rawDni !== undefined ? String(rawDni).trim() : null;
-
-    let nombres = rawNombres !== null && rawNombres !== undefined ? String(rawNombres).trim() : "";
-    let apellido_paterno = rawApPaterno !== null && rawApPaterno !== undefined ? String(rawApPaterno).trim() : "";
-    let apellido_materno = rawApMaterno !== null && rawApMaterno !== undefined ? String(rawApMaterno).trim() : "";
-
-    if (nombres && (!apellido_paterno || apellido_paterno === "")) {
-      const parsed = separarNombreCompleto(nombres);
-      nombres = parsed.nombres;
-      apellido_paterno = parsed.apellido_paterno;
-      apellido_materno = parsed.apellido_materno;
-    }
-
-    if (!dni || !nombres) {
-      errores++;
-      detalleErrores.push({
-        fila: i + 2,
-        dni: dni || "",
-        errores: ["El DNI y los Nombres son campos obligatorios"]
-      });
-      continue;
-    }
-
-    const telefono = rawTelefono !== null && rawTelefono !== undefined && String(rawTelefono).trim() !== ""
-      ? String(rawTelefono).trim()
-      : null;
-    const correo = rawCorreo !== null && rawCorreo !== undefined && String(rawCorreo).trim() !== ""
-      ? String(rawCorreo).trim()
-      : null;
-    const distrito = rawDistrito !== null && rawDistrito !== undefined && String(rawDistrito).trim() !== ""
-      ? String(rawDistrito).trim()
-      : null;
-    const estado = rawEstado !== null && rawEstado !== undefined && String(rawEstado).trim() !== ""
-      ? String(rawEstado).trim().toUpperCase()
-      : "ACTIVO";
-
-    const { latitud, longitud } = extraerCoordenadas(rowObj);
-
-    try {
-      const existente = await prisma.asesor.findUnique({
-        where: { dni: dni } // <-- Corregido a 'dni'
-      });
-
-      if (existente) {
-        errores++;
-        detalleErrores.push({
-          fila: i + 2,
-          dni,
-          errores: [`El DNI ${dni} ya se encuentra registrado en el sistema`]
-        });
-        continue;
-      }
-
-      await prisma.asesor.create({
-        data: {
-          dni: dni, // <-- Corregido a 'dni'
-          nombres,
-          apellido_paterno: apellido_paterno || "",
-          apellido_materno: apellido_materno || "",
-          telefono,
-          correo,
-          distrito,
-          estado,
-          latitud,
-          longitud
-        }
-      });
-      insertados++;
-    } catch (err) {
-      errores++;
-      detalleErrores.push({
-        fila: i + 2,
-        dni,
-        errores: [err.message]
-      });
-    }
-  }
-
-  return {
-    insertados,
-    actualizados: 0,
-    errores,
-    detalleErrores
-  };
-}
-
 export default {
   geocodificarUbicacion,
   geocodificarEnlace,
@@ -541,5 +312,4 @@ export default {
   actualizarAsesor,
   actualizarEstado,
   eliminarAsesor,
-  importarAsesores,
 };
