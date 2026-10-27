@@ -40,7 +40,8 @@ async function obtenerStats() {
     visitasEfectivas,
     recaudacion,
     pagosHoy,
-    recaudacionHoy
+    recaudacionHoy,
+    deudaTotalAggregate
   ] = await Promise.all([
     // 1. Total Clientes
     prisma.cliente.count(),
@@ -171,6 +172,13 @@ async function obtenerStats() {
           AND v.fecha_creacion <= ${endOfDay}
       )
     `,
+
+    // 16. Total saldo de cartera (suma de deuda_cliente de todos los clientes)
+    prisma.cliente.aggregate({
+      _sum: {
+        deuda_cliente: true,
+      },
+    }),
   ]);
 
   // Formatear Clientes por Distrito al esquema que espera el frontend
@@ -217,6 +225,7 @@ async function obtenerStats() {
 
   return {
     totalClientes,
+    deudaTotal: Number(deudaTotalAggregate?._sum?.deuda_cliente || 0),
     clientesPorEstado,
     workersActivos: totalWorkers,
     totalWorkers,
