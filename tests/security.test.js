@@ -75,8 +75,9 @@ test('no se aceptan tokens mediante query string', () => {
   assert.doesNotMatch(source, /req\.query\.token/);
 });
 
-test('la carga Excel usa streaming con ExcelJS para alto volumen', () => {
+test('la carga Excel usa parser mantenido y no la dependencia vulnerable xlsx', () => {
   const packageJson = JSON.parse(fs.readFileSync(path.resolve('package.json'), 'utf8'));
+  assert.equal(packageJson.dependencies.xlsx, undefined);
   assert.ok(packageJson.dependencies.exceljs);
   const source = fs.readFileSync(path.resolve('src/modules/sistema/importaciones.service.js'), 'utf8');
   assert.match(source, /WorkbookReader/);
@@ -84,7 +85,7 @@ test('la carga Excel usa streaming con ExcelJS para alto volumen', () => {
   assert.match(source, /MAX_ROWS = 200_000/);
   assert.match(source, /pendingQueue/);
   assert.match(source, /INSERT INTO "admisiones"/);
-  assert.match(source, /ON CONFLICT \("id_cliente"\)/);
+  assert.match(source, /ON CONFLICT \("id_cliente"\)\s*DO UPDATE/);
 });
 
 test('el mapa representa la cartera mediante cálculo de distancias y filtros', () => {

@@ -107,9 +107,12 @@ async function crearAsesor(req, res) {
     const documentoEntrante = datos.dni || datos.numero_documento || datos.DNI || datos.documento;
 
     if (!documentoEntrante || !String(documentoEntrante).trim()) {
-      return res.status(400).json({ mensaje: "El documento es obligatorio" });
+      return res.status(400).json({ mensaje: "El DNI es obligatorio" });
     }
     const dniStr = String(documentoEntrante).trim();
+    if (!DNI_REGEX.test(dniStr)) {
+      return res.status(400).json({ mensaje: "El DNI debe tener exactamente 8 dígitos numéricos" });
+    }
 
     if (!datos.nombres || !String(datos.nombres).trim()) {
       return res.status(400).json({ mensaje: "Los nombres son obligatorios" });
@@ -133,7 +136,7 @@ async function crearAsesor(req, res) {
 
     const dniDuplicado = await asesoresService.obtenerAsesorPorDni(dniStr);
     if (dniDuplicado) {
-      return res.status(400).json({ mensaje: "El Documento ya se encuentra registrado" });
+      return res.status(400).json({ mensaje: "El DNI ya se encuentra registrado" });
     }
 
     if (datos.latitud !== undefined && datos.latitud !== null && datos.latitud !== "") {
@@ -212,11 +215,14 @@ async function actualizarAsesor(req, res) {
     if (datos.numero_documento !== undefined || datos.dni !== undefined) {
       const docStr = String(datos.numero_documento || datos.dni).trim();
       if (!docStr) {
-        return res.status(400).json({ mensaje: "El Documento no puede ser vacío" });
+        return res.status(400).json({ mensaje: "El DNI no puede ser vacío" });
+      }
+      if (!DNI_REGEX.test(docStr)) {
+        return res.status(400).json({ mensaje: "El DNI debe tener exactamente 8 dígitos numéricos" });
       }
       const dniDuplicado = await asesoresService.obtenerAsesorPorDni(docStr);
       if (dniDuplicado && dniDuplicado.id_asesor !== parsedId) {
-        return res.status(400).json({ mensaje: "El Documento ya pertenece a otro asesor" });
+        return res.status(400).json({ mensaje: "El DNI ya pertenece a otro asesor" });
       }
       datos.dni = docStr;
     }
@@ -388,33 +394,6 @@ async function eliminarAsesor(req, res) {
 
     return res.status(500).json({
       mensaje: "Error al inactivar el asesor",
-      error: error.message,
-    });
-  }
-}
-
-/**
- * Controlador para importar asesores desde un archivo Excel.
- * 
- * @param {import("express").Request} req 
- * @param {import("express").Response} res 
- */
-async function importarAsesores(req, res) {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        mensaje: "No se ha proporcionado ningún archivo o formato no es válido",
-      });
-    }
-
-    const resultado = await asesoresService.importarAsesores(req.file.buffer);
-
-    return res.status(200).json(resultado);
-  } catch (error) {
-    console.error("Error en importarAsesores:", error);
-
-    return res.status(500).json({
-      mensaje: "Error al importar los asesores",
       error: error.message,
     });
   }

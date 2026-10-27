@@ -112,39 +112,8 @@ async function obtenerPuntosMapa(req, res, next) {
   } catch (error) { next(error); }
 }
 
-/**
- * Controlador para importar clientes desde un archivo Excel.
- * 
- * @param {import("express").Request} req 
- * @param {import("express").Response} res 
- */
-async function importarClientes(req, res) {
-  try {
-    // 1. Validar que se haya subido un archivo
-    if (!req.file) {
-      return res.status(400).json({
-        mensaje: "No se ha proporcionado ningún archivo o formato no es válido",
-      });
-    }
-
-    // 2. Invocar al servicio
-    const resultado = await clientesService.importarClientes(req.file.buffer);
-
-    // 3. Retornar el resumen de importación
-    return res.status(200).json(resultado);
-  } catch (error) {
-    console.error("Error en importarClientes:", error);
-
-    return res.status(500).json({
-      mensaje: "Error al importar los clientes",
-      error: error.message,
-    });
-  }
-}
-
 export default {
   obtenerClientes,
   obtenerPuntosMapa,
   obtenerClientePorId,
-  importarClientes,
 };
