@@ -111,53 +111,127 @@ async function obtenerRutaOsrm(coordinates) {
 }
 
 /**
- * Obtiene todas las rutas programadas incluyendo los clientes asociados y el asesor.
+ * Obtiene las rutas programadas incluyendo los clientes asociados y el asesor, con paginación.
  * 
- * /**
- * 
- * Obtiene todas las rutas programadas incluyendo los clientes asociados y el asesor.
- * 
- * @returns {Promise<Array>}
+ * @param {Object} [params]
+ * @param {number} [params.page=1]
+ * @param {number} [params.limit=10]
+ * @param {string} [params.search]
+ * @param {string} [params.estado]
+ * @param {number} [params.id_asesor]
+ * @param {string} [params.fecha_programada]
+ * @returns {Promise<{data: Array, pagination: {page: number, limit: number, total: number, totalPages: number}}>}
  */
-async function obtenerRutas() {
-  const rutas = await prisma.ruta.findMany({
-    orderBy: {
-      fecha_programada: 'desc',
-    },
-    include: {
-      asesor: {
-        select: {
-          nombres: true,
-          apellido_paterno: true,
-          apellido_materno: true,
-          dni: true,
-          distrito: true,
-        }
-      },
-      rutas_clientes: {
-        orderBy: {
-          secuencia: 'asc',
-        },
-        include: {
-          cliente: {
-            select: {
-              id_cliente: true,
-              nombres: true,
-              apellido_paterno: true,
-              apellido_materno: true,
-              tipo_documento: true,
-              numero_documento: true,
+async function obtenerRutas({
+  page = 1,
+  limit = 10,
+  search = "",
+  estado,
+  id_asesor,
+  fecha_programada,
+} = {}) {
+  const where = {};
 
-              deuda_cliente: true,
-              deuda_castigada: true,
-              deuda_vigente: true,
-              otras_deudas: true,
+  if (id_asesor) {
+    where.id_asesor = Number(id_asesor);
+  }
+
+  if (estado && estado.trim() !== "" && estado.trim().toUpperCase() !== "TODOS") {
+    where.estado = estado.trim().toUpperCase();
+  }
+
+  if (fecha_programada && fecha_programada.trim() !== "") {
+    const fecha = new Date(fecha_programada.trim());
+    if (!isNaN(fecha.getTime())) {
+      const inicioDia = new Date(fecha);
+      inicioDia.setUTCHours(0, 0, 0, 0);
+      const finDia = new Date(fecha);
+      finDia.setUTCHours(23, 59, 59, 999);
+
+      where.fecha_programada = {
+        gte: inicioDia,
+        lte: finDia,
+      };
+    }
+  }
+
+  if (search && search.trim() !== "") {
+    const trimmedSearch = search.trim();
+    const searchConditions = [
+      { asesor: { nombres: { contains: trimmedSearch, mode: "insensitive" } } },
+      { asesor: { apellido_paterno: { contains: trimmedSearch, mode: "insensitive" } } },
+      { asesor: { apellido_materno: { contains: trimmedSearch, mode: "insensitive" } } },
+      { asesor: { dni: { contains: trimmedSearch, mode: "insensitive" } } },
+      {
+        rutas_clientes: {
+          some: {
+            cliente: {
+              OR: [
+                { nombres: { contains: trimmedSearch, mode: "insensitive" } },
+                { apellido_paterno: { contains: trimmedSearch, mode: "insensitive" } },
+                { apellido_materno: { contains: trimmedSearch, mode: "insensitive" } },
+                { numero_documento: { contains: trimmedSearch, mode: "insensitive" } },
+              ],
+            },
+          },
+        },
+      },
+    ];
+
+    if (!isNaN(Number(trimmedSearch))) {
+      searchConditions.push({ id_ruta: Number(trimmedSearch) });
+    }
+
+    where.OR = searchConditions;
+  }
+
+  const skip = (page - 1) * limit;
+  const take = limit;
+
+  const [total, rutas] = await Promise.all([
+    prisma.ruta.count({ where }),
+    prisma.ruta.findMany({
+      where,
+      skip,
+      take,
+      orderBy: {
+        fecha_programada: 'desc',
+      },
+      include: {
+        asesor: {
+          select: {
+            nombres: true,
+            apellido_paterno: true,
+            apellido_materno: true,
+            dni: true,
+            distrito: true,
+          }
+        },
+        rutas_clientes: {
+          orderBy: {
+            secuencia: 'asc',
+          },
+          include: {
+            cliente: {
+              select: {
+                id_cliente: true,
+                nombres: true,
+                apellido_paterno: true,
+                apellido_materno: true,
+                tipo_documento: true,
+                numero_documento: true,
+
+                deuda_cliente: true,
+                deuda_castigada: true,
+                deuda_vigente: true,
+                otras_deudas: true,
+              }
             }
           }
         }
       }
-    }
-  });
+    }),
+  ]);
 
   const rutasConDeuda = rutas.map(ruta => ({
     ...ruta,
@@ -166,16 +240,16 @@ async function obtenerRutas() {
       const cliente = item.cliente;
 
       const deuda_cliente =
-        Number(cliente.deuda_cliente ?? 0);
+        Number(cliente?.deuda_cliente ?? 0);
 
       const deuda_castigada =
-        Number(cliente.deuda_castigada ?? 0);
+        Number(cliente?.deuda_castigada ?? 0);
 
       const deuda_vigente =
-        Number(cliente.deuda_vigente ?? 0);
+        Number(cliente?.deuda_vigente ?? 0);
 
       const otras_deudas =
-        Number(cliente.otras_deudas ?? 0);
+        Number(cliente?.otras_deudas ?? 0);
 
       const deuda_total = Number(
         (
@@ -188,19 +262,29 @@ async function obtenerRutas() {
 
       return {
         ...item,
-        cliente: {
+        cliente: cliente ? {
           ...cliente,
           deuda_cliente,
           deuda_castigada,
           deuda_vigente,
           otras_deudas,
           deuda_total,
-        }
+        } : null
       };
     })
   }));
 
-  return rutasConDeuda;
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    data: rutasConDeuda,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+    },
+  };
 }
 
 /**

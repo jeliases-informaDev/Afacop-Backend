@@ -71,17 +71,37 @@ async function obtenerRutaOsrm(req, res) {
 }
 
 /**
- * Controlador para obtener todas las rutas.
+ * Controlador para obtener todas las rutas con paginación (10 por página por defecto).
  * 
  * @param {import("express").Request} req 
  * @param {import("express").Response} res 
  */
 async function obtenerRutas(req, res) {
   try {
-    const rutas = await rutasService.obtenerRutas();
-    return res.status(200).json({
-      data: rutas
+    const { page, limit, search, estado, id_asesor, fecha_programada } = req.query;
+
+    let parsedPage = parseInt(page, 10);
+    if (isNaN(parsedPage) || parsedPage < 1) {
+      parsedPage = 1;
+    }
+
+    let parsedLimit = parseInt(limit, 10);
+    if (isNaN(parsedLimit) || parsedLimit < 1) {
+      parsedLimit = 10;
+    } else if (parsedLimit > 100) {
+      parsedLimit = 100;
+    }
+
+    const resultado = await rutasService.obtenerRutas({
+      page: parsedPage,
+      limit: parsedLimit,
+      search: search ? String(search).trim() : undefined,
+      estado: estado ? String(estado).trim() : undefined,
+      id_asesor: id_asesor ? Number(id_asesor) : undefined,
+      fecha_programada: fecha_programada ? String(fecha_programada).trim() : undefined,
     });
+
+    return res.status(200).json(resultado);
   } catch (error) {
     console.error("Error en obtenerRutas:", error);
     return res.status(500).json({

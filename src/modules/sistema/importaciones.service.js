@@ -3,6 +3,7 @@ import ExcelJS from 'exceljs';
 import prisma from '#core/config/prisma.js';
 import { logger } from '#core/config/logger.js';
 import { resolveMapCoordinates } from '#modules/usuarios/asesores.service.js';
+import { buscarPersonasPorLote } from '#modules/clientes/personas-lookup.service.js';
 const activeJobs = new Set();
 const pendingQueue = [];
 let workerRunning = false;
@@ -1001,6 +1002,29 @@ const existingKeys = new Set(
 
       return;
     }
+        // --------------------------------------------------
+        // ENRIQUECER NOMBRES DESDE OPERADOR.PERSONAS (BUSCADOR)
+        // --------------------------------------------------
+        try {
+          const personasMap = await buscarPersonasPorLote(
+            batch.map(item => item.numero_documento)
+          );
+
+          if (personasMap && personasMap.size > 0) {
+            for (const item of batch) {
+              const docKey = String(item.numero_documento ?? '').trim().toUpperCase();
+              const persona = personasMap.get(docKey);
+              if (!persona) continue;
+
+              if (persona.nombres) item.nombres = persona.nombres;
+              if (persona.apellido_paterno) item.apellido_paterno = persona.apellido_paterno;
+              if (persona.apellido_materno) item.apellido_materno = persona.apellido_materno;
+            }
+          }
+        } catch (lookupErr) {
+          logger.warn({ err: lookupErr.message }, 'lookup_personas_batch_error');
+        }
+
         const affected = await prisma.$executeRaw`
         INSERT INTO "clientes" (
           "tipo_documento",
@@ -1107,6 +1131,31 @@ const existingKeys = new Set(
 
         ON CONFLICT ("tipo_documento", "numero_documento")
         DO UPDATE SET
+
+          -- Completar nombres y apellidos si el cliente existente los tenía vacíos
+          "nombres" = CASE
+            WHEN NULLIF(BTRIM("clientes"."nombres"), '') IS NOT NULL
+              THEN "clientes"."nombres"
+            WHEN NULLIF(BTRIM(EXCLUDED."nombres"), '') IS NOT NULL
+              THEN EXCLUDED."nombres"
+            ELSE "clientes"."nombres"
+          END,
+
+          "apellido_paterno" = CASE
+            WHEN NULLIF(BTRIM("clientes"."apellido_paterno"), '') IS NOT NULL
+              THEN "clientes"."apellido_paterno"
+            WHEN NULLIF(BTRIM(EXCLUDED."apellido_paterno"), '') IS NOT NULL
+              THEN EXCLUDED."apellido_paterno"
+            ELSE "clientes"."apellido_paterno"
+          END,
+
+          "apellido_materno" = CASE
+            WHEN NULLIF(BTRIM("clientes"."apellido_materno"), '') IS NOT NULL
+              THEN "clientes"."apellido_materno"
+            WHEN NULLIF(BTRIM(EXCLUDED."apellido_materno"), '') IS NOT NULL
+              THEN EXCLUDED."apellido_materno"
+            ELSE "clientes"."apellido_materno"
+          END,
 
           -- La deuda de la nueva asignación siempre se actualiza
           "deuda_cliente" = EXCLUDED."deuda_cliente",
