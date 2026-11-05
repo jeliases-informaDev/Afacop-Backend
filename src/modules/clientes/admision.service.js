@@ -1,5 +1,10 @@
 import prisma from "#core/config/prisma.js";
 import crypto from "node:crypto";
+import { cacheGetJson, cacheSetJson, ttlFromEnv } from "#core/cache/redis.js";
+
+// La información SBS se actualiza de forma periódica, no minuto a minuto.
+const RRCC_CACHE_PREFIX = "rrcc:evaluacion:";
+const RRCC_CACHE_TTL_SECONDS = () => ttlFromEnv("CACHE_TTL_RRCC_SECONDS", 4 * 60 * 60);
 /**
  * Obtiene la lista de admisiones con paginación...
 
@@ -97,6 +102,13 @@ async function consultarRrccApi(documento) {
     throw error;
   }
 
+  // Consulta reciente del mismo documento: se evita volver a golpear RRCC-API y SQL Server.
+  const cacheKey = RRCC_CACHE_PREFIX + documento;
+  const enCache = await cacheGetJson(cacheKey);
+  if (enCache) {
+    return enCache;
+  }
+
   let response;
 
   try {
@@ -187,6 +199,9 @@ async function consultarRrccApi(documento) {
 
     throw error;
   }
+
+  // Solo se guardan consultas exitosas: los errores y los "no encontrado" no se cachean.
+  await cacheSetJson(cacheKey, payload.data, RRCC_CACHE_TTL_SECONDS());
 
   return payload.data;
 }
@@ -367,6 +382,8 @@ async function evaluarCliente({
       ),
   };
 }
+
+export { consultarRrccApi };
 
 export default {
   obtenerAdmisiones,

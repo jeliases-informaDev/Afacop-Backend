@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buscarPersonasPorLote } from '#modules/clientes/personas-lookup.service.js';
+import { setCacheClient } from '#core/cache/redis.js';
+
+// Estas pruebas validan la consulta a la API; la caché se desactiva para que
+// no dependan de un Redis real (ver cache.test.js para el comportamiento con caché).
+setCacheClient(null);
 
 test('buscarPersonasPorLote retorna mapa vacío si recibe arreglo vacío o nulo', async () => {
   const r1 = await buscarPersonasPorLote([]);

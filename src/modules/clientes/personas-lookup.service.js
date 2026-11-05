@@ -1,4 +1,9 @@
 import { logger } from '#core/config/logger.js';
+import { cacheGetManyJson, cacheSetManyJson, ttlFromEnv } from '#core/cache/redis.js';
+
+// Nombres, apellidos y ubigeo RENIEC casi no cambian: se guardan una semana por defecto.
+const PERSONA_CACHE_PREFIX = 'persona:';
+const PERSONA_CACHE_TTL_SECONDS = () => ttlFromEnv('CACHE_TTL_PERSONAS_SECONDS', 7 * 24 * 60 * 60);
 
 /**
  * Consulta en lote a la API de RRCC / Buscador para obtener datos de personas
@@ -36,6 +41,19 @@ export async function buscarPersonasPorLote(documentos = []) {
     return map;
   }
 
+  // Documentos ya consultados antes: se resuelven desde Redis sin tocar la red ni SQL Server.
+  const cachedPersonas = await cacheGetManyJson(docsUnicos.map(doc => PERSONA_CACHE_PREFIX + doc));
+  const docsPendientes = [];
+  for (const doc of docsUnicos) {
+    const hit = cachedPersonas.get(PERSONA_CACHE_PREFIX + doc);
+    if (hit) map.set(doc, hit);
+    else docsPendientes.push(doc);
+  }
+
+  if (docsPendientes.length === 0) {
+    return map;
+  }
+
   try {
     const response = await fetch(`${baseUrl}/v1/personas/buscar-lote`, {
       method: 'POST',
@@ -45,14 +63,14 @@ export async function buscarPersonasPorLote(documentos = []) {
         Accept: 'application/json',
       },
       body: JSON.stringify({
-        documentos: docsUnicos,
+        documentos: docsPendientes,
       }),
       signal: AbortSignal.timeout(25000), // 25s timeout de seguridad
     });
 
     if (!response.ok) {
       logger.warn(
-        { status: response.status, statusText: response.statusText, count: docsUnicos.length },
+        { status: response.status, statusText: response.statusText, count: docsPendientes.length },
         'personas_lookup_batch_http_error'
       );
       return map;
@@ -65,23 +83,29 @@ export async function buscarPersonasPorLote(documentos = []) {
         ? payload.data
         : [];
 
+    const nuevos = [];
     for (const item of personas) {
       const doc = String(item.DNI ?? item.dni ?? item.documento ?? '').trim().toUpperCase();
       if (!doc) continue;
 
-      map.set(doc, {
+      const persona = {
         nombres: String(item.PRENOMBRES ?? item.prenombres ?? item.nombres ?? '').trim(),
         apellido_paterno: String(item.APE_PAT ?? item.ape_pat ?? item.apellido_paterno ?? '').trim(),
         apellido_materno: String(item.APE_MAT ?? item.ape_mat ?? item.apellido_materno ?? '').trim(),
         ubigeo: String(item.UBIGEO_RENIEC ?? item.ubigeo_reniec ?? item.ubigeo ?? '').trim() || null,
-      });
+      };
+      map.set(doc, persona);
+      nuevos.push([PERSONA_CACHE_PREFIX + doc, persona]);
     }
+
+    // Solo se guardan las personas encontradas; las no encontradas se vuelven a consultar.
+    await cacheSetManyJson(nuevos, PERSONA_CACHE_TTL_SECONDS());
 
     return map;
   } catch (error) {
     // Si la conexión falla, se cae el túnel o da timeout, registramos la advertencia pero NO interrumpimos la importación
     logger.warn(
-      { err: error.message, count: docsUnicos.length },
+      { err: error.message, count: docsPendientes.length },
       'personas_lookup_batch_failed_silently'
     );
     return map;

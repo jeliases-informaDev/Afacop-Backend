@@ -1,4 +1,9 @@
 import prisma from "#core/config/prisma.js";
+import { cached, ttlFromEnv } from "#core/cache/redis.js";
+
+// Los KPIs son globales (iguales para todos los usuarios) y se recalculan cada minuto como máximo.
+const DASHBOARD_STATS_CACHE_KEY = "dashboard:stats";
+const DASHBOARD_STATS_CACHE_TTL_SECONDS = () => ttlFromEnv("CACHE_TTL_DASHBOARD_SECONDS", 60);
 
 /**
  * Obtiene las estadísticas agregadas para el Dashboard (Fase 1 + Consolidado independiente).
@@ -6,6 +11,14 @@ import prisma from "#core/config/prisma.js";
  * @returns {Promise<Object>} KPIs y agrupaciones del dashboard.
  */
 async function obtenerStats() {
+  return cached(
+    DASHBOARD_STATS_CACHE_KEY,
+    DASHBOARD_STATS_CACHE_TTL_SECONDS(),
+    calcularStats
+  );
+}
+
+async function calcularStats() {
   // Calcular inicio y fin del día actual en la zona horaria de Perú (America/Lima, UTC-5)
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Lima",

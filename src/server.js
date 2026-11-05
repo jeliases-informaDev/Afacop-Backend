@@ -13,6 +13,7 @@ import { auditMiddleware } from '#core/middlewares/audit.middleware.js';
 import { env, allowedOrigins } from '#core/config/env.js';
 import { logger } from '#core/config/logger.js';
 import prisma from '#core/config/prisma.js';
+import { closeCache, initCache } from '#core/cache/redis.js';
 import { authMiddleware } from '#modules/auth/auth.middleware.js';
 import { errorHandler, notFoundHandler } from '#core/middlewares/error.middleware.js';
 import { roleMiddleware } from '#core/middlewares/role.middleware.js';
@@ -242,6 +243,7 @@ io.on('connection', socket => {
   socket.on('disconnect', reason => logger.info({ event: 'socket_disconnected', userId: socket.user.id, socketId: socket.id, reason }, 'realtime_session_finished'));
 });
 
+initCache();
 resumePendingJobs().catch(error => logger.error({ err: error }, 'bulk_import_resume_failed'));
 
 server.requestTimeout = 30_000;
@@ -251,6 +253,7 @@ server.keepAliveTimeout = 5_000;
 async function shutdown(signal) {
   logger.info({ signal }, 'graceful_shutdown_started');
   server.close(async () => {
+    await closeCache();
     await prisma.$disconnect();
     logger.info('graceful_shutdown_completed');
     process.exit(0);
