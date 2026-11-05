@@ -9,7 +9,19 @@ WORKDIR /app
 # Chromium y fuentes: los PDF (calificacion crediticia) se generan con Puppeteer. Puppeteer no ofrece
 # descarga de Chrome para Linux arm64 (el servidor de Oracle), asi que se usa el Chromium de Debian,
 # que existe para arm64 y x64, y se le indica la ruta con PUPPETEER_EXECUTABLE_PATH.
-RUN apt-get update  && apt-get install -y --no-install-recommends openssl ca-certificates chromium fonts-liberation fonts-dejavu-core  && rm -rf /var/lib/apt/lists/*
+#
+# La red del servidor hacia deb.debian.org es intermitente (a veces la conexion se agota). apt-get update
+# solo avisa con una advertencia y sigue, y luego install falla con "Unable to locate package" (codigo 100).
+# Por eso se reintenta todo el paso hasta 8 veces y se acortan los tiempos de espera de apt.
+RUN set -eu; \
+    printf 'Acquire::Retries "5";\nAcquire::http::Timeout "15";\nAcquire::https::Timeout "15";\n' > /etc/apt/apt.conf.d/80-reintentos; \
+    ok=0; \
+    for intento in 1 2 3 4 5 6 7 8; do \
+      if apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates chromium fonts-liberation fonts-dejavu-core; then ok=1; break; fi; \
+      echo "apt fallo (intento $intento de 8); reintentando en 5 s..."; sleep 5; \
+    done; \
+    [ "$ok" = 1 ] || { echo "apt no pudo instalar los paquetes tras 8 intentos (revisar la red hacia deb.debian.org)"; exit 1; }; \
+    rm -rf /var/lib/apt/lists/*
 
 # No descargar el Chrome de Puppeteer en npm ci (no sirve en arm64 y pesa 170 MB); usar el del sistema.
 # Chromium escribe su configuracion en XDG_*: en produccion el contenedor es de solo lectura salvo /tmp.
