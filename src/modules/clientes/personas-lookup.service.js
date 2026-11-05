@@ -2,10 +2,10 @@ import { logger } from '#core/config/logger.js';
 
 /**
  * Consulta en lote a la API de RRCC / Buscador para obtener datos de personas
- * (PRENOMBRES, APE_PAT, APE_MAT) desde la tabla Operador.Personas.
+ * (PRENOMBRES, APE_PAT, APE_MAT, UBIGEO_RENIEC) desde la tabla Operador.Personas.
  *
  * @param {string[]} documentos - Lista de números de documento (DNI, etc.)
- * @returns {Promise<Map<string, { nombres: string, apellido_paterno: string, apellido_materno: string }>>}
+ * @returns {Promise<Map<string, { nombres: string, apellido_paterno: string, apellido_materno: string, ubigeo: string|null }>>}
  */
 export async function buscarPersonasPorLote(documentos = []) {
   const map = new Map();
@@ -73,6 +73,7 @@ export async function buscarPersonasPorLote(documentos = []) {
         nombres: String(item.PRENOMBRES ?? item.prenombres ?? item.nombres ?? '').trim(),
         apellido_paterno: String(item.APE_PAT ?? item.ape_pat ?? item.apellido_paterno ?? '').trim(),
         apellido_materno: String(item.APE_MAT ?? item.ape_mat ?? item.apellido_materno ?? '').trim(),
+        ubigeo: String(item.UBIGEO_RENIEC ?? item.ubigeo_reniec ?? item.ubigeo ?? '').trim() || null,
       });
     }
 

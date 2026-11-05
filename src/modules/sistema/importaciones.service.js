@@ -1019,6 +1019,26 @@ const existingKeys = new Set(
               if (persona.nombres) item.nombres = persona.nombres;
               if (persona.apellido_paterno) item.apellido_paterno = persona.apellido_paterno;
               if (persona.apellido_materno) item.apellido_materno = persona.apellido_materno;
+
+              // Para DNI: el dato oficial del DNI es UBIGEO_RENIEC
+              if (item.tipo_documento === 'DNI' && persona.ubigeo) {
+                if (!item.ubigeo) {
+                  // Autocompletar si no vino en el Excel
+                  item.ubigeo = persona.ubigeo;
+                  if (item.estado_geocodificacion === 'SIN_DIRECCION') {
+                    item.estado_geocodificacion = 'PENDIENTE';
+                  }
+                } else if (item.ubigeo !== persona.ubigeo) {
+                  // Si difiere de RENIEC, guardar el oficial y auditar el digitado
+                  item.datos_adicionales = {
+                    ...(item.datos_adicionales || {}),
+                    ubigeo_digitado: item.ubigeo,
+                    ubigeo_oficial_reniec: persona.ubigeo,
+                    ubigeo_autocorregido: true,
+                  };
+                  item.ubigeo = persona.ubigeo;
+                }
+              }
             }
           }
         } catch (lookupErr) {

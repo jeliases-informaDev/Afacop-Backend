@@ -46,6 +46,7 @@ test('buscarPersonasPorLote procesa correctamente la respuesta de la API simulad
             PRENOMBRES: 'JUAN CARLOS',
             APE_PAT: 'PEREZ',
             APE_MAT: 'GOMEZ',
+            UBIGEO_RENIEC: '150101',
           },
           {
             DNI: '10293847',
@@ -66,11 +67,13 @@ test('buscarPersonasPorLote procesa correctamente la respuesta de la API simulad
     assert.equal(p1.nombres, 'JUAN CARLOS');
     assert.equal(p1.apellido_paterno, 'PEREZ');
     assert.equal(p1.apellido_materno, 'GOMEZ');
+    assert.equal(p1.ubigeo, '150101');
 
     const p2 = mapa.get('10293847');
     assert.equal(p2.nombres, 'MARIA ELENA');
     assert.equal(p2.apellido_paterno, 'QUISPE');
     assert.equal(p2.apellido_materno, 'FLORES');
+    assert.equal(p2.ubigeo, null);
   } finally {
     globalThis.fetch = originalFetch;
     delete process.env.RRCC_API_URL;
