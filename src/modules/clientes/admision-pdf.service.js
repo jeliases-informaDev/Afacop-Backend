@@ -939,10 +939,15 @@ function crearHtml(evaluacion = {}) {
 
 
     /* =====================================================
-       REPORTE ACTUALIZADO
+       PIE DE REPORTE: PERÍODO Y USUARIO
     ===================================================== */
 
-    .report-updated {
+    .report-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+
       margin-top: 2px;
 
       color: #727c86;
@@ -952,6 +957,28 @@ function crearHtml(evaluacion = {}) {
 
       break-inside: avoid;
       page-break-inside: avoid;
+    }
+
+    .report-updated {
+      flex-shrink: 0;
+
+      color: #727c86;
+
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .report-user {
+      max-width: 65%;
+
+      color: #727c86;
+
+      font-size: 11px;
+      font-weight: 600;
+      text-align: right;
+
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
 
   </style>
@@ -1248,15 +1275,25 @@ function crearHtml(evaluacion = {}) {
 
 
     <!-- ===================================================
-         PERÍODO
+         PIE DE REPORTE: PERÍODO Y USUARIO
     ==================================================== -->
 
-    <div class="report-updated">
-      Reporte actualizado con el periodo ${escapeHtml(
-        formatPeriodo(
-          evaluacion.periodo
-        )
-      )}
+    <div class="report-footer">
+      <div class="report-updated">
+        Reporte actualizado con el periodo ${escapeHtml(
+          formatPeriodo(
+            evaluacion.periodo
+          )
+        )}
+      </div>
+
+      <div class="report-user">
+        Consultado por: ${escapeHtml(
+          formatNombre(
+            evaluacion.usuarioConsulta || evaluacion.consultadoPor || "—"
+          )
+        )}
+      </div>
     </div>
 
 

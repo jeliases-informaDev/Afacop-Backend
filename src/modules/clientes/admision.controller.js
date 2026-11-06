@@ -1,5 +1,6 @@
 import admisionService from "./admision.service.js";
 import { generarPdfEvaluacion, } from "./admision-pdf.service.js";
+import prisma from "#core/config/prisma.js";
 
 /**
  * Controlador para obtener el listado de admisiones.
@@ -135,10 +136,42 @@ async function exportarPdf(
       });
     }
 
+    let usuarioConsulta =
+      evaluacion.usuarioConsulta ||
+      evaluacion.consultadoPor;
+
+    if (!usuarioConsulta && req.user?.id) {
+      try {
+        const actor = await prisma.usuario.findUnique({
+          where: { id_usuario: req.user.id },
+          select: {
+            username: true,
+            nombres: true,
+            apellidos: true,
+            asesor: {
+              select: {
+                nombres: true,
+                apellido_paterno: true,
+              },
+            },
+          },
+        });
+
+        if (actor) {
+          usuarioConsulta = actor.asesor
+            ? `${actor.asesor.nombres} ${actor.asesor.apellido_paterno}`.trim()
+            : [actor.nombres, actor.apellidos].filter(Boolean).join(" ").trim() || actor.username;
+        }
+      } catch {
+        usuarioConsulta = req.user.username;
+      }
+    }
+
     const pdf =
       await generarPdfEvaluacion({
         ...evaluacion,
         documento,
+        usuarioConsulta: usuarioConsulta || req.user?.username || null,
       });
 
     const pdfBuffer =

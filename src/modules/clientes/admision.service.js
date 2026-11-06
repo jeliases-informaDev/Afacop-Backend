@@ -306,6 +306,38 @@ async function evaluarCliente({
     );
 
   // --------------------------------------------------
+  // IDENTIFICAR USUARIO QUE REALIZA LA CONSULTA
+  // --------------------------------------------------
+
+  let usuarioConsulta = null;
+  if (actorId) {
+    try {
+      const actor = await prisma.usuario.findUnique({
+        where: { id_usuario: actorId },
+        select: {
+          username: true,
+          nombres: true,
+          apellidos: true,
+          asesor: {
+            select: {
+              nombres: true,
+              apellido_paterno: true,
+            },
+          },
+        },
+      });
+
+      if (actor) {
+        usuarioConsulta = actor.asesor
+          ? `${actor.asesor.nombres} ${actor.asesor.apellido_paterno}`.trim()
+          : [actor.nombres, actor.apellidos].filter(Boolean).join(" ").trim() || actor.username;
+      }
+    } catch {
+      usuarioConsulta = null;
+    }
+  }
+
+  // --------------------------------------------------
   // GENERAR TOKEN DE CONSULTA
   // --------------------------------------------------
 
@@ -380,6 +412,9 @@ async function evaluarCliente({
       Number(
         totalLineaCredito.toFixed(2)
       ),
+
+    usuarioConsulta:
+      usuarioConsulta || null,
   };
 }
 
